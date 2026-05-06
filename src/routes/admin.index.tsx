@@ -14,6 +14,7 @@ import {
   adminUpdateSettings,
   adminRecomputeAll,
 } from "@/server/admin.functions";
+import { googleSearchPlace, googleFetchRating } from "@/server/google-places.functions";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Admin – PoolList" }, { name: "robots", content: "noindex" }] }),
