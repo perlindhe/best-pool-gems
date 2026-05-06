@@ -68,29 +68,41 @@ function AboutPage() {
           </p>
           <ol className="list-inside list-decimal space-y-3">
             <li>
-              <strong className="text-foreground">Vibe</strong> — the
-              atmosphere, music, light, view, and overall feeling at the pool.
-              Does it have a soul?
+              <strong className="text-foreground">Vibe & setting</strong> —
+              views, greenery, atmosphere, light, and music. Does the pool
+              have a soul?
             </li>
             <li>
               <strong className="text-foreground">Lounging space</strong> —
-              loungers, cabanas, shade, deck size, and how easy it is to claim
-              a spot at noon on a Saturday.
+              loungers, cabanas, shade, and deck size. Does it feel roomy
+              even at peak hours?
             </li>
             <li>
-              <strong className="text-foreground">Service</strong> — pool
-              attendants, drink and food service, towels, speed, and friendliness.
+              <strong className="text-foreground">Service</strong> — bar and
+              food service, towels, sunbeds, and the speed and friendliness
+              of pool attendants.
             </li>
             <li>
-              <strong className="text-foreground">Uniqueness</strong> — would
-              you remember this pool a year later? Skyline edge, mosaic floor,
-              cliffside drop, jungle canopy — what makes it unlike anywhere else?
+              <strong className="text-foreground">Uniqueness</strong> — the
+              wow factor. Skyline edge, mosaic floor, cliffside drop, jungle
+              canopy — what makes it unlike anywhere else?
+            </li>
+            <li>
+              <strong className="text-foreground">Overall pool-first feel</strong>{" "}
+              — is the pool a real highlight of the stay, or just an amenity
+              tucked in a basement?
             </li>
           </ol>
           <p>
             Each criterion is scored 0–10 and the Pool Score is the average,
             rounded to one decimal. We re-score every hotel before each summer
             season.
+          </p>
+          <p className="rounded-md border border-border/60 bg-surface/60 p-4 text-base text-muted-foreground">
+            <strong className="text-foreground">A small note:</strong> pool
+            details can be seasonal — opening dates, hours, and access for
+            non-guests change year to year. Always double-check pool info on
+            your booking page before you book.
           </p>
         </div>
 
