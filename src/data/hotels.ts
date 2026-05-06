@@ -40,6 +40,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Drömläge vid stranden",
     description:
       "Två pooler i en frodig trädgård med direkt utsikt över Medelhavet. Cabanas, cocktails och stadens snyggaste solnedgångar.",
+    vibe: "Resort i storstaden — palmer, havsbris, lugn elegans",
+    bestTime: "Juni–september, sen eftermiddag",
+    tags: ["resort", "spa"],
   },
   {
     rank: 2,
@@ -51,6 +54,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Bästa rooftop-vibet",
     description:
       "Mörkblå mosaikpool på taket, palmer och DJ vid solnedgång. Mitt i El Born – nära alla tapasbarer.",
+    vibe: "Cool, ung, DJ-set vid solnedgång",
+    bestTime: "Juli–augusti, 18–22",
+    tags: ["rooftop"],
   },
   {
     rank: 3,
@@ -62,6 +68,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Lyx på Passeig de Gràcia",
     description:
       "Två pooler i takträdgården Terrat med 360°-utsikt över Eixample. Spa i världsklass och Michelin-mat på samma adress.",
+    vibe: "Tyst, vuxet, världsklass-service",
+    bestTime: "Året runt — uppvärmd",
+    tags: ["rooftop", "spa", "quiet"],
   },
   {
     rank: 4,
@@ -73,6 +82,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Bohemisk takbar",
     description:
       "En liten men välkurerad pool på taket med utsikt mot Gaudís La Pedrera. Cool design, ung publik, perfekt för långa eftermiddagar.",
+    vibe: "Bohemiskt, designkänsla, ung publik",
+    bestTime: "Maj–oktober, eftermiddag",
+    tags: ["rooftop"],
   },
   {
     rank: 5,
@@ -84,6 +96,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Festigast vid havet",
     description:
       "Det ikoniska seglet vid stranden. Wet Deck-poolen är stadens partyepicentrum varje sommarlördag.",
+    vibe: "Party, högt tempo, stora grupper",
+    bestTime: "Lördagar juni–augusti",
+    tags: ["resort"],
   },
   {
     rank: 6,
@@ -95,6 +110,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Sky Bar 26",
     description:
       "Takpool på 26:e våningen med 360°-vy över Barcelona. Modern, minimalistisk lyx en bit från turistkrysset.",
+    vibe: "Modernt, minimalistiskt, lugnare",
+    bestTime: "Juni–september, kvällstid",
+    tags: ["rooftop", "spa", "quiet"],
   },
   {
     rank: 7,
@@ -106,6 +124,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Stilrent boutique",
     description:
       "Liten plunge-pool på taket med DJ:s om kvällen. Diskret lyx ett stenkast från Casa Batlló.",
+    vibe: "Boutique, intimt, stilrent",
+    bestTime: "Maj–september, eftermiddag",
+    tags: ["rooftop", "quiet"],
   },
   {
     rank: 8,
@@ -117,6 +138,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Klassisk Eixample-charm",
     description:
       "En liten plunge-pool på taket av ett 1800-talspalats. Frukost på terrassen, drinkar i biblioteket.",
+    vibe: "Klassiskt, lugnt, vuxet",
+    bestTime: "Maj–oktober, morgon",
+    tags: ["quiet"],
   },
   {
     rank: 9,
@@ -128,6 +152,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Rooftop-fest",
     description:
       "Pool och takbar på 11:e våningen, en av stadens mest aktiva sommarkvällar. Bra läge i centrala Eixample.",
+    vibe: "Energiskt, drink-fokus, fest",
+    bestTime: "Torsdag–lördag kväll",
+    tags: ["rooftop"],
   },
   {
     rank: 10,
@@ -139,6 +166,9 @@ export const barcelonaTop10: Hotel[] = [
     highlight: "Bästa läget i Gamla stan",
     description:
       "Liten takpool mitt i gotiska kvarteren. Inte den största poolen, men oslagbar känsla under stjärnorna.",
+    vibe: "Charmig, romantisk, kvällsljus",
+    bestTime: "Juni–september, efter 19",
+    tags: ["rooftop", "quiet"],
   },
 ];
 
