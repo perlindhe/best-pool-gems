@@ -13,7 +13,9 @@ import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolic
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
@@ -35,50 +37,83 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CitySlugRoute = CitySlugRouteImport.update({
+  id: '/$citySlug',
+  path: '/$citySlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
+  id: '/$articleSlug',
+  path: '/$articleSlug',
+  getParentRoute: () => CitySlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/cookies' | '/disclosure' | '/integritetspolicy'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/cookies' | '/disclosure' | '/integritetspolicy'
-  id:
-    | '__root__'
+  fullPaths:
     | '/'
+    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/$citySlug/$articleSlug'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/$citySlug'
+    | '/about'
+    | '/cookies'
+    | '/disclosure'
+    | '/integritetspolicy'
+    | '/$citySlug/$articleSlug'
+  id:
+    | '__root__'
+    | '/'
+    | '/$citySlug'
+    | '/about'
+    | '/cookies'
+    | '/disclosure'
+    | '/integritetspolicy'
+    | '/$citySlug/$articleSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CitySlugRoute: typeof CitySlugRouteWithChildren
   AboutRoute: typeof AboutRoute
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
@@ -115,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$citySlug': {
+      id: '/$citySlug'
+      path: '/$citySlug'
+      fullPath: '/$citySlug'
+      preLoaderRoute: typeof CitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -122,11 +164,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$citySlug/$articleSlug': {
+      id: '/$citySlug/$articleSlug'
+      path: '/$articleSlug'
+      fullPath: '/$citySlug/$articleSlug'
+      preLoaderRoute: typeof CitySlugArticleSlugRouteImport
+      parentRoute: typeof CitySlugRoute
+    }
   }
 }
 
+interface CitySlugRouteChildren {
+  CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
+}
+
+const CitySlugRouteChildren: CitySlugRouteChildren = {
+  CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
+}
+
+const CitySlugRouteWithChildren = CitySlugRoute._addFileChildren(
+  CitySlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CitySlugRoute: CitySlugRouteWithChildren,
   AboutRoute: AboutRoute,
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
@@ -135,12 +197,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

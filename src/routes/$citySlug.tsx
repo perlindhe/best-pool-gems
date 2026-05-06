@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { getCity, cities, getCityGuides, type Hotel } from "@/data/hotels";
+import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
@@ -93,7 +93,7 @@ function CityHub() {
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Guider</p>
           <h2 className="mt-3 font-display text-5xl tracking-wide">Alla {city.name}-guider</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {cityGuides.map((g) => (
+            {cityGuides.map((g: Guide) => (
               <Link
                 key={g.slug}
                 to="/$citySlug/$articleSlug"
