@@ -396,21 +396,86 @@ function HotelDetail({
 
 function MappingRow({ mapping, onSave, onDelete }: { mapping: AnyRec; onSave: (p: AnyRec) => void; onDelete: (id: string) => void }) {
   const [m, setM] = useState(mapping);
+  const [searching, setSearching] = useState(false);
+  const [results, setResults] = useState<AnyRec[] | null>(null);
+  const [fetchMsg, setFetchMsg] = useState<string | null>(null);
   useEffect(() => setM(mapping), [mapping.id, mapping.source]);
+
+  const isGoogle = m.source === "google";
+
+  const doSearch = async () => {
+    setSearching(true);
+    setFetchMsg(null);
+    try {
+      const r = await googleSearchPlace({ data: { query: m._searchQuery || "" } });
+      setResults(r.results);
+    } catch (e) {
+      setFetchMsg((e as Error).message);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const doFetch = async () => {
+    setFetchMsg(null);
+    try {
+      const r = await googleFetchRating({ data: { hotel_id: m.hotel_id, place_id: m.source_place_id } });
+      setFetchMsg(`✓ ${r.rating}★ (${r.count} reviews) — sparat & metascore omräknad`);
+    } catch (e) {
+      setFetchMsg((e as Error).message);
+    }
+  };
+
   return (
-    <div className="grid items-center gap-2 rounded border border-border/40 p-2 sm:grid-cols-[120px_1fr_1fr_auto]">
-      <span className="text-xs uppercase tracking-[0.2em] text-primary">{m.source}</span>
-      {input({ placeholder: "place_id", value: m.source_place_id ?? "", onChange: (e) => setM({ ...m, source_place_id: e.target.value }) })}
-      {input({ placeholder: "url", value: m.source_url ?? "", onChange: (e) => setM({ ...m, source_url: e.target.value }) })}
-      <div className="flex gap-1">
-        <button
-          onClick={() => onSave({ id: m.id, hotel_id: m.hotel_id, source: m.source, source_place_id: m.source_place_id, source_url: m.source_url, is_active: m.is_active ?? true })}
-          className="rounded bg-primary/20 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary"
-        >Spara</button>
-        {m.id && (
-          <button onClick={() => onDelete(m.id)} className="rounded border border-destructive/40 px-3 py-1 text-xs uppercase tracking-[0.2em] text-destructive">×</button>
-        )}
+    <div className="rounded border border-border/40 p-2">
+      <div className="grid items-center gap-2 sm:grid-cols-[120px_1fr_1fr_auto]">
+        <span className="text-xs uppercase tracking-[0.2em] text-primary">{m.source}</span>
+        {input({ placeholder: "place_id", value: m.source_place_id ?? "", onChange: (e) => setM({ ...m, source_place_id: e.target.value }) })}
+        {input({ placeholder: "url", value: m.source_url ?? "", onChange: (e) => setM({ ...m, source_url: e.target.value }) })}
+        <div className="flex gap-1">
+          <button
+            onClick={() => onSave({ id: m.id, hotel_id: m.hotel_id, source: m.source, source_place_id: m.source_place_id, source_url: m.source_url, is_active: m.is_active ?? true })}
+            className="rounded bg-primary/20 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary"
+          >Spara</button>
+          {m.id && (
+            <button onClick={() => onDelete(m.id)} className="rounded border border-destructive/40 px-3 py-1 text-xs uppercase tracking-[0.2em] text-destructive">×</button>
+          )}
+        </div>
       </div>
+      {isGoogle && (
+        <div className="mt-2 space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {input({ placeholder: "Sök hotellnamn + stad…", value: m._searchQuery ?? "", onChange: (e) => setM({ ...m, _searchQuery: e.target.value }), className: "flex-1 min-w-48" })}
+            <button onClick={doSearch} disabled={searching || !m._searchQuery} className="rounded border border-primary/40 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary">
+              {searching ? "Söker…" : "Sök Place ID"}
+            </button>
+            {m.source_place_id && (
+              <button onClick={doFetch} className="rounded bg-primary px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary-foreground">
+                Hämta Google-betyg
+              </button>
+            )}
+          </div>
+          {results && (
+            <ul className="space-y-1 rounded border border-border/40 bg-background p-2 text-xs">
+              {results.length === 0 && <li className="text-muted-foreground">Inga träffar</li>}
+              {results.map((r: AnyRec) => (
+                <li key={r.id} className="flex items-center justify-between gap-2">
+                  <div>
+                    <div className="font-medium">{r.displayName?.text} {r.rating && <span className="text-muted-foreground">· {r.rating}★ ({r.userRatingCount})</span>}</div>
+                    <div className="text-muted-foreground">{r.formattedAddress}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground">{r.id}</div>
+                  </div>
+                  <button
+                    onClick={() => { setM({ ...m, source_place_id: r.id, source_url: r.googleMapsUri ?? m.source_url }); setResults(null); }}
+                    className="rounded bg-primary/20 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-primary"
+                  >Välj</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {fetchMsg && <div className="text-xs text-muted-foreground">{fetchMsg}</div>}
+        </div>
+      )}
     </div>
   );
 }
