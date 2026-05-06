@@ -9,10 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
+import { Route as DisclosureRouteImport } from './routes/disclosure'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GuiderSplatRouteImport } from './routes/guider.$'
 import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 
+const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
+  id: '/integritetspolicy',
+  path: '/integritetspolicy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DisclosureRoute = DisclosureRouteImport.update({
+  id: '/disclosure',
+  path: '/disclosure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -21,6 +40,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiderSplatRoute = GuiderSplatRouteImport.update({
+  id: '/guider/$',
+  path: '/guider/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CitiesSlugRoute = CitiesSlugRouteImport.update({
@@ -32,35 +56,94 @@ const CitiesSlugRoute = CitiesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/cookies': typeof CookiesRoute
+  '/disclosure': typeof DisclosureRoute
+  '/integritetspolicy': typeof IntegritetspolicyRoute
   '/cities/$slug': typeof CitiesSlugRoute
+  '/guider/$': typeof GuiderSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/cookies': typeof CookiesRoute
+  '/disclosure': typeof DisclosureRoute
+  '/integritetspolicy': typeof IntegritetspolicyRoute
   '/cities/$slug': typeof CitiesSlugRoute
+  '/guider/$': typeof GuiderSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/cookies': typeof CookiesRoute
+  '/disclosure': typeof DisclosureRoute
+  '/integritetspolicy': typeof IntegritetspolicyRoute
   '/cities/$slug': typeof CitiesSlugRoute
+  '/guider/$': typeof GuiderSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/cities/$slug'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/cookies'
+    | '/disclosure'
+    | '/integritetspolicy'
+    | '/cities/$slug'
+    | '/guider/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/cities/$slug'
-  id: '__root__' | '/' | '/about' | '/cities/$slug'
+  to:
+    | '/'
+    | '/about'
+    | '/cookies'
+    | '/disclosure'
+    | '/integritetspolicy'
+    | '/cities/$slug'
+    | '/guider/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/cookies'
+    | '/disclosure'
+    | '/integritetspolicy'
+    | '/cities/$slug'
+    | '/guider/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  CookiesRoute: typeof CookiesRoute
+  DisclosureRoute: typeof DisclosureRoute
+  IntegritetspolicyRoute: typeof IntegritetspolicyRoute
   CitiesSlugRoute: typeof CitiesSlugRoute
+  GuiderSplatRoute: typeof GuiderSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/integritetspolicy': {
+      id: '/integritetspolicy'
+      path: '/integritetspolicy'
+      fullPath: '/integritetspolicy'
+      preLoaderRoute: typeof IntegritetspolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disclosure': {
+      id: '/disclosure'
+      path: '/disclosure'
+      fullPath: '/disclosure'
+      preLoaderRoute: typeof DisclosureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -73,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guider/$': {
+      id: '/guider/$'
+      path: '/guider/$'
+      fullPath: '/guider/$'
+      preLoaderRoute: typeof GuiderSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cities/$slug': {
@@ -88,7 +178,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  CookiesRoute: CookiesRoute,
+  DisclosureRoute: DisclosureRoute,
+  IntegritetspolicyRoute: IntegritetspolicyRoute,
   CitiesSlugRoute: CitiesSlugRoute,
+  GuiderSplatRoute: GuiderSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
