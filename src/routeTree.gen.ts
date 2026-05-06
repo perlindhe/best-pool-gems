@@ -17,6 +17,8 @@ import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
+import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
+import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
 
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
@@ -59,6 +61,16 @@ const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
   path: '/$articleSlug',
   getParentRoute: () => CitySlugRoute,
 } as any)
+const ApiPublicHotelsRoute = ApiPublicHotelsRouteImport.update({
+  id: '/api/public/hotels',
+  path: '/api/public/hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ApiPublicHotelsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -69,6 +81,8 @@ export interface FileRoutesByFullPath {
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
+  '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -79,6 +93,8 @@ export interface FileRoutesByTo {
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
+  '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -90,6 +106,8 @@ export interface FileRoutesById {
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
+  '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -102,6 +120,8 @@ export interface FileRouteTypes {
     | '/integritetspolicy'
     | '/$citySlug/$articleSlug'
     | '/barcelona/luxury-pool-hotels'
+    | '/api/public/hotels'
+    | '/api/public/hotels/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -112,6 +132,8 @@ export interface FileRouteTypes {
     | '/integritetspolicy'
     | '/$citySlug/$articleSlug'
     | '/barcelona/luxury-pool-hotels'
+    | '/api/public/hotels'
+    | '/api/public/hotels/$slug'
   id:
     | '__root__'
     | '/'
@@ -122,6 +144,8 @@ export interface FileRouteTypes {
     | '/integritetspolicy'
     | '/$citySlug/$articleSlug'
     | '/barcelona/luxury-pool-hotels'
+    | '/api/public/hotels'
+    | '/api/public/hotels/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +156,7 @@ export interface RootRouteChildren {
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
+  ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +217,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CitySlugArticleSlugRouteImport
       parentRoute: typeof CitySlugRoute
     }
+    '/api/public/hotels': {
+      id: '/api/public/hotels'
+      path: '/api/public/hotels'
+      fullPath: '/api/public/hotels'
+      preLoaderRoute: typeof ApiPublicHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hotels/$slug': {
+      id: '/api/public/hotels/$slug'
+      path: '/$slug'
+      fullPath: '/api/public/hotels/$slug'
+      preLoaderRoute: typeof ApiPublicHotelsSlugRouteImport
+      parentRoute: typeof ApiPublicHotelsRoute
+    }
   }
 }
 
@@ -207,6 +246,18 @@ const CitySlugRouteWithChildren = CitySlugRoute._addFileChildren(
   CitySlugRouteChildren,
 )
 
+interface ApiPublicHotelsRouteChildren {
+  ApiPublicHotelsSlugRoute: typeof ApiPublicHotelsSlugRoute
+}
+
+const ApiPublicHotelsRouteChildren: ApiPublicHotelsRouteChildren = {
+  ApiPublicHotelsSlugRoute: ApiPublicHotelsSlugRoute,
+}
+
+const ApiPublicHotelsRouteWithChildren = ApiPublicHotelsRoute._addFileChildren(
+  ApiPublicHotelsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CitySlugRoute: CitySlugRouteWithChildren,
@@ -215,7 +266,17 @@ const rootRouteChildren: RootRouteChildren = {
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
+  ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
