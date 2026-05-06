@@ -15,6 +15,7 @@ import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
@@ -47,6 +48,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BarcelonaLuxuryPoolHotelsRoute =
+  BarcelonaLuxuryPoolHotelsRouteImport.update({
+    id: '/barcelona/luxury-pool-hotels',
+    path: '/barcelona/luxury-pool-hotels',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
   id: '/$articleSlug',
   path: '/$articleSlug',
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
+  '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +78,7 @@ export interface FileRoutesByTo {
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
+  '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +89,7 @@ export interface FileRoutesById {
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
+  '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +101,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/integritetspolicy'
     | '/$citySlug/$articleSlug'
+    | '/barcelona/luxury-pool-hotels'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +111,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/integritetspolicy'
     | '/$citySlug/$articleSlug'
+    | '/barcelona/luxury-pool-hotels'
   id:
     | '__root__'
     | '/'
@@ -109,6 +121,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/integritetspolicy'
     | '/$citySlug/$articleSlug'
+    | '/barcelona/luxury-pool-hotels'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,6 +131,7 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
+  BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -164,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/barcelona/luxury-pool-hotels': {
+      id: '/barcelona/luxury-pool-hotels'
+      path: '/barcelona/luxury-pool-hotels'
+      fullPath: '/barcelona/luxury-pool-hotels'
+      preLoaderRoute: typeof BarcelonaLuxuryPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$citySlug/$articleSlug': {
       id: '/$citySlug/$articleSlug'
       path: '/$articleSlug'
@@ -193,6 +214,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
+  BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
