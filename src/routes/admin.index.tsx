@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
 import { SiteHeader } from "@/components/SiteHeader";
+
+installServerFnAuth();
 import {
   adminListHotels,
   adminGetHotel,
