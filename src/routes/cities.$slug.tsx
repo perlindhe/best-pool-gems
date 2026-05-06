@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { getCity, cities } from "@/data/hotels";
+import { getCity, cities, type Hotel } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
@@ -78,7 +78,7 @@ function CityPage() {
 
       {/* Hotels list */}
       <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
-        {city.hotels.map((h) => (
+        {city.hotels.map((h: Hotel) => (
           <HotelCard key={h.rank} hotel={h} />
         ))}
       </section>
