@@ -21,6 +21,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
+import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
@@ -83,6 +84,12 @@ const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ApiPublicHotelsRoute,
 } as any)
+const ApiPublicHooksRefreshGoogleRatingsRoute =
+  ApiPublicHooksRefreshGoogleRatingsRouteImport.update({
+    id: '/api/public/hooks/refresh-google-ratings',
+    path: '/api/public/hooks/refresh-google-ratings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
+  '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -110,6 +118,7 @@ export interface FileRoutesByTo {
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
+  '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesById {
@@ -125,6 +134,7 @@ export interface FileRoutesById {
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
+  '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRouteTypes {
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/barcelona/luxury-pool-hotels'
     | '/admin/'
     | '/api/public/hotels'
+    | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hotels/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/barcelona/luxury-pool-hotels'
     | '/admin'
     | '/api/public/hotels'
+    | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hotels/$slug'
   id:
     | '__root__'
@@ -169,6 +181,7 @@ export interface FileRouteTypes {
     | '/barcelona/luxury-pool-hotels'
     | '/admin/'
     | '/api/public/hotels'
+    | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hotels/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +196,7 @@ export interface RootRouteChildren {
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
+  ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -271,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHotelsSlugRouteImport
       parentRoute: typeof ApiPublicHotelsRoute
     }
+    '/api/public/hooks/refresh-google-ratings': {
+      id: '/api/public/hooks/refresh-google-ratings'
+      path: '/api/public/hooks/refresh-google-ratings'
+      fullPath: '/api/public/hooks/refresh-google-ratings'
+      preLoaderRoute: typeof ApiPublicHooksRefreshGoogleRatingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -309,6 +330,8 @@ const rootRouteChildren: RootRouteChildren = {
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
+  ApiPublicHooksRefreshGoogleRatingsRoute:
+    ApiPublicHooksRefreshGoogleRatingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
