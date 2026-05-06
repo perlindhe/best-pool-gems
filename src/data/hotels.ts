@@ -3,6 +3,8 @@ import parisImg from "@/assets/paris.jpg";
 import londonImg from "@/assets/london.jpg";
 import newyorkImg from "@/assets/newyork.jpg";
 
+export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
+
 export type Hotel = {
   rank: number;
   name: string;
@@ -12,6 +14,9 @@ export type Hotel = {
   poolType: string;
   highlight: string;
   description: string;
+  vibe?: string;
+  bestTime?: string;
+  tags?: HotelTag[];
 };
 
 export type City = {
