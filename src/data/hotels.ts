@@ -184,7 +184,9 @@ export const getCity = (slug: string) => cities.find((c) => c.slug === slug);
 /* ---------------- Guides / articles ---------------- */
 
 export type Guide = {
-  slug: string;
+  slug: string; // e.g. "barcelona/luxury-pool-hotels"
+  citySlug: string;
+  articleSlug: string;
   title: string;
   city: string;
   category: string;
@@ -196,7 +198,9 @@ export type Guide = {
 
 export const guides: Guide[] = [
   {
-    slug: "barcelona/topp-10-lyxhotell-pool",
+    slug: "barcelona/luxury-pool-hotels",
+    citySlug: "barcelona",
+    articleSlug: "luxury-pool-hotels",
     title: "Topp 10 lyxhotell med bäst pooler i Barcelona",
     city: "Barcelona",
     category: "Stor guide",
@@ -207,7 +211,9 @@ export const guides: Guide[] = [
     image: barcelonaImg,
   },
   {
-    slug: "barcelona/rooftop-pooler",
+    slug: "barcelona/rooftop-pool-hotels",
+    citySlug: "barcelona",
+    articleSlug: "rooftop-pool-hotels",
     title: "Bästa rooftop-pooler i Barcelona",
     city: "Barcelona",
     category: "Rooftop",
@@ -218,7 +224,9 @@ export const guides: Guide[] = [
     image: barcelonaImg,
   },
   {
-    slug: "barcelona/poolhotell-nara-stranden",
+    slug: "barcelona/pool-hotels-near-beach",
+    citySlug: "barcelona",
+    articleSlug: "pool-hotels-near-beach",
     title: "Poolhotell nära stranden i Barcelona",
     city: "Barcelona",
     category: "Strand",
@@ -229,7 +237,9 @@ export const guides: Guide[] = [
     image: barcelonaImg,
   },
   {
-    slug: "barcelona/poolsasong-oppettider",
+    slug: "barcelona/pool-season",
+    citySlug: "barcelona",
+    articleSlug: "pool-season",
     title: "När är poolerna öppna i Barcelona? Säsong & öppettider",
     city: "Barcelona",
     category: "Praktiskt",
@@ -242,3 +252,7 @@ export const guides: Guide[] = [
 ];
 
 export const getGuide = (slug: string) => guides.find((g) => g.slug === slug);
+export const getGuideByParts = (citySlug: string, articleSlug: string) =>
+  guides.find((g) => g.citySlug === citySlug && g.articleSlug === articleSlug);
+export const getCityGuides = (citySlug: string) =>
+  guides.filter((g) => g.citySlug === citySlug);
