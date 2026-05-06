@@ -14,8 +14,6 @@ import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as GuiderSplatRouteImport } from './routes/guider.$'
-import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
@@ -42,16 +40,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuiderSplatRoute = GuiderSplatRouteImport.update({
-  id: '/guider/$',
-  path: '/guider/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CitiesSlugRoute = CitiesSlugRouteImport.update({
-  id: '/cities/$slug',
-  path: '/cities/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,8 +47,6 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
-  '/cities/$slug': typeof CitiesSlugRoute
-  '/guider/$': typeof GuiderSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +54,6 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
-  '/cities/$slug': typeof CitiesSlugRoute
-  '/guider/$': typeof GuiderSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,28 +62,12 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
-  '/cities/$slug': typeof CitiesSlugRoute
-  '/guider/$': typeof GuiderSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/cookies'
-    | '/disclosure'
-    | '/integritetspolicy'
-    | '/cities/$slug'
-    | '/guider/$'
+  fullPaths: '/' | '/about' | '/cookies' | '/disclosure' | '/integritetspolicy'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/cookies'
-    | '/disclosure'
-    | '/integritetspolicy'
-    | '/cities/$slug'
-    | '/guider/$'
+  to: '/' | '/about' | '/cookies' | '/disclosure' | '/integritetspolicy'
   id:
     | '__root__'
     | '/'
@@ -107,8 +75,6 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
-    | '/cities/$slug'
-    | '/guider/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,8 +83,6 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
-  CitiesSlugRoute: typeof CitiesSlugRoute
-  GuiderSplatRoute: typeof GuiderSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -158,20 +122,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/guider/$': {
-      id: '/guider/$'
-      path: '/guider/$'
-      fullPath: '/guider/$'
-      preLoaderRoute: typeof GuiderSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cities/$slug': {
-      id: '/cities/$slug'
-      path: '/cities/$slug'
-      fullPath: '/cities/$slug'
-      preLoaderRoute: typeof CitiesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -181,9 +131,16 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
-  CitiesSlugRoute: CitiesSlugRoute,
-  GuiderSplatRoute: GuiderSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
