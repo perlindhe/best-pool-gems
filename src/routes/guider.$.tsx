@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { guides, getGuide } from "@/data/hotels";
-import { guideContent, buildGuideMeta } from "@/data/guideContent";
+import { guideContent, buildGuideMeta, type GuideContent } from "@/data/guideContent";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -73,7 +73,7 @@ function GuidePage() {
 
         <section className="mx-auto max-w-3xl px-6 py-20">
           <div className="space-y-12">
-            {content.body.map((block, i) => (
+            {content.body.map((block: GuideContent["body"][number], i: number) => (
               <div key={i}>
                 {block.heading && (
                   <h2 className="font-display text-4xl tracking-wide text-primary md:text-5xl">
@@ -81,7 +81,7 @@ function GuidePage() {
                   </h2>
                 )}
                 <div className="mt-5 space-y-4 text-lg leading-relaxed text-foreground/90">
-                  {block.paragraphs.map((p, j) => (
+                  {block.paragraphs.map((p: string, j: number) => (
                     <p key={j}>{renderInline(p)}</p>
                   ))}
                 </div>
