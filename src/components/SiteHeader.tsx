@@ -18,8 +18,8 @@ export function SiteHeader() {
           {cities.map((c) => (
             <Link
               key={c.slug}
-              to="/cities/$slug"
-              params={{ slug: c.slug }}
+              to="/$citySlug"
+              params={{ citySlug: c.slug }}
               activeProps={{ className: "text-foreground" }}
               className="transition hover:text-foreground"
             >

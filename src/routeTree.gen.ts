@@ -13,9 +13,9 @@ import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolic
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as GuiderSplatRouteImport } from './routes/guider.$'
-import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
+import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
@@ -37,88 +37,87 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CitySlugRoute = CitySlugRouteImport.update({
+  id: '/$citySlug',
+  path: '/$citySlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuiderSplatRoute = GuiderSplatRouteImport.update({
-  id: '/guider/$',
-  path: '/guider/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CitiesSlugRoute = CitiesSlugRouteImport.update({
-  id: '/cities/$slug',
-  path: '/cities/$slug',
-  getParentRoute: () => rootRouteImport,
+const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
+  id: '/$articleSlug',
+  path: '/$articleSlug',
+  getParentRoute: () => CitySlugRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
-  '/cities/$slug': typeof CitiesSlugRoute
-  '/guider/$': typeof GuiderSplatRoute
+  '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
-  '/cities/$slug': typeof CitiesSlugRoute
-  '/guider/$': typeof GuiderSplatRoute
+  '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
-  '/cities/$slug': typeof CitiesSlugRoute
-  '/guider/$': typeof GuiderSplatRoute
+  '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
-    | '/cities/$slug'
-    | '/guider/$'
+    | '/$citySlug/$articleSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
-    | '/cities/$slug'
-    | '/guider/$'
+    | '/$citySlug/$articleSlug'
   id:
     | '__root__'
     | '/'
+    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
-    | '/cities/$slug'
-    | '/guider/$'
+    | '/$citySlug/$articleSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CitySlugRoute: typeof CitySlugRouteWithChildren
   AboutRoute: typeof AboutRoute
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
-  CitiesSlugRoute: typeof CitiesSlugRoute
-  GuiderSplatRoute: typeof GuiderSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$citySlug': {
+      id: '/$citySlug'
+      path: '/$citySlug'
+      fullPath: '/$citySlug'
+      preLoaderRoute: typeof CitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -158,31 +164,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/guider/$': {
-      id: '/guider/$'
-      path: '/guider/$'
-      fullPath: '/guider/$'
-      preLoaderRoute: typeof GuiderSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cities/$slug': {
-      id: '/cities/$slug'
-      path: '/cities/$slug'
-      fullPath: '/cities/$slug'
-      preLoaderRoute: typeof CitiesSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/$citySlug/$articleSlug': {
+      id: '/$citySlug/$articleSlug'
+      path: '/$articleSlug'
+      fullPath: '/$citySlug/$articleSlug'
+      preLoaderRoute: typeof CitySlugArticleSlugRouteImport
+      parentRoute: typeof CitySlugRoute
     }
   }
 }
 
+interface CitySlugRouteChildren {
+  CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
+}
+
+const CitySlugRouteChildren: CitySlugRouteChildren = {
+  CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
+}
+
+const CitySlugRouteWithChildren = CitySlugRoute._addFileChildren(
+  CitySlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CitySlugRoute: CitySlugRouteWithChildren,
   AboutRoute: AboutRoute,
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
-  CitiesSlugRoute: CitiesSlugRoute,
-  GuiderSplatRoute: GuiderSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

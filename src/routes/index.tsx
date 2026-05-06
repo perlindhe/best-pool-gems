@@ -44,8 +44,8 @@ function Home() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              to="/cities/$slug"
-              params={{ slug: "barcelona" }}
+              to="/$citySlug"
+              params={{ citySlug: "barcelona" }}
               className="rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
             >
               Topp 10 Barcelona
@@ -77,8 +77,8 @@ function Home() {
         <div className="mt-12 grid gap-8 lg:grid-cols-12">
           {/* Featured */}
           <Link
-            to="/guider/$"
-            params={{ _splat: latestGuides[0].slug }}
+            to="/$citySlug/$articleSlug"
+            params={{ citySlug: latestGuides[0].citySlug, articleSlug: latestGuides[0].articleSlug }}
             className="group relative col-span-12 overflow-hidden rounded-xl shadow-card lg:col-span-7"
           >
             <img
@@ -108,8 +108,8 @@ function Home() {
             {latestGuides.slice(1).map((g) => (
               <Link
                 key={g.slug}
-                to="/guider/$"
-                params={{ _splat: g.slug }}
+                to="/$citySlug/$articleSlug"
+                params={{ citySlug: g.citySlug, articleSlug: g.articleSlug }}
                 className="group rounded-xl border border-border/60 bg-surface/60 p-6 transition hover:border-primary/60"
               >
                 <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
@@ -134,8 +134,8 @@ function Home() {
             {cities.map((c) => (
               <Link
                 key={c.slug}
-                to="/cities/$slug"
-                params={{ slug: c.slug }}
+                to="/$citySlug"
+                params={{ citySlug: c.slug }}
                 className="group relative overflow-hidden rounded-xl shadow-card"
               >
                 <img

@@ -1,20 +1,21 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { getCity, cities, type Hotel } from "@/data/hotels";
+import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
 
-export const Route = createFileRoute("/cities/$slug")({
+export const Route = createFileRoute("/$citySlug")({
   loader: ({ params }) => {
-    const city = getCity(params.slug);
+    const city = getCity(params.citySlug);
     if (!city) throw notFound();
-    return { city };
+    const cityGuides = getCityGuides(city.slug);
+    return { city, cityGuides };
   },
   head: ({ loaderData }) => {
     const city = loaderData?.city;
     if (!city) return {};
-    const title = `De bästa pool-hotellen i ${city.name} — PoolList`;
-    const description = `Topp 5 hotell med pool i ${city.name}. ${city.tagline}.`;
+    const title = `Bästa pool-hotellen i ${city.name} — PoolList`;
+    const description = `Rankningar och guider till hotell med bäst pooler i ${city.name}. ${city.tagline}.`;
     return {
       meta: [
         { title },
@@ -31,19 +32,29 @@ export const Route = createFileRoute("/cities/$slug")({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
-        <h1 className="font-display text-6xl text-primary">Stad saknas</h1>
+        <h1 className="font-display text-6xl text-primary">Sidan saknas</h1>
         <p className="mt-4 text-muted-foreground">Vi täcker inte den här destinationen ännu.</p>
         <Link to="/" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
           ← Till startsidan
         </Link>
       </div>
+      <SiteFooter />
     </div>
   ),
-  component: CityPage,
+  errorComponent: ({ error }) => (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-6 py-32 text-center">
+        <h1 className="font-display text-5xl text-primary">Något gick fel</h1>
+        <p className="mt-4 text-muted-foreground">{error.message}</p>
+      </div>
+    </div>
+  ),
+  component: CityHub,
 });
 
-function CityPage() {
-  const { city } = Route.useLoaderData();
+function CityHub() {
+  const { city, cityGuides } = Route.useLoaderData();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
 
   return (
@@ -61,7 +72,7 @@ function CityPage() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
         <div className="mx-auto flex min-h-[64vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-28">
-          <p className="text-xs uppercase tracking-[0.35em] text-primary">{city.country} · Topp 5</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-primary">{city.country} · Hub</p>
           <h1 className="mt-5 font-display text-[clamp(3.5rem,12vw,9rem)] leading-[0.85] tracking-tight">
             {city.name}
           </h1>
@@ -76,12 +87,42 @@ function CityPage() {
         </p>
       </section>
 
-      {/* Hotels list */}
-      <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
-        {city.hotels.map((h: Hotel) => (
-          <HotelCard key={h.rank} hotel={h} />
-        ))}
-      </section>
+      {/* Guides for this city */}
+      {cityGuides.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-20">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Guider</p>
+          <h2 className="mt-3 font-display text-5xl tracking-wide">Alla {city.name}-guider</h2>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            {cityGuides.map((g: Guide) => (
+              <Link
+                key={g.slug}
+                to="/$citySlug/$articleSlug"
+                params={{ citySlug: g.citySlug, articleSlug: g.articleSlug }}
+                className="group rounded-xl border border-border/60 bg-surface/60 p-6 transition hover:border-primary/60"
+              >
+                <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
+                  {g.category} · {g.readingTime}
+                </p>
+                <h3 className="mt-3 font-display text-3xl leading-tight tracking-wide group-hover:text-primary">
+                  {g.title}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">{g.excerpt}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Top hotels list (if any) */}
+      {city.hotels.length > 0 && (
+        <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Rankning</p>
+          <h2 className="font-display text-5xl tracking-wide">Topp {city.hotels.length}</h2>
+          {city.hotels.map((h: Hotel) => (
+            <HotelCard key={h.rank} hotel={h} />
+          ))}
+        </section>
+      )}
 
       {/* Other cities */}
       <section className="border-t border-border/50 bg-surface/40">
@@ -92,8 +133,8 @@ function CityPage() {
             {otherCities.map((c) => (
               <Link
                 key={c.slug}
-                to="/cities/$slug"
-                params={{ slug: c.slug }}
+                to="/$citySlug"
+                params={{ citySlug: c.slug }}
                 className="group relative overflow-hidden rounded-xl shadow-card"
               >
                 <img

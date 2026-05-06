@@ -6,7 +6,7 @@ export type GuideContent = {
 };
 
 export const guideContent: Record<string, GuideContent> = {
-  "barcelona/topp-10-lyxhotell-pool": {
+  "barcelona/luxury-pool-hotels": {
     hero: "Den definitiva listan över Barcelonas tio bästa hotellpooler — från ikoner till hemliga takplunger.",
     body: [
       {
@@ -32,7 +32,7 @@ export const guideContent: Record<string, GuideContent> = {
       },
     ],
   },
-  "barcelona/rooftop-pooler": {
+  "barcelona/rooftop-pool-hotels": {
     hero: "Sju takpooler där utsikten är minst lika viktig som vattnet — med tider, dresscode och insläpp för icke-gäster.",
     body: [
       {
@@ -55,7 +55,7 @@ export const guideContent: Record<string, GuideContent> = {
       },
     ],
   },
-  "barcelona/poolhotell-nara-stranden": {
+  "barcelona/pool-hotels-near-beach": {
     hero: "Hotell i Barceloneta och Poblenou där du kan kombinera Medelhavet med en riktigt bra hotellpool.",
     body: [
       {
@@ -80,7 +80,7 @@ export const guideContent: Record<string, GuideContent> = {
       },
     ],
   },
-  "barcelona/poolsasong-oppettider": {
+  "barcelona/pool-season": {
     hero: "Allt om poolsäsongen i Barcelona — när öppnar takpoolerna och vilka är öppna året runt?",
     body: [
       {

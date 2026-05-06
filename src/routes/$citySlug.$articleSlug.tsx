@@ -1,14 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { guides, getGuide } from "@/data/hotels";
+import { getCityGuides, getGuideByParts } from "@/data/hotels";
 import { guideContent, buildGuideMeta, type GuideContent } from "@/data/guideContent";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
-export const Route = createFileRoute("/guider/$")({
+export const Route = createFileRoute("/$citySlug/$articleSlug")({
   loader: ({ params }) => {
-    const slug = params._splat ?? "";
-    const guide = getGuide(slug);
-    const content = guideContent[slug];
+    const guide = getGuideByParts(params.citySlug, params.articleSlug);
+    const content = guide ? guideContent[guide.slug] : undefined;
     if (!guide || !content) throw notFound();
     return { guide, content };
   },
@@ -25,11 +24,19 @@ export const Route = createFileRoute("/guider/$")({
       <SiteFooter />
     </div>
   ),
+  errorComponent: ({ error }) => (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-6 py-32 text-center">
+        <h1 className="font-display text-5xl text-primary">Något gick fel</h1>
+        <p className="mt-4 text-muted-foreground">{error.message}</p>
+      </div>
+    </div>
+  ),
   component: GuidePage,
 });
 
 function renderInline(text: string) {
-  // tiny **bold** parser
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((p, i) =>
     p.startsWith("**") && p.endsWith("**") ? (
@@ -44,7 +51,9 @@ function renderInline(text: string) {
 
 function GuidePage() {
   const { guide, content } = Route.useLoaderData();
-  const related = guides.filter((g) => g.slug !== guide.slug && g.city === guide.city).slice(0, 3);
+  const related = getCityGuides(guide.citySlug)
+    .filter((g) => g.slug !== guide.slug)
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,7 +71,14 @@ function GuidePage() {
           <div className="absolute inset-0 -z-10 bg-gradient-hero" />
           <div className="mx-auto flex min-h-[60vh] max-w-5xl flex-col justify-end px-6 pb-16 pt-28">
             <p className="text-xs uppercase tracking-[0.35em] text-primary">
-              {guide.city} · {guide.category} · {guide.readingTime}
+              <Link
+                to="/$citySlug"
+                params={{ citySlug: guide.citySlug }}
+                className="hover:text-foreground"
+              >
+                {guide.city}
+              </Link>{" "}
+              · {guide.category} · {guide.readingTime}
             </p>
             <h1 className="mt-5 font-display text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] tracking-tight text-balance">
               {guide.title}
@@ -110,8 +126,8 @@ function GuidePage() {
                 {related.map((g) => (
                   <Link
                     key={g.slug}
-                    to="/guider/$"
-                    params={{ _splat: g.slug }}
+                    to="/$citySlug/$articleSlug"
+                    params={{ citySlug: g.citySlug, articleSlug: g.articleSlug }}
                     className="group block rounded-lg border border-border/60 bg-surface/60 p-6 transition hover:border-primary/60"
                   >
                     <p className="text-[10px] uppercase tracking-[0.3em] text-primary">{g.category}</p>
