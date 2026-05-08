@@ -136,6 +136,7 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
             </a>
           )}
         </div>
+        <PoolFactsTable facts={hotel.pool_facts} />
       </div>
 
       <div className="flex gap-4 md:flex-col md:items-end md:gap-2">
