@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -23,6 +24,11 @@ import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 
+const RankingsRoute = RankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
   path: '/integritetspolicy',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/rankings': typeof RankingsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/rankings': typeof RankingsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/rankings': typeof RankingsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/rankings'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/rankings'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/rankings'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
+  RankingsRoute: typeof RankingsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/rankings': {
+      id: '/rankings'
+      path: '/rankings'
+      fullPath: '/rankings'
+      preLoaderRoute: typeof RankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integritetspolicy': {
       id: '/integritetspolicy'
       path: '/integritetspolicy'
@@ -326,6 +346,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
+  RankingsRoute: RankingsRoute,
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   AdminIndexRoute: AdminIndexRoute,

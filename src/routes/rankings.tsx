@@ -35,8 +35,8 @@ export const Route = createFileRoute("/rankings")({
 });
 
 function RankingsPage() {
-  const { hotels } = Route.useLoaderData();
-  const cities = Array.from(new Set(hotels.map((h) => h.city))).filter(Boolean);
+  const { hotels } = Route.useLoaderData() as { hotels: RankedHotel[] };
+  const cities = Array.from(new Set(hotels.map((h: RankedHotel) => h.city))).filter(Boolean);
 
   return (
     <div className="min-h-screen bg-background">
