@@ -268,6 +268,7 @@ export async function autoScoreHotelById(hotel_id: string) {
     editorial_notes: string;
     confidence: string;
     reasoning: string;
+    facts: PoolFacts;
   };
 
   const components = {
@@ -285,6 +286,7 @@ export async function autoScoreHotelById(hotel_id: string) {
     editorial_notes: parsed.editorial_notes,
     confidence: parsed.confidence,
     reasoning: parsed.reasoning,
+    facts: parsed.facts,
     reviews_analyzed: useReviews.length,
     pool_score_0_10: computePoolScore(components),
   };
