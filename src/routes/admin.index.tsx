@@ -50,6 +50,43 @@ function AdminPage() {
   const [batchProgress, setBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [batchResults, setBatchResults] = useState<BatchResult[]>([]);
 
+  type PhotoResult = { id: string; name: string; ok: boolean; total?: number; msg: string };
+  const [photosBatchRunning, setPhotosBatchRunning] = useState(false);
+  const photosBatchCancelRef = useRef(false);
+  const [photosBatchProgress, setPhotosBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
+  const [photosBatchResults, setPhotosBatchResults] = useState<PhotoResult[]>([]);
+
+  const runBatchPhotos = async () => {
+    if (photosBatchRunning) return;
+    setPhotosBatchRunning(true);
+    photosBatchCancelRef.current = false;
+    setPhotosBatchResults([]);
+    setPhotosBatchProgress({ done: 0, total: hotels.length });
+    setMsg(null);
+    for (let i = 0; i < hotels.length; i++) {
+      if (photosBatchCancelRef.current) break;
+      const h = hotels[i];
+      try {
+        const r = await adminRefreshHotelPhotos({ data: { hotel_id: h.id } });
+        setPhotosBatchResults((prev) => [
+          ...prev,
+          { id: h.id, name: h.name, ok: true, total: r.counts.total,
+            msg: `${r.counts.total} photos (G:${r.counts.google} TA:${r.counts.tripadvisor} W:${r.counts.website})` },
+        ]);
+      } catch (e) {
+        const errMsg = (e as Error).message;
+        setPhotosBatchResults((prev) => [...prev, { id: h.id, name: h.name, ok: false, msg: errMsg }]);
+        if (/rate limit|credits exhausted|402|429/i.test(errMsg)) {
+          photosBatchCancelRef.current = true;
+          setMsg(errMsg);
+        }
+      }
+      setPhotosBatchProgress({ done: i + 1, total: hotels.length });
+      await new Promise((res) => setTimeout(res, 600));
+    }
+    setPhotosBatchRunning(false);
+  };
+
   const runBatchAutoScore = async () => {
     if (batchRunning) return;
     setBatchRunning(true);
