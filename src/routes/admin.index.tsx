@@ -234,6 +234,21 @@ function AdminPage() {
               </button>
             )}
             <button
+              onClick={runBatchPhotos}
+              disabled={photosBatchRunning || hotels.length === 0}
+              className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
+            >
+              {photosBatchRunning ? `Photos ${photosBatchProgress.done}/${photosBatchProgress.total}…` : "🖼 Refresh ALL photos"}
+            </button>
+            {photosBatchRunning && (
+              <button
+                onClick={() => { photosBatchCancelRef.current = true; }}
+                className="rounded-full border border-destructive/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-destructive"
+              >
+                Stop photos
+              </button>
+            )}
+            <button
               onClick={() => supabase.auth.signOut()}
               className="rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.2em]"
             >
