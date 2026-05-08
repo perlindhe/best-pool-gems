@@ -253,6 +253,119 @@ export const adminRecomputeAll = createServerFn({ method: "POST" })
     return { processed };
   });
 
+// ---------- BATCH FETCH RATINGS (Google + TripAdvisor) ----------
+async function saveSnapshot(
+  hotel_id: string,
+  source: SourceKey,
+  rating: number,
+  count: number,
+  raw: unknown,
+) {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const { error } = await supabaseAdmin.from("ratings_snapshots").upsert(
+    {
+      hotel_id,
+      source,
+      rating_value: rating,
+      rating_scale: 5,
+      rating_count: count,
+      captured_at: today.toISOString(),
+      status: "ok",
+      raw_payload: raw,
+    },
+    { onConflict: "hotel_id,source,captured_date" },
+  );
+  if (error) throw new Error(error.message);
+}
+
+async function fetchGoogle(place_id: string) {
+  const key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!key) throw new Error("GOOGLE_PLACES_API_KEY not configured");
+  const res = await fetch(
+    `https://places.googleapis.com/v1/places/${encodeURIComponent(place_id)}`,
+    {
+      headers: {
+        "X-Goog-Api-Key": key,
+        "X-Goog-FieldMask": "id,displayName,rating,userRatingCount,googleMapsUri",
+      },
+    },
+  );
+  const json = await res.json();
+  if (!res.ok) throw new Error(`Google [${res.status}]: ${JSON.stringify(json).slice(0, 200)}`);
+  return { rating: Number(json.rating), count: Number(json.userRatingCount ?? 0), raw: json };
+}
+
+async function fetchTripadvisor(location_id: string) {
+  const key = process.env.TRIPADVISOR_API_KEY;
+  if (!key) throw new Error("TRIPADVISOR_API_KEY not configured");
+  const res = await fetch(
+    `https://api.content.tripadvisor.com/api/v1/location/${encodeURIComponent(location_id)}/details?key=${encodeURIComponent(key)}&language=en&currency=USD`,
+    { headers: { Accept: "application/json" } },
+  );
+  const json = await res.json();
+  if (!res.ok) throw new Error(`TripAdvisor [${res.status}]: ${JSON.stringify(json).slice(0, 200)}`);
+  return { rating: Number(json.rating), count: Number(json.num_reviews ?? 0), raw: json };
+}
+
+export const adminFetchAllRatings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context.userId);
+    const { data: maps, error } = await supabaseAdmin
+      .from("source_mappings")
+      .select("hotel_id, source, source_place_id, is_active")
+      .eq("is_active", true)
+      .in("source", ["google", "tripadvisor"])
+      .not("source_place_id", "is", null);
+    if (error) throw new Error(error.message);
+
+    const results: Array<{ hotel_id: string; source: string; ok: boolean; msg: string }> = [];
+    const touchedHotels = new Set<string>();
+
+    for (const m of maps ?? []) {
+      const placeId = (m.source_place_id ?? "").trim();
+      if (!placeId) continue;
+      try {
+        const { rating, count, raw } =
+          m.source === "google"
+            ? await fetchGoogle(placeId)
+            : await fetchTripadvisor(placeId);
+        if (!rating) throw new Error("no rating returned");
+        await saveSnapshot(m.hotel_id as string, m.source as SourceKey, rating, count, {
+          source: m.source === "google" ? "google_places_api" : "tripadvisor_content_api",
+          payload: raw,
+        });
+        touchedHotels.add(m.hotel_id as string);
+        results.push({
+          hotel_id: m.hotel_id as string,
+          source: m.source as string,
+          ok: true,
+          msg: `${rating}★ (${count})`,
+        });
+      } catch (e) {
+        results.push({
+          hotel_id: m.hotel_id as string,
+          source: m.source as string,
+          ok: false,
+          msg: (e as Error).message,
+        });
+      }
+    }
+
+    for (const id of touchedHotels) {
+      try {
+        await recomputeForHotel(id);
+      } catch (e) {
+        results.push({ hotel_id: id, source: "recompute", ok: false, msg: (e as Error).message });
+      }
+    }
+
+    const okCount = results.filter((r) => r.ok).length;
+    const errCount = results.filter((r) => !r.ok).length;
+    return { processed: results.length, ok: okCount, errors: errCount, results };
+  });
+
 // ---------- POOL SCORE ----------
 const PoolScoreSchema = z.object({
   hotel_id: z.string().uuid(),
