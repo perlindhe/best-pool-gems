@@ -7,13 +7,13 @@ export const Route = createFileRoute("/rankings")({
   loader: () => listRankedHotels({ data: {} }),
   head: () => ({
     meta: [
-      { title: "Live pool rankings — PoolList" },
+      { title: "Live pool rankings — Best Pool Hotels" },
       {
         name: "description",
         content:
           "Live ranking of hotel pools, scored by our editors and combined with real-time guest ratings from Google and TripAdvisor.",
       },
-      { property: "og:title", content: "Live pool rankings — PoolList" },
+      { property: "og:title", content: "Live pool rankings — Best Pool Hotels" },
       {
         property: "og:description",
         content:

@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/disclosure")({
   head: () => ({
     meta: [
-      { title: "Affiliate links & disclosure — PoolList" },
-      { name: "description", content: "How affiliate links and partnerships work on PoolList. Transparency is central to us." },
+      { title: "Affiliate links & disclosure — Best Pool Hotels" },
+      { name: "description", content: "How affiliate links and partnerships work on Best Pool Hotels. Transparency is central to us." },
     ],
   }),
   component: Disclosure,
@@ -24,7 +24,7 @@ function Disclosure() {
 
         <div className="mt-10 space-y-6 text-lg leading-relaxed text-foreground/90">
           <p>
-            PoolList is funded by <strong className="text-foreground">affiliate links</strong>.
+            Best Pool Hotels is funded by <strong className="text-foreground">affiliate links</strong>.
             When you click a link to e.g. Booking.com, Hotels.com or directly to a
             hotel and book a stay, we may receive a small commission. You don't pay extra for it.
           </p>

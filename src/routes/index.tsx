@@ -7,9 +7,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Best hotel pools — PoolList" },
+      { title: "Best hotel pools — Best Pool Hotels" },
       { name: "description", content: "Independent guide to the best hotel pools in the world's biggest travel cities. Rankings, guides and insider tips." },
-      { property: "og:title", content: "Best hotel pools — PoolList" },
+      { property: "og:title", content: "Best hotel pools — Best Pool Hotels" },
       { property: "og:description", content: "Independent rankings of the world's most beautiful hotel pools." },
     ],
   }),

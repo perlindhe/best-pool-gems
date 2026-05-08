@@ -22,7 +22,7 @@ import { googleSearchPlace, googleFetchRating } from "@/server/google-places.fun
 import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/server/tripadvisor.functions";
 
 export const Route = createFileRoute("/admin/")({
-  head: () => ({ meta: [{ title: "Admin – PoolList" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin – Best Pool Hotels" }, { name: "robots", content: "noindex" }] }),
   component: AdminPage,
 });
 
