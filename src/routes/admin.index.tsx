@@ -42,6 +42,54 @@ function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
+  type BatchResult = { id: string; name: string; ok: boolean; score?: number; confidence?: string; msg: string };
+  const [batchRunning, setBatchRunning] = useState(false);
+  const [batchCancel, setBatchCancel] = useState(false);
+  const [batchProgress, setBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
+  const [batchResults, setBatchResults] = useState<BatchResult[]>([]);
+
+  const runBatchAutoScore = async () => {
+    if (batchRunning) return;
+    setBatchRunning(true);
+    setBatchCancel(false);
+    setBatchResults([]);
+    setBatchProgress({ done: 0, total: hotels.length });
+    setMsg(null);
+    let cancelled = false;
+    for (let i = 0; i < hotels.length; i++) {
+      if (batchCancel || cancelled) break;
+      const h = hotels[i];
+      try {
+        const r = await adminAutoScoreHotel({ data: { hotel_id: h.id } });
+        await adminUpsertPoolScore({
+          data: {
+            hotel_id: h.id,
+            components: r.components,
+            pool_type: r.pool_type,
+            best_time: r.best_time,
+            editorial_notes: r.editorial_notes,
+          },
+        });
+        setBatchResults((prev) => [
+          ...prev,
+          { id: h.id, name: h.name, ok: true, score: r.pool_score_0_10, confidence: r.confidence, msg: `${r.reviews_analyzed} reviews · ${r.reasoning}` },
+        ]);
+      } catch (e) {
+        const errMsg = (e as Error).message;
+        setBatchResults((prev) => [...prev, { id: h.id, name: h.name, ok: false, msg: errMsg }]);
+        if (errMsg.includes("rate limit") || errMsg.includes("credits exhausted")) {
+          cancelled = true;
+          setMsg(errMsg);
+        }
+      }
+      setBatchProgress({ done: i + 1, total: hotels.length });
+      // Throttle slightly to be polite to the AI gateway
+      await new Promise((res) => setTimeout(res, 400));
+    }
+    setBatchRunning(false);
+    if (selected) await loadDetail(selected);
+  };
+
   useEffect(() => {
     let unsub: (() => void) | undefined;
     supabase.auth.getSession().then(({ data }) => {
