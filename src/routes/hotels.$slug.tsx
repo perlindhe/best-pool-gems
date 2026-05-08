@@ -61,7 +61,9 @@ export const Route = createFileRoute("/hotels/$slug")({
 });
 
 function HotelDetailPage() {
-  const { hotel, photos } = Route.useLoaderData();
+  const { hotel, photos } = Route.useLoaderData() as NonNullable<
+    Awaited<ReturnType<typeof getHotelBySlug>>
+  >;
   const hero = photos[0]?.url || hotel.cover_image_url;
   const gallery = photos.slice(1, 7);
   const sources = hotel.sources_used ?? [];
