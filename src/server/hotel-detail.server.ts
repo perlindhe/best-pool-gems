@@ -68,7 +68,7 @@ export async function getHotelDetail(slug: string) {
   const { data: mappings } = await supabaseAdmin
     .from("source_mappings")
     .select("source, source_place_id")
-    .eq("hotel_id", hotel.id)
+    .eq("hotel_id", hotel.id as string)
     .eq("is_active", true);
   const googleMap = (mappings ?? []).find((m) => m.source === "google");
 
