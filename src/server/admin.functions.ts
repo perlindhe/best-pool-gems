@@ -510,6 +510,7 @@ const PoolScoreSchema = z.object({
   best_time: z.string().max(200).nullish().or(z.literal("")),
   pool_type: z.string().max(200).nullish().or(z.literal("")),
   editorial_notes: z.string().max(2000).nullish().or(z.literal("")),
+  facts: z.record(z.string(), z.unknown()).nullish(),
 });
 
 export const adminUpsertPoolScore = createServerFn({ method: "POST" })
@@ -528,6 +529,7 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
           best_time: data.best_time || null,
           pool_type: data.pool_type || null,
           editorial_notes: data.editorial_notes || null,
+          facts: data.facts ?? null,
         },
         { onConflict: "hotel_id" },
       )
