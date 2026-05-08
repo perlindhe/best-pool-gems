@@ -205,6 +205,51 @@ function AdminPage() {
           <div className="mt-4 rounded-md border border-primary/30 bg-primary/10 px-4 py-2 text-sm">{msg}</div>
         )}
 
+        {(batchRunning || batchResults.length > 0) && (
+          <div className="mt-4 rounded-lg border border-primary/30 bg-surface/40 p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs uppercase tracking-[0.2em] text-primary">
+                Batch AI scoring · {batchProgress.done}/{batchProgress.total}
+                {!batchRunning && batchResults.length > 0 && " · done"}
+              </h3>
+              {!batchRunning && (
+                <button
+                  onClick={() => setBatchResults([])}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border/50">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${batchProgress.total ? (batchProgress.done / batchProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+            <ul className="mt-3 max-h-72 space-y-1 overflow-auto text-xs">
+              {batchResults.map((r) => (
+                <li
+                  key={r.id}
+                  className={`rounded border px-2 py-1.5 ${r.ok ? "border-primary/20 bg-primary/5" : "border-destructive/30 bg-destructive/5"}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium">{r.name}</span>
+                    {r.ok ? (
+                      <span className="font-display text-primary">
+                        {r.score?.toFixed(1)}/10 · {r.confidence}
+                      </span>
+                    ) : (
+                      <span className="text-destructive">✕</span>
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-muted-foreground line-clamp-2">{r.msg}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {tab === "settings" ? (
           <SettingsPanel onSaved={() => setMsg("Settings saved")} />
         ) : (
