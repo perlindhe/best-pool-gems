@@ -209,25 +209,24 @@ export async function autoScoreHotelById(hotel_id: string) {
     }
   }
 
-  if (allReviews.length === 0) {
-    throw new Error(
-      "No reviews available. Map a Google or TripAdvisor source for this hotel first.",
-    );
-  }
-
   const poolWords = /\b(pool|swim|swimming|rooftop|infinity|cabana|sunbed|lounger|jacuzzi|spa|terrace|deck)\b/i;
   const poolReviews = allReviews.filter((r) => poolWords.test(r.text));
   const useReviews = (poolReviews.length >= 5 ? poolReviews : allReviews).slice(0, 30);
 
+  const hasContext = allReviews.length > 0 || googleSummary.length > 0;
   const userPrompt = [
     `Hotel: ${hotel.name}`,
     `Location: ${[hotel.neighborhood, hotel.city, hotel.country].filter(Boolean).join(", ")}`,
+    hotel.website_url ? `Website: ${hotel.website_url}` : "",
     googleSummary ? `\nGoogle editorial summary: ${googleSummary}` : "",
-    `\n${useReviews.length} review excerpts (filtered to pool mentions when possible):\n`,
+    useReviews.length > 0
+      ? `\n${useReviews.length} review excerpts (filtered to pool mentions when possible):\n`
+      : `\nNo external reviews available — base your assessment on hotel name, location, and general knowledge of this property. Lower confidence accordingly.\n`,
     ...useReviews.map(
       (r, i) => `[${i + 1}] (${r.source}, ${r.rating ?? "?"}★) ${r.text}`,
     ),
-  ].join("\n");
+  ].filter(Boolean).join("\n");
+  void hasContext;
 
   const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
