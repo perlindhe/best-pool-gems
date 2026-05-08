@@ -59,7 +59,7 @@ function AdminPage() {
     setMsg(null);
     let cancelled = false;
     for (let i = 0; i < hotels.length; i++) {
-      if (batchCancel || cancelled) break;
+      if (batchCancelRef.current) break;
       const h = hotels[i];
       try {
         const r = await adminAutoScoreHotel({ data: { hotel_id: h.id } });
