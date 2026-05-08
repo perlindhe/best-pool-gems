@@ -13,7 +13,7 @@ export function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-7 text-sm uppercase tracking-[0.18em] text-muted-foreground md:flex">
           <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }} className="transition hover:text-foreground">
-            Hem
+            Home
           </Link>
           {cities.map((c) => (
             <Link
@@ -27,7 +27,7 @@ export function SiteHeader() {
             </Link>
           ))}
           <Link to="/about" activeProps={{ className: "text-foreground" }} className="transition hover:text-foreground">
-            Om
+            About
           </Link>
         </nav>
       </div>

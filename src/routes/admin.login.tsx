@@ -51,7 +51,7 @@ function LoginPage() {
       <div className="mx-auto max-w-md px-6 py-24">
         <h1 className="font-display text-5xl tracking-wide">Admin {mode === "login" ? "login" : "signup"}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Endast inbjudna admins. Första kontot måste promotas via DB.
+          Invited admins only. The first account must be promoted via DB.
         </p>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <input
@@ -77,14 +77,14 @@ function LoginPage() {
             disabled={busy}
             className="w-full rounded-md bg-primary px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground disabled:opacity-50"
           >
-            {busy ? "..." : mode === "login" ? "Logga in" : "Skapa konto"}
+            {busy ? "..." : mode === "login" ? "Sign in" : "Create account"}
           </button>
           <button
             type="button"
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
             className="block w-full text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
           >
-            {mode === "login" ? "Inget konto? Skapa" : "Har redan konto? Logga in"}
+            {mode === "login" ? "No account? Sign up" : "Have an account? Sign in"}
           </button>
         </form>
       </div>

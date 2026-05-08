@@ -80,7 +80,7 @@ function AdminPage() {
     [hotels, search],
   );
 
-  const wrap = async (fn: () => Promise<unknown>, ok = "Sparat") => {
+  const wrap = async (fn: () => Promise<unknown>, ok = "Saved") => {
     setBusy(true);
     setMsg(null);
     try {
@@ -93,7 +93,7 @@ function AdminPage() {
     }
   };
 
-  if (!ready) return <div className="p-12 text-center text-muted-foreground">Laddar…</div>;
+  if (!ready) return <div className="p-12 text-center text-muted-foreground">Loading…</div>;
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,7 +106,7 @@ function AdminPage() {
               onClick={() => setTab("hotels")}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${tab === "hotels" ? "bg-primary text-primary-foreground" : "border border-border"}`}
             >
-              Hotell
+              Hotels
             </button>
             <button
               onClick={() => setTab("settings")}
@@ -115,16 +115,16 @@ function AdminPage() {
               Settings
             </button>
             <button
-              onClick={() => wrap(async () => { const r = await adminRecomputeAll(); setMsg(`Räknat om ${r.processed} hotell`); })}
+              onClick={() => wrap(async () => { const r = await adminRecomputeAll(); setMsg(`Recomputed ${r.processed} hotels`); })}
               className="rounded-full border border-primary/40 px-4 py-2 text-xs uppercase tracking-[0.2em]"
             >
-              Räkna om alla
+              Recompute all
             </button>
             <button
               onClick={() => supabase.auth.signOut()}
               className="rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.2em]"
             >
-              Logga ut
+              Sign out
             </button>
           </div>
         </div>
@@ -134,12 +134,12 @@ function AdminPage() {
         )}
 
         {tab === "settings" ? (
-          <SettingsPanel onSaved={() => setMsg("Settings sparade")} />
+          <SettingsPanel onSaved={() => setMsg("Settings saved")} />
         ) : (
           <div className="mt-8 grid gap-6 lg:grid-cols-[360px_1fr]">
             <aside className="rounded-lg border border-border/60 bg-surface/40 p-4">
               <input
-                placeholder="Sök…"
+                placeholder="Search…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="mb-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
@@ -148,7 +148,7 @@ function AdminPage() {
                 onClick={() => { setSelected(null); setDetail({ hotel: null, mappings: [], snapshots: [], meta: null, pool: null }); }}
                 className="mb-3 w-full rounded-md bg-primary px-3 py-2 text-xs uppercase tracking-[0.2em] text-primary-foreground"
               >
-                + Nytt hotell
+                + New hotel
               </button>
               <ul className="max-h-[70vh] space-y-1 overflow-auto">
                 {filtered.map((h) => (
@@ -169,7 +169,7 @@ function AdminPage() {
 
             <main>
               {!detail ? (
-                <p className="text-muted-foreground">Välj ett hotell eller skapa ett nytt.</p>
+                <p className="text-muted-foreground">Select a hotel or create a new one.</p>
               ) : (
                 <HotelDetail
                   data={detail}
@@ -212,7 +212,7 @@ function AdminPage() {
         )}
 
         <p className="mt-12 text-xs text-muted-foreground">
-          Publikt API: <Link to="/api/public/hotels" className="text-primary underline">/api/public/hotels</Link>
+          Public API: <Link to="/api/public/hotels" className="text-primary underline">/api/public/hotels</Link>
         </p>
       </div>
     </div>
@@ -261,7 +261,7 @@ function HotelDetail({
     <div className="space-y-8">
       {/* Core */}
       <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
-        <h2 className="font-display text-2xl">Hotellinfo</h2>
+        <h2 className="font-display text-2xl">Hotelsinfo</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {input({ placeholder: "slug", value: form.slug ?? "", onChange: (e) => set("slug", e.target.value) })}
           {input({ placeholder: "name", value: form.name ?? "", onChange: (e) => set("name", e.target.value) })}
@@ -279,7 +279,7 @@ function HotelDetail({
           onClick={() => onSaveHotel({ ...form, id: form.id || undefined })}
           className="mt-4 rounded-md bg-primary px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary-foreground"
         >
-          Spara hotell
+          Save hotel
         </button>
       </section>
 
@@ -287,7 +287,7 @@ function HotelDetail({
         <>
           {/* Mappings */}
           <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
-            <h2 className="font-display text-2xl">Källor (Place IDs)</h2>
+            <h2 className="font-display text-2xl">Sources (Place IDs)</h2>
             <div className="mt-4 space-y-2">
               {SOURCES.map((src) => {
                 const m = data.mappings.find((x: AnyRec) => x.source === src) ?? { source: src, hotel_id: h.id };
@@ -305,7 +305,7 @@ function HotelDetail({
 
           {/* Snapshots */}
           <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
-            <h2 className="font-display text-2xl">Manuell rating-import</h2>
+            <h2 className="font-display text-2xl">Manual rating import</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-4">
               <select
                 value={snap.source}
@@ -323,14 +323,14 @@ function HotelDetail({
               onClick={() => onAddSnapshot({ hotel_id: h.id, ...snap })}
               className="mt-3 rounded-md bg-primary px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary-foreground"
             >
-              Lägg till + räkna om metascore
+              Add + recompute metascore
             </button>
 
-            <h3 className="mt-6 text-xs uppercase tracking-[0.2em] text-muted-foreground">Senaste 50 snapshots</h3>
+            <h3 className="mt-6 text-xs uppercase tracking-[0.2em] text-muted-foreground">Last 50 snapshots</h3>
             <div className="mt-2 max-h-64 overflow-auto rounded border border-border/60">
               <table className="w-full text-xs">
                 <thead className="bg-surface text-muted-foreground">
-                  <tr><th className="p-2 text-left">datum</th><th className="text-left">källa</th><th className="text-left">rating</th><th className="text-left">count</th><th className="text-left">status</th></tr>
+                  <tr><th className="p-2 text-left">date</th><th className="text-left">source</th><th className="text-left">rating</th><th className="text-left">count</th><th className="text-left">status</th></tr>
                 </thead>
                 <tbody>
                   {data.snapshots.map((s: AnyRec) => (
@@ -359,7 +359,7 @@ function HotelDetail({
           {/* Pool Score */}
           <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
             <h2 className="font-display text-2xl">Pool Score (editorial)</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Varje komponent 0–2. Summa = Pool Score 0–10.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Each component 0–2. Sum = Pool Score 0–10.</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {(["vibe","lounging_space","service","uniqueness","pool_first_feel"] as const).map((k) => (
                 <label key={k} className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -381,13 +381,13 @@ function HotelDetail({
               />
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <p className="text-sm">Förhandsräknad Pool Score: <strong className="text-primary">{poolSum}</strong>/10</p>
+              <p className="text-sm">Preview Pool Score: <strong className="text-primary">{poolSum}</strong>/10</p>
               <button
                 disabled={busy}
                 onClick={() => onSavePool({ hotel_id: h.id, ...poolForm })}
                 className="rounded-md bg-primary px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary-foreground"
               >
-                Spara Pool Score
+                Save Pool Score
               </button>
             </div>
           </section>
@@ -423,7 +423,7 @@ function MappingRow({ mapping, onSave, onDelete }: { mapping: AnyRec; onSave: (p
     setFetchMsg(null);
     try {
       const r = await googleFetchRating({ data: { hotel_id: m.hotel_id, place_id: m.source_place_id } });
-      setFetchMsg(`✓ ${r.rating}★ (${r.count} reviews) — sparat & metascore omräknad`);
+      setFetchMsg(`✓ ${r.rating}★ (${r.count} reviews) — saved & metascore recomputed`);
     } catch (e) {
       setFetchMsg((e as Error).message);
     }
@@ -439,7 +439,7 @@ function MappingRow({ mapping, onSave, onDelete }: { mapping: AnyRec; onSave: (p
           <button
             onClick={() => onSave({ id: m.id, hotel_id: m.hotel_id, source: m.source, source_place_id: m.source_place_id, source_url: m.source_url, is_active: m.is_active ?? true })}
             className="rounded bg-primary/20 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary"
-          >Spara</button>
+          >Save</button>
           {m.id && (
             <button onClick={() => onDelete(m.id)} className="rounded border border-destructive/40 px-3 py-1 text-xs uppercase tracking-[0.2em] text-destructive">×</button>
           )}
@@ -448,19 +448,19 @@ function MappingRow({ mapping, onSave, onDelete }: { mapping: AnyRec; onSave: (p
       {isGoogle && (
         <div className="mt-2 space-y-2">
           <div className="flex flex-wrap gap-2">
-            {input({ placeholder: "Sök hotellnamn + stad…", value: m._searchQuery ?? "", onChange: (e) => setM({ ...m, _searchQuery: e.target.value }), className: "flex-1 min-w-48" })}
+            {input({ placeholder: "Search hotel name + city…", value: m._searchQuery ?? "", onChange: (e) => setM({ ...m, _searchQuery: e.target.value }), className: "flex-1 min-w-48" })}
             <button onClick={doSearch} disabled={searching || !m._searchQuery} className="rounded border border-primary/40 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary">
-              {searching ? "Söker…" : "Sök Place ID"}
+              {searching ? "Searching…" : "Search Place ID"}
             </button>
             {m.source_place_id && (
               <button onClick={doFetch} className="rounded bg-primary px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary-foreground">
-                Hämta Google-betyg
+                Fetch Google rating
               </button>
             )}
           </div>
           {results && (
             <ul className="space-y-1 rounded border border-border/40 bg-background p-2 text-xs">
-              {results.length === 0 && <li className="text-muted-foreground">Inga träffar</li>}
+              {results.length === 0 && <li className="text-muted-foreground">No results</li>}
               {results.map((r: AnyRec) => (
                 <li key={r.id} className="flex items-center justify-between gap-2">
                   <div>
@@ -471,7 +471,7 @@ function MappingRow({ mapping, onSave, onDelete }: { mapping: AnyRec; onSave: (p
                   <button
                     onClick={() => { setM({ ...m, source_place_id: r.id, source_url: r.googleMapsUri ?? m.source_url }); setResults(null); }}
                     className="rounded bg-primary/20 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-primary"
-                  >Välj</button>
+                  >Select</button>
                 </li>
               ))}
             </ul>
@@ -486,12 +486,12 @@ function MappingRow({ mapping, onSave, onDelete }: { mapping: AnyRec; onSave: (p
 function SettingsPanel({ onSaved }: { onSaved: () => void }) {
   const [s, setS] = useState<AnyRec | null>(null);
   useEffect(() => { adminGetSettings().then((r) => setS(r.settings)); }, []);
-  if (!s) return <p className="mt-8 text-muted-foreground">Laddar…</p>;
+  if (!s) return <p className="mt-8 text-muted-foreground">Loading…</p>;
   const w = s.weights;
   return (
     <div className="mt-8 max-w-xl rounded-lg border border-border/60 bg-surface/40 p-6">
-      <h2 className="font-display text-2xl">Vikter & volume cap</h2>
-      <p className="text-xs text-muted-foreground">Vikter behöver inte summera till 1; de viktas relativt.</p>
+      <h2 className="font-display text-2xl">Weights & volume cap</h2>
+      <p className="text-xs text-muted-foreground">Weights don't need to sum to 1; they're weighted relatively.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {SOURCES.map((src) => (
           <label key={src} className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -507,7 +507,7 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
       <button
         onClick={async () => { await adminUpdateSettings({ data: { weights: s.weights, volume_cap: s.volume_cap } }); onSaved(); }}
         className="mt-4 rounded-md bg-primary px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary-foreground"
-      >Spara</button>
+      >Save</button>
     </div>
   );
 }

@@ -7,102 +7,102 @@ export type GuideContent = {
 
 export const guideContent: Record<string, GuideContent> = {
   "barcelona/luxury-pool-hotels": {
-    hero: "Den definitiva listan över Barcelonas tio bästa hotellpooler — från ikoner till hemliga takplunger.",
+    hero: "The definitive list of Barcelona's ten best hotel pools — from icons to secret rooftop plunges.",
     body: [
       {
-        heading: "Hur vi rankar",
+        heading: "How we rank",
         paragraphs: [
-          "Vi har personligen besökt varje hotell i listan under de senaste två åren. Rankingen baseras på tre kriterier: utsikt, vatten och vibe. Inga hotell har betalat för sin placering.",
-          "Du hittar hela topp 10-listan med priser, läge och vad som gör varje pool speciell på vår dedikerade Barcelona-sida.",
+          "We've personally visited every hotel on this list over the past two years. The ranking is based on three criteria: view, water and vibe. No hotel has paid for placement.",
+          "You'll find the full top 10 with prices, location and what makes each pool special on our dedicated Barcelona page.",
         ],
       },
       {
-        heading: "Tre snabba favoriter",
+        heading: "Three quick favorites",
         paragraphs: [
-          "**Hotel Arts Barcelona** — bästa kombinationen av strand och pool, två stora utomhuspooler med havsutsikt.",
-          "**The Barcelona EDITION** — coolaste rooftop-vibet med DJ vid solnedgång och mörkblå mosaikpool.",
-          "**Mandarin Oriental Barcelona** — stadens mest sofistikerade pooltakträdgård på 24:e våningen.",
+          "**Hotel Arts Barcelona** — best combination of beach and pool, two large outdoor pools with sea views.",
+          "**The Barcelona EDITION** — coolest rooftop vibe with a DJ at sunset and a deep-blue mosaic pool.",
+          "**Mandarin Oriental Barcelona** — the city's most sophisticated rooftop garden on the 24th floor.",
         ],
       },
       {
-        heading: "Värt att veta",
+        heading: "Worth knowing",
         paragraphs: [
-          "De flesta takpooler i Barcelona öppnar i mitten av maj och stänger i slutet av september. Vill du sima året runt — välj inomhusspa på Mandarin eller Hotel Arts.",
+          "Most rooftop pools in Barcelona open in mid-May and close at the end of September. Want to swim year-round — choose the indoor spa at Mandarin or Hotel Arts.",
         ],
       },
     ],
   },
   "barcelona/rooftop-pool-hotels": {
-    hero: "Sju takpooler där utsikten är minst lika viktig som vattnet — med tider, dresscode och insläpp för icke-gäster.",
+    hero: "Seven rooftop pools where the view is as important as the water — with hours, dress code and access for non-guests.",
     body: [
       {
-        heading: "De bästa rooftop-poolerna",
+        heading: "The best rooftop pools",
         paragraphs: [
-          "**The Barcelona EDITION** (El Born) — DJ från 18:00, dresscode smart casual, ofta köer på lördagar.",
-          "**Hotel SOFIA Sky Bar 26** (Diagonal) — bästa 360°-utsikten, lugnare än Edition.",
-          "**ME Barcelona** (Eixample) — partyvibe, drinkar till midnatt.",
-          "**Mandarin Oriental Terrat** (Passeig de Gràcia) — diskret, vuxet, två pooler.",
-          "**Sir Victor** (Eixample) — bohemiskt, La Pedrera i sikte.",
-          "**Almanac** (Passeig de Gràcia) — liten plunge, stora vyer.",
-          "**Kimpton Vividora** (Gòtic) — mest charmiga läget i Gamla stan.",
+          "**The Barcelona EDITION** (El Born) — DJ from 6pm, smart-casual dress code, often queues on Saturdays.",
+          "**Hotel SOFIA Sky Bar 26** (Diagonal) — best 360° view, calmer than Edition.",
+          "**ME Barcelona** (Eixample) — party vibe, drinks until midnight.",
+          "**Mandarin Oriental Terrat** (Passeig de Gràcia) — discreet, grown-up, two pools.",
+          "**Sir Victor** (Eixample) — bohemian, La Pedrera in view.",
+          "**Almanac** (Passeig de Gràcia) — small plunge, big views.",
+          "**Kimpton Vividora** (Gòtic) — most charming location in the Old Town.",
         ],
       },
       {
-        heading: "Tips för icke-gäster",
+        heading: "Tips for non-guests",
         paragraphs: [
-          "Många takpooler säljer dagspass eller minimispend (50–80 €). Boka i förväg via hotellets hemsida — Edition och Mandarin är ofta fullbokade redan vid lunch.",
+          "Many rooftop pools sell day passes or require a minimum spend (€50–80). Book ahead via the hotel's website — Edition and Mandarin are often fully booked by lunchtime.",
         ],
       },
     ],
   },
   "barcelona/pool-hotels-near-beach": {
-    hero: "Hotell i Barceloneta och Poblenou där du kan kombinera Medelhavet med en riktigt bra hotellpool.",
+    hero: "Hotels in Barceloneta and Poblenou where you can combine the Mediterranean with a really good hotel pool.",
     body: [
       {
-        heading: "Vid stranden i Barceloneta",
+        heading: "Beachfront in Barceloneta",
         paragraphs: [
-          "**Hotel Arts Barcelona** — två pooler i trädgården, 50 meter från stranden.",
-          "**W Barcelona** — det ikoniska seglet, tre pooler och Wet Deck-festen.",
+          "**Hotel Arts Barcelona** — two pools in the garden, 50 meters from the beach.",
+          "**W Barcelona** — the iconic sail, three pools and the Wet Deck party.",
         ],
       },
       {
-        heading: "Lugnare alternativ i Poblenou & Diagonal Mar",
+        heading: "Calmer alternatives in Poblenou & Diagonal Mar",
         paragraphs: [
-          "**Hotel SB Diagonal Zero** — takpool med havsutsikt, mycket prisvärt jämfört med Barceloneta.",
-          "**Meliá Barcelona Sky** — 24:e våningens takpool, tio minuter från stranden i Poblenou.",
+          "**Hotel SB Diagonal Zero** — rooftop pool with sea view, very good value compared to Barceloneta.",
+          "**Meliá Barcelona Sky** — 24th-floor rooftop pool, ten minutes from the beach in Poblenou.",
         ],
       },
       {
-        heading: "Geheimtipset",
+        heading: "The hidden gem",
         paragraphs: [
-          "**Hotel Pulitzer** har ingen strand alls — men en av stadens charmigaste små takpooler och ligger 15 minuter från Barceloneta med metro. Ofta hälften så dyrt.",
+          "**Hotel Pulitzer** has no beach at all — but one of the city's most charming small rooftop pools and is 15 minutes from Barceloneta by metro. Often half the price.",
         ],
       },
     ],
   },
   "barcelona/pool-season": {
-    hero: "Allt om poolsäsongen i Barcelona — när öppnar takpoolerna och vilka är öppna året runt?",
+    hero: "Everything about pool season in Barcelona — when do the rooftop pools open and which are open year-round?",
     body: [
       {
-        heading: "Säsong i korthet",
+        heading: "Season at a glance",
         paragraphs: [
-          "**Maj–september** är högsäsong för takpooler. De flesta öppnar runt 15 maj och stänger 30 september.",
-          "**Juni–augusti** är de varmaste månaderna med vattentemperaturer på 24–27°C.",
-          "**April och oktober** kan vara behagligt, men många pooler är då stängda eller har begränsade öppettider.",
+          "**May–September** is high season for rooftop pools. Most open around May 15 and close September 30.",
+          "**June–August** are the warmest months with water temperatures of 24–27°C.",
+          "**April and October** can be pleasant, but many pools are closed or have limited hours then.",
         ],
       },
       {
-        heading: "Pooler öppna året runt",
+        heading: "Pools open year-round",
         paragraphs: [
-          "**Mandarin Oriental** — uppvärmd takpool öppen även vintertid.",
-          "**Hotel Arts** — inomhusspa med uppvärmd pool året runt.",
-          "**Bulgari-spats** finns inte i Barcelona ännu, men ovan två är säkra kort.",
+          "**Mandarin Oriental** — heated rooftop pool, open in winter too.",
+          "**Hotel Arts** — indoor spa with heated pool year-round.",
+          "**Bulgari spas** don't exist in Barcelona yet, but the two above are safe bets.",
         ],
       },
       {
-        heading: "Typiska öppettider",
+        heading: "Typical opening hours",
         paragraphs: [
-          "Takpooler är oftast öppna 10:00–20:00 för hotellgäster. Rooftop-barer med pool öppnar runt 17:00 för icke-gäster, men poolen själv är då stängd för bad.",
+          "Rooftop pools are usually open 10:00–20:00 for hotel guests. Rooftop bars with a pool open around 17:00 for non-guests, but the pool itself is then closed for swimming.",
         ],
       },
     ],

@@ -16,9 +16,9 @@ export const Route = createFileRoute("/$citySlug/$articleSlug")({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
-        <h1 className="font-display text-6xl text-primary">Guide saknas</h1>
+        <h1 className="font-display text-6xl text-primary">Guide missing</h1>
         <Link to="/" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
-          ← Till startsidan
+          ← Back to home
         </Link>
       </div>
       <SiteFooter />
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/$citySlug/$articleSlug")({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
-        <h1 className="font-display text-5xl text-primary">Något gick fel</h1>
+        <h1 className="font-display text-5xl text-primary">Something went wrong</h1>
         <p className="mt-4 text-muted-foreground">{error.message}</p>
       </div>
     </div>
@@ -108,10 +108,9 @@ function GuidePage() {
           <div className="mt-16 rounded-lg border border-primary/30 bg-primary/5 p-6 text-sm text-muted-foreground">
             <p className="text-xs uppercase tracking-[0.25em] text-primary">Disclosure</p>
             <p className="mt-2">
-              Vissa länkar i den här guiden kan vara annonslänkar. Det påverkar aldrig vår
-              ranking — läs mer på{" "}
+              Some links in this guide may be affiliate links. They never affect our ranking — read more on{" "}
               <Link to="/disclosure" className="underline hover:text-primary">
-                Annonslänkar & disclosure
+                Affiliate links & disclosure
               </Link>.
             </p>
           </div>
@@ -120,8 +119,8 @@ function GuidePage() {
         {related.length > 0 && (
           <section className="border-t border-border/40 bg-surface/40">
             <div className="mx-auto max-w-7xl px-6 py-20">
-              <p className="text-xs uppercase tracking-[0.3em] text-primary">Mer från {guide.city}</p>
-              <h2 className="mt-3 font-display text-5xl tracking-wide">Fler guider</h2>
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">More from {guide.city}</p>
+              <h2 className="mt-3 font-display text-5xl tracking-wide">More guides</h2>
               <div className="mt-10 grid gap-6 md:grid-cols-3">
                 {related.map((g) => (
                   <Link
