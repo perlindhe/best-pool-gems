@@ -259,7 +259,7 @@ async function saveSnapshot(
   source: SourceKey,
   rating: number,
   count: number,
-  raw: unknown,
+  raw: Record<string, unknown>,
 ) {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
