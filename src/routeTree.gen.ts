@@ -17,6 +17,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
@@ -63,6 +64,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HotelsSlugRoute = HotelsSlugRouteImport.update({
+  id: '/hotels/$slug',
+  path: '/hotels/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BarcelonaLuxuryPoolHotelsRoute =
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/hotels/$slug': typeof HotelsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/hotels/$slug': typeof HotelsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/hotels/$slug': typeof HotelsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
+    | '/hotels/$slug'
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
+    | '/hotels/$slug'
     | '/admin'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
+    | '/hotels/$slug'
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
@@ -220,6 +232,7 @@ export interface RootRouteChildren {
   RankingsRoute: typeof RankingsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
+  HotelsSlugRoute: typeof HotelsSlugRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hotels/$slug': {
+      id: '/hotels/$slug'
+      path: '/hotels/$slug'
+      fullPath: '/hotels/$slug'
+      preLoaderRoute: typeof HotelsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/barcelona/luxury-pool-hotels': {
@@ -370,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   RankingsRoute: RankingsRoute,
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
+  HotelsSlugRoute: HotelsSlugRoute,
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
