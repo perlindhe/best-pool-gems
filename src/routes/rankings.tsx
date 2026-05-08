@@ -90,7 +90,13 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
 
       <div>
         <div className="flex flex-wrap items-baseline gap-x-3">
-          <h2 className="font-display text-3xl tracking-wide md:text-4xl">{hotel.name}</h2>
+          <Link
+            to="/hotels/$slug"
+            params={{ slug: hotel.slug }}
+            className="font-display text-3xl tracking-wide transition hover:text-primary md:text-4xl"
+          >
+            {hotel.name}
+          </Link>
           {hotel.country && (
             <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               {hotel.city}
