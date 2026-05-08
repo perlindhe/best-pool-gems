@@ -16,6 +16,7 @@ import {
   adminGetSettings,
   adminUpdateSettings,
   adminRecomputeAll,
+  adminFetchAllRatings,
 } from "@/server/admin.functions";
 import { googleSearchPlace, googleFetchRating } from "@/server/google-places.functions";
 import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/server/tripadvisor.functions";
@@ -114,6 +115,12 @@ function AdminPage() {
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${tab === "settings" ? "bg-primary text-primary-foreground" : "border border-border"}`}
             >
               Settings
+            </button>
+            <button
+              onClick={() => wrap(async () => { const r = await adminFetchAllRatings(); setMsg(`Fetched ratings: ${r.ok} ok, ${r.errors} errors (${r.processed} mappings)`); if (selected) await loadDetail(selected); })}
+              className="rounded-full border border-primary/40 px-4 py-2 text-xs uppercase tracking-[0.2em]"
+            >
+              Fetch all ratings
             </button>
             <button
               onClick={() => wrap(async () => { const r = await adminRecomputeAll(); setMsg(`Recomputed ${r.processed} hotels`); })}
