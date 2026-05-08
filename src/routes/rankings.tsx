@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { listRankedHotels, type RankedHotel } from "@/lib/rankings.functions";
 
 export const Route = createFileRoute("/rankings")({
