@@ -15,6 +15,9 @@ export function SiteHeader() {
           <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }} className="transition hover:text-foreground">
             Home
           </Link>
+          <Link to="/rankings" activeProps={{ className: "text-foreground" }} className="transition hover:text-foreground">
+            Rankings
+          </Link>
           {cities.map((c) => (
             <Link
               key={c.slug}
