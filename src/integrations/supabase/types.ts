@@ -329,6 +329,7 @@ export type Database = {
           name: string | null
           neighborhood: string | null
           pool_components: Json | null
+          pool_facts: Json | null
           pool_score_0_10: number | null
           pool_score_updated_at: string | null
           pool_type: string | null
