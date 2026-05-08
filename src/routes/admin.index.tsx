@@ -53,6 +53,7 @@ function AdminPage() {
     if (batchRunning) return;
     setBatchRunning(true);
     setBatchCancel(false);
+    batchCancelRef.current = false;
     setBatchResults([]);
     setBatchProgress({ done: 0, total: hotels.length });
     setMsg(null);
