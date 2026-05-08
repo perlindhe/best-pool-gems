@@ -6,7 +6,7 @@ export const Route = createFileRoute("/cookies")({
   head: () => ({
     meta: [
       { title: "Cookies — PoolList" },
-      { name: "description", content: "Hur PoolList använder cookies för analytics och affiliate-länkar." },
+      { name: "description", content: "How PoolList uses cookies for analytics and affiliate links." },
     ],
   }),
   component: CookiesPage,
@@ -17,58 +17,58 @@ function CookiesPage() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <section className="mx-auto max-w-3xl px-6 py-24">
-        <p className="text-xs uppercase tracking-[0.35em] text-primary">Juridik</p>
+        <p className="text-xs uppercase tracking-[0.35em] text-primary">Legal</p>
         <h1 className="mt-4 font-display text-6xl leading-[0.9] tracking-wide md:text-7xl">
           Cookies
         </h1>
-        <p className="mt-6 text-sm text-muted-foreground">Senast uppdaterad: april 2026</p>
+        <p className="mt-6 text-sm text-muted-foreground">Last updated: April 2026</p>
 
         <div className="mt-10 space-y-8 text-lg leading-relaxed text-foreground/90">
           <p>
-            PoolList använder cookies för att förstå hur sajten används och för att kunna
-            tjäna pengar via affiliate-länkar. Vi använder inte cookies för riktad reklam.
+            PoolList uses cookies to understand how the site is used and to earn
+            money via affiliate links. We don't use cookies for targeted advertising.
           </p>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Nödvändiga cookies</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Necessary cookies</h2>
             <p className="mt-3">
-              Sätts av sajten för att den ska fungera (sessionshantering, språk).
-              Kräver inte samtycke.
+              Set by the site so it works (session handling, language).
+              No consent required.
             </p>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Statistik (anonymiserad)</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Statistics (anonymized)</h2>
             <p className="mt-3">
-              Vi använder en integritetsvänlig analytics-tjänst (utan personlig spårning).
-              Inga uppgifter delas med tredje part i marknadsföringssyfte.
+              We use a privacy-friendly analytics service (no personal tracking).
+              No data is shared with third parties for marketing purposes.
             </p>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Affiliate-cookies</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Affiliate cookies</h2>
             <p className="mt-3">
-              När du klickar på en bok-länk till t.ex. Booking.com sätter <em>de</em> en
-              cookie i din webbläsare som gör att vi får ersättning om du bokar. Cookien
-              sätts först <strong className="text-foreground">efter</strong> att du klickat
-              — aldrig automatiskt vid sidladdning.
+              When you click a booking link to e.g. Booking.com, <em>they</em> set a
+              cookie in your browser so we receive a commission if you book. The cookie
+              is set only <strong className="text-foreground">after</strong> you click
+              — never automatically on page load.
             </p>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Hantera cookies</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Manage cookies</h2>
             <p className="mt-3">
-              Du kan när som helst rensa eller blockera cookies via din webbläsares
-              inställningar. Det påverkar inte din möjlighet att läsa innehållet på sajten.
+              You can clear or block cookies at any time via your browser
+              settings. It does not affect your ability to read the content on the site.
             </p>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            Frågor? Se vår{" "}
+            Questions? See our{" "}
             <Link to="/integritetspolicy" className="text-primary underline">
-              integritetspolicy
+              privacy policy
             </Link>{" "}
-            eller mejla{" "}
+            or email{" "}
             <a href="mailto:hej@poollist.se" className="text-primary underline">
               hej@poollist.se
             </a>.

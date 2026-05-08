@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/integritetspolicy")({
   head: () => ({
     meta: [
-      { title: "Integritetspolicy — PoolList" },
-      { name: "description", content: "Hur PoolList samlar in och hanterar personuppgifter." },
+      { title: "Privacy policy — PoolList" },
+      { name: "description", content: "How PoolList collects and handles personal data." },
     ],
   }),
   component: PrivacyPage,
@@ -17,18 +17,18 @@ function PrivacyPage() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <section className="mx-auto max-w-3xl px-6 py-24">
-        <p className="text-xs uppercase tracking-[0.35em] text-primary">Juridik</p>
+        <p className="text-xs uppercase tracking-[0.35em] text-primary">Legal</p>
         <h1 className="mt-4 font-display text-6xl leading-[0.9] tracking-wide md:text-7xl">
-          Integritetspolicy
+          Privacy policy
         </h1>
-        <p className="mt-6 text-sm text-muted-foreground">Senast uppdaterad: april 2026</p>
+        <p className="mt-6 text-sm text-muted-foreground">Last updated: April 2026</p>
 
         <div className="mt-10 space-y-8 text-lg leading-relaxed text-foreground/90">
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Personuppgiftsansvarig</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Data controller</h2>
             <p className="mt-3">
-              PoolList AB är personuppgiftsansvarig för behandlingen av dina uppgifter på
-              denna sajt. Kontakt:{" "}
+              PoolList AB is the data controller for the processing of your data on
+              this site. Contact:{" "}
               <a href="mailto:hej@poollist.se" className="text-primary underline">
                 hej@poollist.se
               </a>.
@@ -36,46 +36,46 @@ function PrivacyPage() {
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Vilka uppgifter samlar vi in?</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">What data do we collect?</h2>
             <ul className="mt-3 list-inside list-disc space-y-2">
               <li>
-                <strong className="text-foreground">Analytics</strong> — anonymiserad
-                besöksstatistik (vilka sidor som besöks, från vilken stad, enhetstyp).
+                <strong className="text-foreground">Analytics</strong> — anonymized
+                visitor statistics (which pages are visited, from which city, device type).
               </li>
               <li>
-                <strong className="text-foreground">Affiliate-cookies</strong> — när du
-                klickar på en bok-länk sätter partners (Booking.com, Hotels.com) cookies
-                så att vi får ersättning för bokningen.
+                <strong className="text-foreground">Affiliate cookies</strong> — when you
+                click a booking link, partners (Booking.com, Hotels.com) set cookies
+                so we receive a commission for the booking.
               </li>
               <li>
-                <strong className="text-foreground">E-post</strong> — om du skriver till
-                oss sparar vi din mejl tills ärendet är löst.
+                <strong className="text-foreground">Email</strong> — if you write to
+                us we keep your email until the matter is resolved.
               </li>
             </ul>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Rättslig grund</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Legal basis</h2>
             <p className="mt-3">
-              Vi behandlar uppgifter med stöd av samtycke (cookies) och berättigat intresse
-              (anonymiserad statistik för att förbättra sajten).
+              We process data based on consent (cookies) and legitimate interest
+              (anonymized statistics to improve the site).
             </p>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Dina rättigheter</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">Your rights</h2>
             <p className="mt-3">
-              Du har rätt att begära registerutdrag, rättelse, radering och invändning
-              mot behandling. Mejla oss så fixar vi det inom 30 dagar.
+              You have the right to request a data extract, correction, deletion and
+              objection to processing. Email us and we'll handle it within 30 days.
             </p>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl tracking-wide text-primary">Mer info</h2>
+            <h2 className="font-display text-3xl tracking-wide text-primary">More info</h2>
             <p className="mt-3">
-              Läs även våra{" "}
-              <Link to="/cookies" className="text-primary underline">cookie-inställningar</Link>{" "}
-              och{" "}
+              Also read our{" "}
+              <Link to="/cookies" className="text-primary underline">cookie settings</Link>{" "}
+              and{" "}
               <Link to="/disclosure" className="text-primary underline">disclosure</Link>.
             </p>
           </div>

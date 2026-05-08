@@ -9,28 +9,28 @@ export function SiteFooter() {
             Pool<span className="text-primary">List</span>
           </p>
           <p className="mt-3 max-w-md text-sm text-muted-foreground">
-            Oberoende rankningar av världens snyggaste hotellpooler. Inga sponsrade placeringar.
+            Independent rankings of the world's most beautiful hotel pools. No sponsored placements.
           </p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-primary">Sajten</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary">The site</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li><Link to="/" className="hover:text-primary">Bästa hotellpooler</Link></li>
-            <li><Link to="/about" className="hover:text-primary">Om PoolList</Link></li>
-            <li><Link to="/disclosure" className="hover:text-primary">Annonslänkar & disclosure</Link></li>
+            <li><Link to="/" className="hover:text-primary">Best hotel pools</Link></li>
+            <li><Link to="/about" className="hover:text-primary">About PoolList</Link></li>
+            <li><Link to="/disclosure" className="hover:text-primary">Affiliate links & disclosure</Link></li>
           </ul>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-primary">Juridik</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary">Legal</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li><Link to="/integritetspolicy" className="hover:text-primary">Integritetspolicy</Link></li>
+            <li><Link to="/integritetspolicy" className="hover:text-primary">Privacy policy</Link></li>
             <li><Link to="/cookies" className="hover:text-primary">Cookies</Link></li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/40">
         <p className="mx-auto max-w-7xl px-6 py-5 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          © {new Date().getFullYear()} PoolList — gjort för soldyrkare
+          © {new Date().getFullYear()} PoolList — made for sun chasers
         </p>
       </div>
     </footer>

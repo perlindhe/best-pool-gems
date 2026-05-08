@@ -7,10 +7,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bästa hotellpooler — PoolList" },
-      { name: "description", content: "Oberoende guide till de bästa hotellpoolerna i världens största turiststäder. Rankningar, guider och insidertips." },
-      { property: "og:title", content: "Bästa hotellpooler — PoolList" },
-      { property: "og:description", content: "Oberoende rankningar av världens snyggaste hotellpooler." },
+      { title: "Best hotel pools — PoolList" },
+      { name: "description", content: "Independent guide to the best hotel pools in the world's biggest travel cities. Rankings, guides and insider tips." },
+      { property: "og:title", content: "Best hotel pools — PoolList" },
+      { property: "og:description", content: "Independent rankings of the world's most beautiful hotel pools." },
     ],
   }),
   component: Home,
@@ -27,7 +27,7 @@ function Home() {
       <section className="relative isolate overflow-hidden">
         <img
           src={heroImg}
-          alt="Takpool i solnedgång"
+          alt="Rooftop pool at sunset"
           width={1920}
           height={1280}
           className="absolute inset-0 -z-10 h-full w-full object-cover"
@@ -36,11 +36,11 @@ function Home() {
         <div className="mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-20 pt-32 md:pb-28">
           <p className="text-xs uppercase tracking-[0.4em] text-primary">Edition 01 · 2026</p>
           <h1 className="mt-6 max-w-5xl font-display text-[clamp(3.5rem,11vw,9rem)] leading-[0.85] tracking-tight text-balance">
-            Bästa <span className="text-primary">hotellpoolerna</span>, rankade.
+            The best <span className="text-primary">hotel pools</span>, ranked.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-foreground/85 md:text-xl">
-            Oberoende rankningar och guider till världens snyggaste hotellpooler — i Barcelona,
-            Paris, London och New York. Inga sponsrade placeringar.
+            Independent rankings and guides to the world's most beautiful hotel pools — in Barcelona,
+            Paris, London and New York. No sponsored placements.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
@@ -48,13 +48,13 @@ function Home() {
               params={{ citySlug: "barcelona" }}
               className="rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
             >
-              Topp 10 Barcelona
+              Top 10 Barcelona
             </Link>
             <Link
               to="/about"
               className="rounded-full border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.2em] backdrop-blur transition hover:border-primary hover:bg-primary/10"
             >
-              Hur vi rankar
+              How we rank
             </Link>
           </div>
         </div>
@@ -64,13 +64,13 @@ function Home() {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-primary">Senaste guiderna</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">Latest guides</p>
             <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
-              Färska poolspaningar
+              Fresh pool reports
             </h2>
           </div>
           <p className="hidden max-w-sm text-sm text-muted-foreground md:block">
-            Kuraterade tips från redaktionens senaste resor — uppdaterat veckovis.
+            Curated tips from our editors' latest trips — updated weekly.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ function Home() {
               </h3>
               <p className="mt-4 max-w-lg text-base text-foreground/90">{latestGuides[0].excerpt}</p>
               <span className="mt-6 inline-flex w-fit items-center gap-2 text-sm uppercase tracking-[0.25em] text-primary">
-                Läs guiden <span aria-hidden>→</span>
+                Read the guide <span aria-hidden>→</span>
               </span>
             </div>
           </Link>
@@ -128,8 +128,8 @@ function Home() {
       {/* Cities row */}
       <section className="border-y border-border/50 bg-surface/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Destinationer</p>
-          <h2 className="mt-3 font-display text-5xl tracking-wide">Utforska per stad</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Destinations</p>
+          <h2 className="mt-3 font-display text-5xl tracking-wide">Explore by city</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {cities.map((c) => (
               <Link
@@ -140,7 +140,7 @@ function Home() {
               >
                 <img
                   src={c.image}
-                  alt={`Pool i ${c.name}`}
+                  alt={`Pool in ${c.name}`}
                   width={1280}
                   height={896}
                   loading="lazy"

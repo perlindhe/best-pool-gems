@@ -14,8 +14,8 @@ export const Route = createFileRoute("/$citySlug")({
   head: ({ loaderData }) => {
     const city = loaderData?.city;
     if (!city) return {};
-    const title = `Bästa pool-hotellen i ${city.name} — PoolList`;
-    const description = `Rankningar och guider till hotell med bäst pooler i ${city.name}. ${city.tagline}.`;
+    const title = `Best pool hotels in ${city.name} — PoolList`;
+    const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
     return {
       meta: [
         { title },
@@ -32,10 +32,10 @@ export const Route = createFileRoute("/$citySlug")({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
-        <h1 className="font-display text-6xl text-primary">Sidan saknas</h1>
-        <p className="mt-4 text-muted-foreground">Vi täcker inte den här destinationen ännu.</p>
+        <h1 className="font-display text-6xl text-primary">Page missing</h1>
+        <p className="mt-4 text-muted-foreground">We don't cover that destination yet.</p>
         <Link to="/" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
-          ← Till startsidan
+          ← Back to home
         </Link>
       </div>
       <SiteFooter />
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/$citySlug")({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
-        <h1 className="font-display text-5xl text-primary">Något gick fel</h1>
+        <h1 className="font-display text-5xl text-primary">Something went wrong</h1>
         <p className="mt-4 text-muted-foreground">{error.message}</p>
       </div>
     </div>
@@ -65,7 +65,7 @@ function CityHub() {
       <section className="relative isolate overflow-hidden">
         <img
           src={city.image}
-          alt={`Pool i ${city.name}`}
+          alt={`Pool in ${city.name}`}
           width={1280}
           height={896}
           className="absolute inset-0 -z-10 h-full w-full object-cover"
@@ -90,8 +90,8 @@ function CityHub() {
       {/* Guides for this city */}
       {cityGuides.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Guider</p>
-          <h2 className="mt-3 font-display text-5xl tracking-wide">Alla {city.name}-guider</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Guides</p>
+          <h2 className="mt-3 font-display text-5xl tracking-wide">All {city.name} guides</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             {cityGuides.map((g: Guide) => (
               <Link
@@ -116,8 +116,8 @@ function CityHub() {
       {/* Top hotels list (if any) */}
       {city.hotels.length > 0 && (
         <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Rankning</p>
-          <h2 className="font-display text-5xl tracking-wide">Topp {city.hotels.length}</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
+          <h2 className="font-display text-5xl tracking-wide">Top {city.hotels.length}</h2>
           {city.hotels.map((h: Hotel) => (
             <HotelCard key={h.rank} hotel={h} />
           ))}
@@ -127,8 +127,8 @@ function CityHub() {
       {/* Other cities */}
       <section className="border-t border-border/50 bg-surface/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Fortsätt utforska</p>
-          <h2 className="mt-3 font-display text-5xl tracking-wide">Andra städer</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Keep exploring</p>
+          <h2 className="mt-3 font-display text-5xl tracking-wide">Other cities</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {otherCities.map((c) => (
               <Link
@@ -139,7 +139,7 @@ function CityHub() {
               >
                 <img
                   src={c.image}
-                  alt={`Pool i ${c.name}`}
+                  alt={`Pool in ${c.name}`}
                   width={1280}
                   height={896}
                   loading="lazy"
