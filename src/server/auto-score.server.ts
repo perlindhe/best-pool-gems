@@ -175,7 +175,7 @@ export async function autoScoreHotelById(hotel_id: string) {
   if (!lovableKey) throw new Error("LOVABLE_API_KEY not configured");
 
   const [hotelRes, mapsRes] = await Promise.all([
-    supabaseAdmin.from("hotels").select("name, city, country, neighborhood").eq("id", hotel_id).single(),
+    supabaseAdmin.from("hotels").select("name, city, country, neighborhood, website_url").eq("id", hotel_id).single(),
     supabaseAdmin
       .from("source_mappings")
       .select("source, source_place_id")
