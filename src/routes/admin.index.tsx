@@ -408,6 +408,23 @@ function HotelDetail({
     }
   };
 
+  const [photosBusy, setPhotosBusy] = useState(false);
+  const [photosMsg, setPhotosMsg] = useState<string | null>(null);
+  const runRefreshPhotos = async () => {
+    setPhotosBusy(true);
+    setPhotosMsg(null);
+    try {
+      const r = await adminRefreshHotelPhotos({ data: { hotel_id: h.id } });
+      setPhotosMsg(
+        `✓ ${r.counts.total} photos saved (Google: ${r.counts.google}, TripAdvisor: ${r.counts.tripadvisor}, Website: ${r.counts.website})`,
+      );
+    } catch (e) {
+      setPhotosMsg((e as Error).message);
+    } finally {
+      setPhotosBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Core */}
