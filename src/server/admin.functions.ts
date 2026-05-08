@@ -575,3 +575,13 @@ export const adminUpdateSettings = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- HOTEL PHOTOS ----------
+export const adminRefreshHotelPhotos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ hotel_id: z.string().uuid() }).parse(input))
+  .handler(async ({ context, data }) => {
+    await ensureAdmin(context.userId);
+    const { refreshHotelPhotos } = await import("./hotel-photos.server");
+    return refreshHotelPhotos(data.hotel_id);
+  });

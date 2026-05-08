@@ -18,6 +18,7 @@ import {
   adminRecomputeAll,
   adminFetchAllRatings,
   adminAutoScoreHotel,
+  adminRefreshHotelPhotos,
 } from "@/server/admin.functions";
 import { googleSearchPlace, googleFetchRating } from "@/server/google-places.functions";
 import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/server/tripadvisor.functions";
@@ -407,6 +408,23 @@ function HotelDetail({
     }
   };
 
+  const [photosBusy, setPhotosBusy] = useState(false);
+  const [photosMsg, setPhotosMsg] = useState<string | null>(null);
+  const runRefreshPhotos = async () => {
+    setPhotosBusy(true);
+    setPhotosMsg(null);
+    try {
+      const r = await adminRefreshHotelPhotos({ data: { hotel_id: h.id } });
+      setPhotosMsg(
+        `✓ ${r.counts.total} photos saved (Google: ${r.counts.google}, TripAdvisor: ${r.counts.tripadvisor}, Website: ${r.counts.website})`,
+      );
+    } catch (e) {
+      setPhotosMsg((e as Error).message);
+    } finally {
+      setPhotosBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Core */}
@@ -435,6 +453,28 @@ function HotelDetail({
 
       {!h.id ? null : (
         <>
+          {/* Photos */}
+          <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-display text-2xl">Photos</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Fetches from Google Places, TripAdvisor and the hotel's website. Replaces existing cache.
+                </p>
+              </div>
+              <button
+                disabled={photosBusy}
+                onClick={runRefreshPhotos}
+                className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
+              >
+                {photosBusy ? "Fetching…" : "🖼 Refresh photos"}
+              </button>
+            </div>
+            {photosMsg && (
+              <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-xs">{photosMsg}</div>
+            )}
+          </section>
+
           {/* Mappings */}
           <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
             <h2 className="font-display text-2xl">Sources (Place IDs)</h2>

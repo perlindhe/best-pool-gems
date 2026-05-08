@@ -5,54 +5,8 @@ export type HotelPhoto = {
   width: number;
   height: number;
   attribution?: string;
+  source?: string;
 };
-
-async function fetchGooglePhotos(place_id: string, max = 8): Promise<HotelPhoto[]> {
-  const key = process.env.GOOGLE_PLACES_API_KEY;
-  if (!key) return [];
-  const detailsRes = await fetch(
-    `https://places.googleapis.com/v1/places/${encodeURIComponent(place_id)}`,
-    {
-      headers: {
-        "X-Goog-Api-Key": key,
-        "X-Goog-FieldMask": "photos",
-      },
-    },
-  );
-  if (!detailsRes.ok) return [];
-  const json = (await detailsRes.json()) as {
-    photos?: Array<{
-      name: string;
-      widthPx?: number;
-      heightPx?: number;
-      authorAttributions?: Array<{ displayName?: string }>;
-    }>;
-  };
-  const photos = (json.photos ?? []).slice(0, max);
-
-  const resolved = await Promise.all(
-    photos.map(async (p) => {
-      try {
-        const res = await fetch(
-          `https://places.googleapis.com/v1/${p.name}/media?maxWidthPx=1600&skipHttpRedirect=true&key=${encodeURIComponent(key)}`,
-        );
-        if (!res.ok) return null;
-        const data = (await res.json()) as { photoUri?: string };
-        if (!data.photoUri) return null;
-        return {
-          url: data.photoUri,
-          width: p.widthPx ?? 1600,
-          height: p.heightPx ?? 1067,
-          attribution: p.authorAttributions?.[0]?.displayName,
-        } as HotelPhoto;
-      } catch {
-        return null;
-      }
-    }),
-  );
-
-  return resolved.filter((p): p is HotelPhoto => p !== null);
-}
 
 export async function getHotelDetail(slug: string) {
   const { data: hotel, error } = await supabaseAdmin
@@ -65,17 +19,20 @@ export async function getHotelDetail(slug: string) {
   if (error) throw new Error(error.message);
   if (!hotel) return null;
 
-  const { data: mappings } = await supabaseAdmin
-    .from("source_mappings")
-    .select("source, source_place_id")
+  const { data: photoRows } = await supabaseAdmin
+    .from("hotel_photos")
+    .select("url, width, height, attribution, source")
     .eq("hotel_id", hotel.id as string)
-    .eq("is_active", true);
-  const googleMap = (mappings ?? []).find((m) => m.source === "google");
+    .order("position", { ascending: true });
 
-  let photos: HotelPhoto[] = [];
-  if (googleMap?.source_place_id) {
-    photos = await fetchGooglePhotos(googleMap.source_place_id);
-  }
+  const photos: HotelPhoto[] = (photoRows ?? []).map((p) => ({
+    url: p.url as string,
+    width: (p.width as number) ?? 1600,
+    height: (p.height as number) ?? 1067,
+    attribution: (p.attribution as string) ?? undefined,
+    source: (p.source as string) ?? undefined,
+  }));
 
   return { hotel, photos };
 }
+
