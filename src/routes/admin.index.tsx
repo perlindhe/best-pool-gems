@@ -45,6 +45,7 @@ function AdminPage() {
   type BatchResult = { id: string; name: string; ok: boolean; score?: number; confidence?: string; msg: string };
   const [batchRunning, setBatchRunning] = useState(false);
   const [batchCancel, setBatchCancel] = useState(false);
+  const batchCancelRef = useRef(false);
   const [batchProgress, setBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [batchResults, setBatchResults] = useState<BatchResult[]>([]);
 
