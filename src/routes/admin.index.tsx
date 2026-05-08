@@ -70,6 +70,7 @@ function AdminPage() {
             pool_type: r.pool_type,
             best_time: r.best_time,
             editorial_notes: r.editorial_notes,
+            facts: r.facts ?? null,
           },
         });
         setBatchResults((prev) => [
