@@ -1,0 +1,1 @@
+ALTER VIEW public.public_hotels_view SET (security_invoker = true);

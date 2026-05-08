@@ -53,6 +53,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
                   best_time: r.best_time || null,
                   pool_type: r.pool_type || null,
                   editorial_notes: r.editorial_notes || null,
+                  facts: (r.facts ?? null) as never,
                 },
                 { onConflict: "hotel_id" },
               );

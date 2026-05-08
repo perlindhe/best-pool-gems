@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { listRankedHotels, type RankedHotel } from "@/lib/rankings.functions";
 
 export const Route = createFileRoute("/rankings")({
@@ -135,6 +136,7 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
             </a>
           )}
         </div>
+        <PoolFactsTable facts={hotel.pool_facts} />
       </div>
 
       <div className="flex gap-4 md:flex-col md:items-end md:gap-2">
