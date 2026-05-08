@@ -50,6 +50,43 @@ function AdminPage() {
   const [batchProgress, setBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [batchResults, setBatchResults] = useState<BatchResult[]>([]);
 
+  type PhotoResult = { id: string; name: string; ok: boolean; total?: number; msg: string };
+  const [photosBatchRunning, setPhotosBatchRunning] = useState(false);
+  const photosBatchCancelRef = useRef(false);
+  const [photosBatchProgress, setPhotosBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
+  const [photosBatchResults, setPhotosBatchResults] = useState<PhotoResult[]>([]);
+
+  const runBatchPhotos = async () => {
+    if (photosBatchRunning) return;
+    setPhotosBatchRunning(true);
+    photosBatchCancelRef.current = false;
+    setPhotosBatchResults([]);
+    setPhotosBatchProgress({ done: 0, total: hotels.length });
+    setMsg(null);
+    for (let i = 0; i < hotels.length; i++) {
+      if (photosBatchCancelRef.current) break;
+      const h = hotels[i];
+      try {
+        const r = await adminRefreshHotelPhotos({ data: { hotel_id: h.id } });
+        setPhotosBatchResults((prev) => [
+          ...prev,
+          { id: h.id, name: h.name, ok: true, total: r.counts.total,
+            msg: `${r.counts.total} photos (G:${r.counts.google} TA:${r.counts.tripadvisor} W:${r.counts.website})` },
+        ]);
+      } catch (e) {
+        const errMsg = (e as Error).message;
+        setPhotosBatchResults((prev) => [...prev, { id: h.id, name: h.name, ok: false, msg: errMsg }]);
+        if (/rate limit|credits exhausted|402|429/i.test(errMsg)) {
+          photosBatchCancelRef.current = true;
+          setMsg(errMsg);
+        }
+      }
+      setPhotosBatchProgress({ done: i + 1, total: hotels.length });
+      await new Promise((res) => setTimeout(res, 600));
+    }
+    setPhotosBatchRunning(false);
+  };
+
   const runBatchAutoScore = async () => {
     if (batchRunning) return;
     setBatchRunning(true);
@@ -197,6 +234,21 @@ function AdminPage() {
               </button>
             )}
             <button
+              onClick={runBatchPhotos}
+              disabled={photosBatchRunning || hotels.length === 0}
+              className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
+            >
+              {photosBatchRunning ? `Photos ${photosBatchProgress.done}/${photosBatchProgress.total}…` : "🖼 Refresh ALL photos"}
+            </button>
+            {photosBatchRunning && (
+              <button
+                onClick={() => { photosBatchCancelRef.current = true; }}
+                className="rounded-full border border-destructive/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-destructive"
+              >
+                Stop photos
+              </button>
+            )}
+            <button
               onClick={() => supabase.auth.signOut()}
               className="rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.2em]"
             >
@@ -246,6 +298,42 @@ function AdminPage() {
                     ) : (
                       <span className="text-destructive">✕</span>
                     )}
+                  </div>
+                  <div className="mt-0.5 text-muted-foreground line-clamp-2">{r.msg}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {(photosBatchRunning || photosBatchResults.length > 0) && (
+          <div className="mt-4 rounded-lg border border-primary/30 bg-surface/40 p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs uppercase tracking-[0.2em] text-primary">
+                Batch photos · {photosBatchProgress.done}/{photosBatchProgress.total}
+                {!photosBatchRunning && photosBatchResults.length > 0 && " · done"}
+              </h3>
+              {!photosBatchRunning && (
+                <button onClick={() => setPhotosBatchResults([])} className="text-xs text-muted-foreground hover:text-foreground">
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border/50">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${photosBatchProgress.total ? (photosBatchProgress.done / photosBatchProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+            <ul className="mt-3 max-h-72 space-y-1 overflow-auto text-xs">
+              {photosBatchResults.map((r) => (
+                <li
+                  key={r.id}
+                  className={`rounded border px-2 py-1.5 ${r.ok ? "border-primary/20 bg-primary/5" : "border-destructive/30 bg-destructive/5"}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium">{r.name}</span>
+                    {r.ok ? <span className="font-display text-primary">{r.total} 📷</span> : <span className="text-destructive">✕</span>}
                   </div>
                   <div className="mt-0.5 text-muted-foreground line-clamp-2">{r.msg}</div>
                 </li>
