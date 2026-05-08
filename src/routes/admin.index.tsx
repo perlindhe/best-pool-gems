@@ -361,11 +361,18 @@ function HotelDetail({
 
   const [snap, setSnap] = useState({ source: "google", rating_value: 4.5, rating_scale: 5, rating_count: 100 });
   const pool = data.pool?.components ?? { vibe: 1.5, lounging_space: 1.5, service: 1.5, uniqueness: 1.5, pool_first_feel: 1.5 };
-  const [poolForm, setPoolForm] = useState({
+  const [poolForm, setPoolForm] = useState<{
+    components: Record<string, number>;
+    best_time: string;
+    pool_type: string;
+    editorial_notes: string;
+    facts: Record<string, unknown> | null;
+  }>({
     components: pool,
     best_time: data.pool?.best_time ?? "",
     pool_type: data.pool?.pool_type ?? "",
     editorial_notes: data.pool?.editorial_notes ?? "",
+    facts: (data.pool?.facts as Record<string, unknown> | null) ?? null,
   });
   useEffect(() => {
     setPoolForm({
@@ -373,6 +380,7 @@ function HotelDetail({
       best_time: data.pool?.best_time ?? "",
       pool_type: data.pool?.pool_type ?? "",
       editorial_notes: data.pool?.editorial_notes ?? "",
+      facts: (data.pool?.facts as Record<string, unknown> | null) ?? null,
     });
   }, [h.id]);
   const poolSum = Object.values(poolForm.components).reduce((a: number, b: any) => a + Number(b || 0), 0).toFixed(1);
@@ -389,6 +397,7 @@ function HotelDetail({
         pool_type: r.pool_type,
         best_time: r.best_time,
         editorial_notes: r.editorial_notes,
+        facts: (r.facts as Record<string, unknown> | null) ?? null,
       });
       setAiMsg(`✓ Scored ${r.pool_score_0_10}/10 (confidence: ${r.confidence}, ${r.reviews_analyzed} reviews). ${r.reasoning} — Review and click Save.`);
     } catch (e) {
