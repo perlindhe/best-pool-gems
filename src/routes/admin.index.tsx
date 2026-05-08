@@ -266,6 +266,27 @@ function HotelDetail({
   }, [h.id]);
   const poolSum = Object.values(poolForm.components).reduce((a: number, b: any) => a + Number(b || 0), 0).toFixed(1);
 
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiMsg, setAiMsg] = useState<string | null>(null);
+  const runAutoScore = async () => {
+    setAiBusy(true);
+    setAiMsg(null);
+    try {
+      const r = await adminAutoScoreHotel({ data: { hotel_id: h.id } });
+      setPoolForm({
+        components: r.components,
+        pool_type: r.pool_type,
+        best_time: r.best_time,
+        editorial_notes: r.editorial_notes,
+      });
+      setAiMsg(`✓ Scored ${r.pool_score_0_10}/10 (confidence: ${r.confidence}, ${r.reviews_analyzed} reviews). ${r.reasoning} — Review and click Save.`);
+    } catch (e) {
+      setAiMsg((e as Error).message);
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Core */}
