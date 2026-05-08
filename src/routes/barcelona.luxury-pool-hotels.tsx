@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import barcelonaImg from "@/assets/barcelona.jpg";
 
-const TITLE = "Top 10 pool hotels in Barcelona (Pool Score 2026) — PoolList";
+const TITLE = "Top 10 pool hotels in Barcelona (Pool Score 2026) — Best Pool Hotels";
 const DESCRIPTION =
   "Pool-first ranking of Barcelona's ten best hotel pools 2026. Pool Score, pool type, vibe, best time to visit, neighborhood guide and FAQ.";
 
@@ -124,7 +124,7 @@ function LuxuryPoolHotels() {
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
         <div className="mx-auto flex min-h-[72vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-28">
           <nav className="mb-6 text-xs uppercase tracking-[0.3em] text-primary">
-            <Link to="/" className="hover:text-foreground">PoolList</Link>
+            <Link to="/" className="hover:text-foreground">Best Pool Hotels</Link>
             <span className="mx-2 text-muted-foreground">/</span>
             <Link to="/$citySlug" params={{ citySlug: "barcelona" }} className="hover:text-foreground">
               Barcelona

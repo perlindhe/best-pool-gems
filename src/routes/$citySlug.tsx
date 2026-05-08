@@ -14,7 +14,7 @@ export const Route = createFileRoute("/$citySlug")({
   head: ({ loaderData }) => {
     const city = loaderData?.city;
     if (!city) return {};
-    const title = `Best pool hotels in ${city.name} — PoolList`;
+    const title = `Best pool hotels in ${city.name} — Best Pool Hotels`;
     const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
     return {
       meta: [

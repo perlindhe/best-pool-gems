@@ -111,7 +111,7 @@ export const guideContent: Record<string, GuideContent> = {
 
 export const buildGuideMeta = (guide: Guide) => ({
   meta: [
-    { title: `${guide.title} — PoolList` },
+    { title: `${guide.title} — Best Pool Hotels` },
     { name: "description", content: guide.excerpt },
     { property: "og:title", content: guide.title },
     { property: "og:description", content: guide.excerpt },

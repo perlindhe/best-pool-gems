@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/cookies")({
   head: () => ({
     meta: [
-      { title: "Cookies — PoolList" },
-      { name: "description", content: "How PoolList uses cookies for analytics and affiliate links." },
+      { title: "Cookies — Best Pool Hotels" },
+      { name: "description", content: "How Best Pool Hotels uses cookies for analytics and affiliate links." },
     ],
   }),
   component: CookiesPage,
@@ -25,7 +25,7 @@ function CookiesPage() {
 
         <div className="mt-10 space-y-8 text-lg leading-relaxed text-foreground/90">
           <p>
-            PoolList uses cookies to understand how the site is used and to earn
+            Best Pool Hotels uses cookies to understand how the site is used and to earn
             money via affiliate links. We don't use cookies for targeted advertising.
           </p>
 

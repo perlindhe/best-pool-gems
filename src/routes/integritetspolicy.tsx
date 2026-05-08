@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/integritetspolicy")({
   head: () => ({
     meta: [
-      { title: "Privacy policy — PoolList" },
-      { name: "description", content: "How PoolList collects and handles personal data." },
+      { title: "Privacy policy — Best Pool Hotels" },
+      { name: "description", content: "How Best Pool Hotels collects and handles personal data." },
     ],
   }),
   component: PrivacyPage,
@@ -27,7 +27,7 @@ function PrivacyPage() {
           <div>
             <h2 className="font-display text-3xl tracking-wide text-primary">Data controller</h2>
             <p className="mt-3">
-              PoolList AB is the data controller for the processing of your data on
+              Best Pool Hotels AB is the data controller for the processing of your data on
               this site. Contact:{" "}
               <a href="mailto:hej@poollist.se" className="text-primary underline">
                 hej@poollist.se

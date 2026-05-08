@@ -8,7 +8,7 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-gradient-aqua shadow-glow" />
           <span className="font-display text-2xl tracking-wider">
-            Pool<span className="text-primary">List</span>
+            Best Pool <span className="text-primary">Hotels</span>
           </span>
         </Link>
         <nav className="hidden items-center gap-7 text-sm uppercase tracking-[0.18em] text-muted-foreground md:flex">
