@@ -76,14 +76,55 @@ Also infer:
 - pool_type (e.g. "Rooftop infinity", "Indoor heated", "Beachfront", "Garden", "Lap pool")
 - best_time (e.g. "May–September, late afternoon")
 - editorial_notes: 2–4 sentences in editorial English describing what makes the pool special, citing concrete details from reviews. Do NOT use phrases like "guests said". Write as a confident editorial review.
+- facts: a structured object of pool facts. Use null for any field you cannot infer with reasonable confidence. Estimate cautiously — never invent numbers. If reviews mention "huge", "small", etc., make a rough estimate but mark estimated=true.
 
 Return your scores via the rate_pool function.`;
+
+const FactsSchema = {
+  type: "object",
+  properties: {
+    pool_count: { type: ["integer", "null"], minimum: 1, maximum: 30, description: "Total number of swimming pools at the hotel" },
+    is_rooftop: { type: ["boolean", "null"], description: "At least one pool is on the roof" },
+    is_infinity: { type: ["boolean", "null"], description: "At least one infinity-edge pool" },
+    is_heated: { type: ["boolean", "null"] },
+    has_indoor: { type: ["boolean", "null"] },
+    has_outdoor: { type: ["boolean", "null"] },
+    is_saltwater: { type: ["boolean", "null"] },
+    has_kids_pool: { type: ["boolean", "null"] },
+    has_jacuzzi: { type: ["boolean", "null"], description: "Hot tub / whirlpool / jacuzzi available" },
+    has_swim_up_bar: { type: ["boolean", "null"] },
+    has_cabanas: { type: ["boolean", "null"] },
+    has_poolside_food: { type: ["boolean", "null"] },
+    adults_only: { type: ["boolean", "null"], description: "Pool is adults-only (kids not allowed)" },
+    year_round: { type: ["boolean", "null"], description: "Pool is open all year" },
+    size_estimate: {
+      type: ["string", "null"],
+      enum: ["small", "medium", "large", "very_large", null],
+      description: "Rough size: small (<50m²), medium (50–150m²), large (150–400m²), very_large (>400m²)",
+    },
+    length_m: { type: ["number", "null"], minimum: 3, maximum: 200, description: "Approximate pool length in meters if known" },
+    view: {
+      type: ["string", "null"],
+      description: "Primary view from the main pool (e.g. 'Skyline', 'Sea', 'Garden', 'Mountain', 'Courtyard')",
+    },
+    season: {
+      type: ["string", "null"],
+      description: "Open season if not year-round (e.g. 'May–October')",
+    },
+  },
+  required: [
+    "pool_count", "is_rooftop", "is_infinity", "is_heated", "has_indoor", "has_outdoor",
+    "is_saltwater", "has_kids_pool", "has_jacuzzi", "has_swim_up_bar", "has_cabanas",
+    "has_poolside_food", "adults_only", "year_round", "size_estimate", "length_m", "view", "season",
+  ],
+  additionalProperties: false,
+};
 
 const AiToolSchema = {
   type: "function" as const,
   function: {
     name: "rate_pool",
-    description: "Return the 5 pool component scores and editorial metadata.",
+    description: "Return the 5 pool component scores, editorial metadata, and structured pool facts.",
     parameters: {
       type: "object",
       properties: {
@@ -97,22 +138,36 @@ const AiToolSchema = {
         editorial_notes: { type: "string" },
         confidence: { type: "string", enum: ["low", "medium", "high"] },
         reasoning: { type: "string" },
+        facts: FactsSchema,
       },
       required: [
-        "vibe",
-        "lounging_space",
-        "service",
-        "uniqueness",
-        "pool_first_feel",
-        "pool_type",
-        "best_time",
-        "editorial_notes",
-        "confidence",
-        "reasoning",
+        "vibe", "lounging_space", "service", "uniqueness", "pool_first_feel",
+        "pool_type", "best_time", "editorial_notes", "confidence", "reasoning", "facts",
       ],
       additionalProperties: false,
     },
   },
+};
+
+export type PoolFacts = {
+  pool_count: number | null;
+  is_rooftop: boolean | null;
+  is_infinity: boolean | null;
+  is_heated: boolean | null;
+  has_indoor: boolean | null;
+  has_outdoor: boolean | null;
+  is_saltwater: boolean | null;
+  has_kids_pool: boolean | null;
+  has_jacuzzi: boolean | null;
+  has_swim_up_bar: boolean | null;
+  has_cabanas: boolean | null;
+  has_poolside_food: boolean | null;
+  adults_only: boolean | null;
+  year_round: boolean | null;
+  size_estimate: "small" | "medium" | "large" | "very_large" | null;
+  length_m: number | null;
+  view: string | null;
+  season: string | null;
 };
 
 export async function autoScoreHotelById(hotel_id: string) {
