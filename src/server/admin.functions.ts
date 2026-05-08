@@ -613,6 +613,15 @@ export async function autoScoreHotelById(hotel_id: string) {
         pool_first_feel: parsed.pool_first_feel,
       }),
     };
+  }
+}
+
+export const adminAutoScoreHotel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ hotel_id: z.string().uuid() }).parse(input))
+  .handler(async ({ context, data }) => {
+    await ensureAdmin(context.userId);
+    return autoScoreHotelById(data.hotel_id);
   });
 
 // ---------- POOL SCORE ----------
