@@ -117,6 +117,12 @@ function AdminPage() {
               Settings
             </button>
             <button
+              onClick={() => wrap(async () => { const r = await adminFetchAllRatings(); setMsg(`Fetched ratings: ${r.ok} ok, ${r.errors} errors (${r.processed} mappings)`); if (selected) await loadDetail(selected); })}
+              className="rounded-full border border-primary/40 px-4 py-2 text-xs uppercase tracking-[0.2em]"
+            >
+              Fetch all ratings
+            </button>
+            <button
               onClick={() => wrap(async () => { const r = await adminRecomputeAll(); setMsg(`Recomputed ${r.processed} hotels`); })}
               className="rounded-full border border-primary/40 px-4 py-2 text-xs uppercase tracking-[0.2em]"
             >
