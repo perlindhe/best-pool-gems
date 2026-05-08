@@ -65,7 +65,7 @@ function RankingsPage() {
             No published hotels yet. Add some in the admin to see them ranked here.
           </p>
         ) : (
-          hotels.map((h, i) => <RankRow key={h.id} hotel={h} position={i + 1} />)
+          hotels.map((h: RankedHotel, i: number) => <RankRow key={h.id} hotel={h} position={i + 1} />)
         )}
       </section>
 
