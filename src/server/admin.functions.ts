@@ -488,12 +488,9 @@ const AiToolSchema = {
   },
 };
 
-export const adminAutoScoreHotel = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ hotel_id: z.string().uuid() }).parse(input))
-  .handler(async ({ context, data }) => {
-    await ensureAdmin(context.userId);
-
+export async function autoScoreHotelById(hotel_id: string) {
+  const data = { hotel_id };
+  {
     const lovableKey = process.env.LOVABLE_API_KEY;
     if (!lovableKey) throw new Error("LOVABLE_API_KEY not configured");
 
