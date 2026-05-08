@@ -80,7 +80,7 @@ function AdminPage() {
         const errMsg = (e as Error).message;
         setBatchResults((prev) => [...prev, { id: h.id, name: h.name, ok: false, msg: errMsg }]);
         if (errMsg.includes("rate limit") || errMsg.includes("credits exhausted")) {
-          cancelled = true;
+          batchCancelRef.current = true;
           setMsg(errMsg);
         }
       }
