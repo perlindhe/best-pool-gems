@@ -272,7 +272,7 @@ async function saveSnapshot(
       rating_count: count,
       captured_at: today.toISOString(),
       status: "ok",
-      raw_payload: raw,
+      raw_payload: raw as never,
     },
     { onConflict: "hotel_id,source,captured_date" },
   );
