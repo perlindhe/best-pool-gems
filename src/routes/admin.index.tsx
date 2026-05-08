@@ -17,6 +17,7 @@ import {
   adminUpdateSettings,
   adminRecomputeAll,
   adminFetchAllRatings,
+  adminAutoScoreHotel,
 } from "@/server/admin.functions";
 import { googleSearchPlace, googleFetchRating } from "@/server/google-places.functions";
 import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/server/tripadvisor.functions";
@@ -265,6 +266,27 @@ function HotelDetail({
   }, [h.id]);
   const poolSum = Object.values(poolForm.components).reduce((a: number, b: any) => a + Number(b || 0), 0).toFixed(1);
 
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiMsg, setAiMsg] = useState<string | null>(null);
+  const runAutoScore = async () => {
+    setAiBusy(true);
+    setAiMsg(null);
+    try {
+      const r = await adminAutoScoreHotel({ data: { hotel_id: h.id } });
+      setPoolForm({
+        components: r.components,
+        pool_type: r.pool_type,
+        best_time: r.best_time,
+        editorial_notes: r.editorial_notes,
+      });
+      setAiMsg(`✓ Scored ${r.pool_score_0_10}/10 (confidence: ${r.confidence}, ${r.reviews_analyzed} reviews). ${r.reasoning} — Review and click Save.`);
+    } catch (e) {
+      setAiMsg((e as Error).message);
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Core */}
@@ -366,8 +388,22 @@ function HotelDetail({
 
           {/* Pool Score */}
           <section className="rounded-lg border border-border/60 bg-surface/40 p-6">
-            <h2 className="font-display text-2xl">Pool Score (editorial)</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Each component 0–2. Sum = Pool Score 0–10.</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-display text-2xl">Pool Score (editorial)</h2>
+                <p className="mt-1 text-xs text-muted-foreground">Each component 0–2. Sum = Pool Score 0–10.</p>
+              </div>
+              <button
+                disabled={aiBusy}
+                onClick={runAutoScore}
+                className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
+              >
+                {aiBusy ? "Analyzing reviews…" : "✨ Auto-score with AI"}
+              </button>
+            </div>
+            {aiMsg && (
+              <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-xs">{aiMsg}</div>
+            )}
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {(["vibe","lounging_space","service","uniqueness","pool_first_feel"] as const).map((k) => (
                 <label key={k} className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
