@@ -24,6 +24,7 @@ import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$art
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
+import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
 
 const RankingsRoute = RankingsRouteImport.update({
@@ -103,6 +104,12 @@ const ApiPublicHooksRefreshGoogleRatingsRoute =
     path: '/api/public/hooks/refresh-google-ratings',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRefreshAllPhotosRoute =
+  ApiPublicHooksRefreshAllPhotosRouteImport.update({
+    id: '/api/public/hooks/refresh-all-photos',
+    path: '/api/public/hooks/refresh-all-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksAutoScoreAllRoute =
   ApiPublicHooksAutoScoreAllRouteImport.update({
     id: '/api/public/hooks/auto-score-all',
@@ -125,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
@@ -143,6 +151,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
@@ -162,6 +171,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hotels/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hotels/$slug'
   id:
@@ -218,6 +230,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hotels/$slug'
   fileRoutesById: FileRoutesById
@@ -236,6 +249,7 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
+  ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
   ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
 }
 
@@ -346,6 +360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshGoogleRatingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/refresh-all-photos': {
+      id: '/api/public/hooks/refresh-all-photos'
+      path: '/api/public/hooks/refresh-all-photos'
+      fullPath: '/api/public/hooks/refresh-all-photos'
+      preLoaderRoute: typeof ApiPublicHooksRefreshAllPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/auto-score-all': {
       id: '/api/public/hooks/auto-score-all'
       path: '/api/public/hooks/auto-score-all'
@@ -394,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
+  ApiPublicHooksRefreshAllPhotosRoute: ApiPublicHooksRefreshAllPhotosRoute,
   ApiPublicHooksRefreshGoogleRatingsRoute:
     ApiPublicHooksRefreshGoogleRatingsRoute,
 }
