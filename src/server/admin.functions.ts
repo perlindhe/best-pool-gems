@@ -529,7 +529,7 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
           best_time: data.best_time || null,
           pool_type: data.pool_type || null,
           editorial_notes: data.editorial_notes || null,
-          facts: data.facts ?? null,
+          facts: (data.facts ?? null) as never,
         },
         { onConflict: "hotel_id" },
       )
