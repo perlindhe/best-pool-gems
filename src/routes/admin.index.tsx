@@ -178,6 +178,21 @@ function AdminPage() {
               Recompute all
             </button>
             <button
+              onClick={runBatchAutoScore}
+              disabled={batchRunning || hotels.length === 0}
+              className="rounded-full border border-primary/60 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
+            >
+              {batchRunning ? `AI scoring ${batchProgress.done}/${batchProgress.total}…` : "✨ Auto-score ALL"}
+            </button>
+            {batchRunning && (
+              <button
+                onClick={() => setBatchCancel(true)}
+                className="rounded-full border border-destructive/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-destructive"
+              >
+                Stop
+              </button>
+            )}
+            <button
               onClick={() => supabase.auth.signOut()}
               className="rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.2em]"
             >
