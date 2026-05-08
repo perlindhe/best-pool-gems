@@ -188,7 +188,7 @@ function AdminPage() {
             </button>
             {batchRunning && (
               <button
-                onClick={() => setBatchCancel(true)}
+                onClick={() => { batchCancelRef.current = true; setBatchCancel(true); }}
                 className="rounded-full border border-destructive/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-destructive"
               >
                 Stop
