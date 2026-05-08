@@ -121,6 +121,7 @@ export type Database = {
           best_time: string | null
           components: Json | null
           editorial_notes: string | null
+          facts: Json | null
           hotel_id: string
           pool_score_0_10: number | null
           pool_type: string | null
@@ -130,6 +131,7 @@ export type Database = {
           best_time?: string | null
           components?: Json | null
           editorial_notes?: string | null
+          facts?: Json | null
           hotel_id: string
           pool_score_0_10?: number | null
           pool_type?: string | null
@@ -139,6 +141,7 @@ export type Database = {
           best_time?: string | null
           components?: Json | null
           editorial_notes?: string | null
+          facts?: Json | null
           hotel_id?: string
           pool_score_0_10?: number | null
           pool_type?: string | null
