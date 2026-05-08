@@ -32,7 +32,7 @@ async function fetchGooglePhotos(place_id: string, max = 10): Promise<FetchedPho
   };
   const photos = (json.photos ?? []).slice(0, max);
   const resolved = await Promise.all(
-    photos.map(async (p) => {
+    photos.map(async (p): Promise<FetchedPhoto | null> => {
       try {
         const res = await fetch(
           `https://places.googleapis.com/v1/${p.name}/media?maxWidthPx=1600&skipHttpRedirect=true&key=${encodeURIComponent(key)}`,
@@ -41,7 +41,7 @@ async function fetchGooglePhotos(place_id: string, max = 10): Promise<FetchedPho
         const data = (await res.json()) as { photoUri?: string };
         if (!data.photoUri) return null;
         return {
-          source: "google" as const,
+          source: "google",
           url: data.photoUri,
           width: p.widthPx ?? null,
           height: p.heightPx ?? null,
@@ -71,11 +71,11 @@ async function fetchTripadvisorPhotos(location_id: string): Promise<FetchedPhoto
       }>;
     };
     return (json.data ?? [])
-      .map((p) => {
+      .map((p): FetchedPhoto | null => {
         const large = p.images?.large;
         if (!large?.url) return null;
         return {
-          source: "tripadvisor" as const,
+          source: "tripadvisor",
           url: large.url,
           width: large.width ?? null,
           height: large.height ?? null,
