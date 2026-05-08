@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      hotel_photos: {
+        Row: {
+          attribution: string | null
+          created_at: string
+          height: number | null
+          hotel_id: string
+          id: string
+          position: number
+          source: string
+          url: string
+          width: number | null
+        }
+        Insert: {
+          attribution?: string | null
+          created_at?: string
+          height?: number | null
+          hotel_id: string
+          id?: string
+          position?: number
+          source: string
+          url: string
+          width?: number | null
+        }
+        Update: {
+          attribution?: string | null
+          created_at?: string
+          height?: number | null
+          hotel_id?: string
+          id?: string
+          position?: number
+          source?: string
+          url?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hotel_photos_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hotel_photos_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hotels: {
         Row: {
           address: string | null
