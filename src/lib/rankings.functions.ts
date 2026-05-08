@@ -2,6 +2,27 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+export type PoolFacts = {
+  pool_count?: number | null;
+  is_rooftop?: boolean | null;
+  is_infinity?: boolean | null;
+  is_heated?: boolean | null;
+  has_indoor?: boolean | null;
+  has_outdoor?: boolean | null;
+  is_saltwater?: boolean | null;
+  has_kids_pool?: boolean | null;
+  has_jacuzzi?: boolean | null;
+  has_swim_up_bar?: boolean | null;
+  has_cabanas?: boolean | null;
+  has_poolside_food?: boolean | null;
+  adults_only?: boolean | null;
+  year_round?: boolean | null;
+  size_estimate?: "small" | "medium" | "large" | "very_large" | null;
+  length_m?: number | null;
+  view?: string | null;
+  season?: string | null;
+};
+
 export type RankedHotel = {
   id: string;
   slug: string;
@@ -18,6 +39,7 @@ export type RankedHotel = {
   pool_components: Record<string, number> | null;
   best_time: string | null;
   pool_type: string | null;
+  pool_facts: PoolFacts | null;
   meta_rating_0_100: number | null;
   confidence_0_100: number | null;
   sources_used: Array<{ source: string; normalized: number; rating_count: number }> | null;
@@ -33,7 +55,7 @@ export const listRankedHotels = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("public_hotels_view")
       .select(
-        "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at",
+        "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at",
       );
     if (data.city) q = q.eq("city_slug", data.city);
     const { data: rows, error } = await q;
