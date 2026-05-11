@@ -413,7 +413,9 @@ export async function refreshHotelPhotos(hotelId: string) {
     tripadvisor?.source_place_id
       ? fetchTripadvisorPhotos(tripadvisor.source_place_id)
       : Promise.resolve([]),
-    websiteUrl ? fetchWebsitePhotos(websiteUrl) : Promise.resolve([]),
+    websiteUrl && hotel.scrape_website !== false
+      ? fetchWebsitePhotos(websiteUrl)
+      : Promise.resolve([]),
   ]);
 
   // Priority order: google > tripadvisor > website. Dedupe by url.
