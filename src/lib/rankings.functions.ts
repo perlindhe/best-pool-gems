@@ -34,6 +34,7 @@ export type RankedHotel = {
   website_url: string | null;
   booking_url: string | null;
   cover_image_url: string | null;
+  hero_photo_url: string | null;
   rank_position: number | null;
   pool_score_0_10: number | null;
   pool_components: Record<string, number> | null;
