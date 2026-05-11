@@ -3,13 +3,15 @@ import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/h
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
+import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 
 export const Route = createFileRoute("/$citySlug")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
-    return { city, cityGuides };
+    const hotelInfo = await getCityHotelPhotos({ data: { citySlug: city.slug } });
+    return { city, cityGuides, hotelInfo };
   },
   head: ({ loaderData }) => {
     const city = loaderData?.city;
