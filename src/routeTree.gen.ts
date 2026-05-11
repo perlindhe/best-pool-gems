@@ -23,6 +23,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
+import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
@@ -98,6 +99,12 @@ const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ApiPublicHotelsRoute,
 } as any)
+const ApiPublicHooksRefreshMissingPhotosRoute =
+  ApiPublicHooksRefreshMissingPhotosRouteImport.update({
+    id: '/api/public/hooks/refresh-missing-photos',
+    path: '/api/public/hooks/refresh-missing-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRefreshGoogleRatingsRoute =
   ApiPublicHooksRefreshGoogleRatingsRouteImport.update({
     id: '/api/public/hooks/refresh-google-ratings',
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
+  '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
+  '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesById {
@@ -173,6 +182,7 @@ export interface FileRoutesById {
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
+  '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRouteTypes {
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
+    | '/api/public/hooks/refresh-missing-photos'
     | '/api/public/hotels/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
+    | '/api/public/hooks/refresh-missing-photos'
     | '/api/public/hotels/$slug'
   id:
     | '__root__'
@@ -232,6 +244,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
+    | '/api/public/hooks/refresh-missing-photos'
     | '/api/public/hotels/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -251,6 +264,7 @@ export interface RootRouteChildren {
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
   ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
   ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
+  ApiPublicHooksRefreshMissingPhotosRoute: typeof ApiPublicHooksRefreshMissingPhotosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -353,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHotelsSlugRouteImport
       parentRoute: typeof ApiPublicHotelsRoute
     }
+    '/api/public/hooks/refresh-missing-photos': {
+      id: '/api/public/hooks/refresh-missing-photos'
+      path: '/api/public/hooks/refresh-missing-photos'
+      fullPath: '/api/public/hooks/refresh-missing-photos'
+      preLoaderRoute: typeof ApiPublicHooksRefreshMissingPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/refresh-google-ratings': {
       id: '/api/public/hooks/refresh-google-ratings'
       path: '/api/public/hooks/refresh-google-ratings'
@@ -418,6 +439,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRefreshAllPhotosRoute: ApiPublicHooksRefreshAllPhotosRoute,
   ApiPublicHooksRefreshGoogleRatingsRoute:
     ApiPublicHooksRefreshGoogleRatingsRoute,
+  ApiPublicHooksRefreshMissingPhotosRoute:
+    ApiPublicHooksRefreshMissingPhotosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
