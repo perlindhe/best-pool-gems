@@ -2,16 +2,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export type CityHotelPhotoMap = Record<string, string>;
+export type CityHotelInfo = { url: string | null; slug: string };
+export type CityHotelInfoMap = Record<string, CityHotelInfo>;
 
 export const getCityHotelPhotos = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
     z.object({ citySlug: z.string().max(120) }).parse(input),
   )
-  .handler(async ({ data }): Promise<CityHotelPhotoMap> => {
+  .handler(async ({ data }): Promise<CityHotelInfoMap> => {
     const { data: hotels, error } = await supabaseAdmin
       .from("hotels")
-      .select("id, name, cover_image_url")
+      .select("id, name, slug, cover_image_url")
       .eq("city_slug", data.citySlug)
       .eq("is_published", true);
     if (error || !hotels) return {};
@@ -28,10 +29,12 @@ export const getCityHotelPhotos = createServerFn({ method: "GET" })
       if (!firstByHotel.has(p.hotel_id)) firstByHotel.set(p.hotel_id, p.url);
     }
 
-    const map: CityHotelPhotoMap = {};
+    const map: CityHotelInfoMap = {};
     for (const h of hotels) {
-      const url = firstByHotel.get(h.id) ?? h.cover_image_url ?? null;
-      if (url) map[h.name.toLowerCase()] = url;
+      map[h.name.toLowerCase()] = {
+        url: firstByHotel.get(h.id) ?? h.cover_image_url ?? null,
+        slug: h.slug,
+      };
     }
     return map;
   });

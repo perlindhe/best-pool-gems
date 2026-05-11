@@ -213,10 +213,11 @@ function LuxuryPoolHotels() {
           </p>
         )}
         {visible.map((h: Hotel) => {
-          const photo = photos[h.name.toLowerCase()];
-          return (
+          const info = photos[h.name.toLowerCase()];
+          const photo = info?.url ?? null;
+          const slug = info?.slug ?? null;
+          const CardInner = (
           <article
-            key={h.rank}
             className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 shadow-card transition hover:border-primary/60"
           >
             <div className="grid gap-0 md:grid-cols-[18rem_1fr]">
@@ -239,7 +240,9 @@ function LuxuryPoolHotels() {
               </div>
               <div className="flex-1 p-6 md:p-8">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h2 className="font-display text-3xl tracking-wide md:text-4xl">{h.name}</h2>
+                  <h2 className="font-display text-3xl tracking-wide md:text-4xl group-hover:text-primary">
+                    {h.name}
+                  </h2>
                   <span className="font-display text-2xl text-primary">
                     {h.score.toFixed(1)}
                     <span className="ml-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -279,9 +282,22 @@ function LuxuryPoolHotels() {
                     ))}
                   </div>
                 )}
+
+                {slug && (
+                  <p className="mt-5 text-xs uppercase tracking-[0.25em] text-primary">
+                    View hotel →
+                  </p>
+                )}
               </div>
             </div>
           </article>
+          );
+          return slug ? (
+            <Link key={h.rank} to="/hotels/$slug" params={{ slug }} className="block">
+              {CardInner}
+            </Link>
+          ) : (
+            <div key={h.rank}>{CardInner}</div>
           );
         })}
       </section>

@@ -3,13 +3,15 @@ import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/h
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
+import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 
 export const Route = createFileRoute("/$citySlug")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
-    return { city, cityGuides };
+    const hotelInfo = await getCityHotelPhotos({ data: { citySlug: city.slug } });
+    return { city, cityGuides, hotelInfo };
   },
   head: ({ loaderData }) => {
     const city = loaderData?.city;
@@ -54,7 +56,7 @@ export const Route = createFileRoute("/$citySlug")({
 });
 
 function CityHub() {
-  const { city, cityGuides } = Route.useLoaderData();
+  const { city, cityGuides, hotelInfo } = Route.useLoaderData();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
 
   return (
@@ -119,7 +121,7 @@ function CityHub() {
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
           <h2 className="font-display text-5xl tracking-wide">Top {city.hotels.length}</h2>
           {city.hotels.map((h: Hotel) => (
-            <HotelCard key={h.rank} hotel={h} />
+            <HotelCard key={h.rank} hotel={h} slug={hotelInfo[h.name.toLowerCase()]?.slug ?? null} />
           ))}
         </section>
       )}
