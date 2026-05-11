@@ -212,18 +212,32 @@ function LuxuryPoolHotels() {
             No hotel matches that filter. Try a different vibe.
           </p>
         )}
-        {visible.map((h: Hotel) => (
+        {visible.map((h: Hotel) => {
+          const photo = photos[h.name.toLowerCase()];
+          return (
           <article
             key={h.rank}
-            className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 p-6 shadow-card transition hover:border-primary/60 md:p-8"
+            className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 shadow-card transition hover:border-primary/60"
           >
-            <div className="flex items-start gap-6">
-              <div className="shrink-0">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-gradient-aqua font-display text-3xl text-primary-foreground shadow-glow md:h-20 md:w-20 md:text-4xl">
+            <div className="grid gap-0 md:grid-cols-[18rem_1fr]">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-aqua md:aspect-auto md:h-full">
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt={`${h.name} pool`}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center font-display text-5xl text-primary-foreground/70">
+                    {h.rank}
+                  </div>
+                )}
+                <div className="absolute left-3 top-3 flex h-12 w-12 items-center justify-center rounded-md bg-background/85 font-display text-2xl text-primary shadow-glow backdrop-blur">
                   {h.rank}
                 </div>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 p-6 md:p-8">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h2 className="font-display text-3xl tracking-wide md:text-4xl">{h.name}</h2>
                   <span className="font-display text-2xl text-primary">
@@ -268,7 +282,8 @@ function LuxuryPoolHotels() {
               </div>
             </div>
           </article>
-        ))}
+          );
+        })}
       </section>
 
       {/* Areas / map section */}
