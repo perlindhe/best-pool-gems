@@ -372,7 +372,7 @@ async function fetchWebsitePhotos(siteUrl: string): Promise<FetchedPhoto[]> {
 export async function refreshHotelPhotos(hotelId: string) {
   const { data: hotel } = await supabaseAdmin
     .from("hotels")
-    .select("id, name, city, website_url")
+    .select("id, name, city, website_url, scrape_website")
     .eq("id", hotelId)
     .maybeSingle();
   if (!hotel) throw new Error("Hotel not found");
