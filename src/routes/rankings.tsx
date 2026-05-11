@@ -81,36 +81,65 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
   const tripadvisor = sources.find((s) => s.source === "tripadvisor");
+  const hero = hotel.hero_photo_url;
 
   return (
-    <article className="group grid gap-6 rounded-lg border border-border/60 bg-surface/50 p-6 transition hover:border-primary/60 md:grid-cols-[80px_1fr_auto] md:items-center md:p-8">
-      <div className="flex h-16 w-16 items-center justify-center rounded-md bg-gradient-aqua font-display text-3xl text-primary-foreground shadow-glow md:h-20 md:w-20 md:text-4xl">
-        {position}
-      </div>
+    <article className="group overflow-hidden rounded-xl border border-border/60 bg-surface/50 transition hover:border-primary/60 hover:shadow-glow md:grid md:grid-cols-[minmax(0,420px)_1fr]">
+      {/* Photo */}
+      <Link
+        to="/hotels/$slug"
+        params={{ slug: hotel.slug }}
+        className="relative block aspect-[4/3] overflow-hidden bg-background md:aspect-auto md:h-full md:min-h-[320px]"
+      >
+        {hero ? (
+          <img
+            src={hero}
+            alt={`Pool at ${hotel.name}`}
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-aqua/30 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            No photo yet
+          </div>
+        )}
+        <div className="absolute left-4 top-4 flex h-14 w-14 items-center justify-center rounded-md bg-gradient-aqua font-display text-2xl text-primary-foreground shadow-glow md:h-16 md:w-16 md:text-3xl">
+          {position}
+        </div>
+        {pool != null && (
+          <div className="absolute bottom-4 right-4 rounded-md bg-background/85 px-3 py-1.5 backdrop-blur">
+            <span className="font-display text-2xl text-primary">{pool.toFixed(1)}</span>
+            <span className="text-xs text-muted-foreground">/10</span>
+          </div>
+        )}
+      </Link>
 
-      <div>
-        <div className="flex flex-wrap items-baseline gap-x-3">
-          <Link
-            to="/hotels/$slug"
-            params={{ slug: hotel.slug }}
-            className="font-display text-3xl tracking-wide transition hover:text-primary md:text-4xl"
-          >
-            {hotel.name}
-          </Link>
-          {hotel.country && (
-            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              {hotel.city}
-              {hotel.neighborhood ? ` · ${hotel.neighborhood}` : ""}
-            </span>
+      {/* Content */}
+      <div className="flex flex-col gap-4 p-6 md:p-8">
+        <div>
+          <div className="flex flex-wrap items-baseline gap-x-3">
+            <Link
+              to="/hotels/$slug"
+              params={{ slug: hotel.slug }}
+              className="font-display text-3xl tracking-wide transition hover:text-primary md:text-4xl"
+            >
+              {hotel.name}
+            </Link>
+          </div>
+          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            {hotel.city}
+            {hotel.neighborhood ? ` · ${hotel.neighborhood}` : ""}
+            {hotel.country ? ` · ${hotel.country}` : ""}
+          </p>
+          {hotel.pool_type && (
+            <p className="mt-2 text-xs uppercase tracking-[0.2em] text-primary/80">
+              {hotel.pool_type}
+              {hotel.best_time ? ` · best ${hotel.best_time}` : ""}
+            </p>
           )}
         </div>
-        {hotel.pool_type && (
-          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-primary/80">
-            {hotel.pool_type}
-            {hotel.best_time ? ` · best ${hotel.best_time}` : ""}
-          </p>
-        )}
-        <div className="mt-4 flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.18em]">
+
+        <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em]">
           {google && (
             <SourceBadge label="Google" rating={google.normalized} count={google.rating_count} />
           )}
@@ -121,6 +150,24 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
               count={tripadvisor.rating_count}
             />
           )}
+          {meta != null && (
+            <span className="rounded-sm border border-border/60 bg-background/40 px-2.5 py-1 text-muted-foreground">
+              Meta <strong className="text-foreground">{Math.round(meta)}</strong>
+              <span className="text-[10px]">/100</span>
+            </span>
+          )}
+        </div>
+
+        <PoolFactsTable facts={hotel.pool_facts} />
+
+        <div className="mt-auto flex flex-wrap items-center gap-4 pt-2 text-xs uppercase tracking-[0.18em]">
+          <Link
+            to="/hotels/$slug"
+            params={{ slug: hotel.slug }}
+            className="rounded-sm border border-primary/60 px-4 py-2 text-primary transition hover:bg-primary hover:text-primary-foreground"
+          >
+            View hotel →
+          </Link>
           {hotel.website_url && (
             <a
               href={hotel.website_url}
@@ -142,48 +189,11 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
             </a>
           )}
         </div>
-        <PoolFactsTable facts={hotel.pool_facts} />
-      </div>
-
-      <div className="flex gap-4 md:flex-col md:items-end md:gap-2">
-        <Score label="Pool" value={pool != null ? pool.toFixed(1) : "—"} suffix="/10" big />
-        <Score
-          label="Meta"
-          value={meta != null ? Math.round(meta).toString() : "—"}
-          suffix="/100"
-        />
       </div>
     </article>
   );
 }
 
-function Score({
-  label,
-  value,
-  suffix,
-  big,
-}: {
-  label: string;
-  value: string;
-  suffix: string;
-  big?: boolean;
-}) {
-  return (
-    <div className="text-right">
-      <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</p>
-      <p
-        className={
-          big
-            ? "font-display text-4xl text-primary md:text-5xl"
-            : "font-display text-2xl text-foreground"
-        }
-      >
-        {value}
-        <span className="text-sm text-muted-foreground">{suffix}</span>
-      </p>
-    </div>
-  );
-}
 
 function SourceBadge({
   label,
