@@ -56,7 +56,7 @@ export const Route = createFileRoute("/$citySlug")({
 });
 
 function CityHub() {
-  const { city, cityGuides } = Route.useLoaderData();
+  const { city, cityGuides, hotelInfo } = Route.useLoaderData();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
 
   return (
