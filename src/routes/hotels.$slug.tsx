@@ -84,7 +84,7 @@ function HotelDetailPage() {
           />
         )}
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/40 via-background/60 to-background" />
-        <div className="mx-auto flex min-h-[60vh] max-w-6xl flex-col justify-end px-6 pb-14 pt-28">
+        <div className="mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-6 pb-20 pt-28">
           <Link
             to="/rankings"
             className="text-xs uppercase tracking-[0.3em] text-primary hover:underline"
