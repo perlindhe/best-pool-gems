@@ -530,6 +530,14 @@ function HotelDetail({
           {input({ placeholder: "booking_url", value: form.booking_url ?? "", onChange: (e) => set("booking_url", e.target.value) })}
           {input({ placeholder: "rank_position", type: "number", value: form.rank_position ?? "", onChange: (e) => set("rank_position", e.target.value ? Number(e.target.value) : null) })}
         </div>
+        <label className="mt-4 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={form.scrape_website !== false}
+            onChange={(e) => set("scrape_website", e.target.checked)}
+          />
+          Scrape hotel website for photos (respects robots.txt)
+        </label>
         <button
           disabled={busy}
           onClick={() => onSaveHotel({ ...form, id: form.id || undefined })}
