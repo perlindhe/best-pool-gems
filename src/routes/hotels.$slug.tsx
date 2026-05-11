@@ -65,7 +65,7 @@ function HotelDetailPage() {
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
-  const gallery = photos.slice(1, 7);
+  const gallery = photos.slice(1, 19);
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
   const tripadvisor = sources.find((s) => s.source === "tripadvisor");
