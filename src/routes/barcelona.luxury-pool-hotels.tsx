@@ -11,6 +11,9 @@ const DESCRIPTION =
   "Pool-first ranking of Barcelona's ten best hotel pools 2026. Pool Score, pool type, vibe, best time to visit, neighborhood guide and FAQ.";
 
 export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
+  loader: async () => ({
+    photos: await getCityHotelPhotos({ data: { citySlug: "barcelona" } }),
+  }),
   head: () => ({
     meta: [
       { title: TITLE },
