@@ -103,6 +103,7 @@ const TAG_LABEL: Record<HotelTag, string> = {
 
 function LuxuryPoolHotels() {
   const [filter, setFilter] = useState<HotelTag | "all">("all");
+  const { photos } = Route.useLoaderData();
 
   const visible = useMemo(
     () =>
