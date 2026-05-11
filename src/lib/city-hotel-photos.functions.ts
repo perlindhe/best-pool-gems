@@ -1,0 +1,37 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+export type CityHotelPhotoMap = Record<string, string>;
+
+export const getCityHotelPhotos = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ citySlug: z.string().max(120) }).parse(input),
+  )
+  .handler(async ({ data }): Promise<CityHotelPhotoMap> => {
+    const { data: hotels, error } = await supabaseAdmin
+      .from("hotels")
+      .select("id, name, cover_image_url")
+      .eq("city_slug", data.citySlug)
+      .eq("is_published", true);
+    if (error || !hotels) return {};
+
+    const ids = hotels.map((h) => h.id);
+    const { data: photos } = await supabaseAdmin
+      .from("hotel_photos")
+      .select("hotel_id, url, position")
+      .in("hotel_id", ids)
+      .order("position", { ascending: true });
+
+    const firstByHotel = new Map<string, string>();
+    for (const p of photos ?? []) {
+      if (!firstByHotel.has(p.hotel_id)) firstByHotel.set(p.hotel_id, p.url);
+    }
+
+    const map: CityHotelPhotoMap = {};
+    for (const h of hotels) {
+      const url = firstByHotel.get(h.id) ?? h.cover_image_url ?? null;
+      if (url) map[h.name.toLowerCase()] = url;
+    }
+    return map;
+  });
