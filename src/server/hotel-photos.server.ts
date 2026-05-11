@@ -327,6 +327,7 @@ async function fetchWebsitePhotos(siteUrl: string): Promise<FetchedPhoto[]> {
   const targets = new Set<string>([siteUrl]);
   for (const r of ranked) {
     if (r.score === 0) continue;
+    if (!isAllowedByRobots(r.url, robots)) continue;
     targets.add(r.url);
     if (targets.size >= 6) break;
   }
