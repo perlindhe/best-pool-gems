@@ -62,8 +62,27 @@ export const listRankedHotels = createServerFn({ method: "GET" })
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
+    const ids = (rows ?? []).map((r) => r.id as string);
+    const heroByHotel = new Map<string, string>();
+    if (ids.length > 0) {
+      const { data: photos } = await supabaseAdmin
+        .from("hotel_photos")
+        .select("hotel_id, url, position")
+        .in("hotel_id", ids)
+        .order("position", { ascending: true });
+      for (const p of photos ?? []) {
+        const hid = p.hotel_id as string;
+        if (!heroByHotel.has(hid)) heroByHotel.set(hid, p.url as string);
+      }
+    }
+
+    const enriched = (rows ?? []).map((r) => ({
+      ...r,
+      hero_photo_url: heroByHotel.get(r.id as string) ?? r.cover_image_url ?? null,
+    }));
+
     // Sort: pool_score desc (nulls last), then meta_rating desc (nulls last), then name asc
-    const sorted = [...(rows ?? [])].sort((a, b) => {
+    const sorted = enriched.sort((a, b) => {
       const ap = a.pool_score_0_10 ?? -1;
       const bp = b.pool_score_0_10 ?? -1;
       if (bp !== ap) return bp - ap;
