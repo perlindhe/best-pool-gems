@@ -193,32 +193,7 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
     </article>
   );
 }
-  label,
-  value,
-  suffix,
-  big,
-}: {
-  label: string;
-  value: string;
-  suffix: string;
-  big?: boolean;
-}) {
-  return (
-    <div className="text-right">
-      <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</p>
-      <p
-        className={
-          big
-            ? "font-display text-4xl text-primary md:text-5xl"
-            : "font-display text-2xl text-foreground"
-        }
-      >
-        {value}
-        <span className="text-sm text-muted-foreground">{suffix}</span>
-      </p>
-    </div>
-  );
-}
+
 
 function SourceBadge({
   label,
