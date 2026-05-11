@@ -9,7 +9,44 @@ export type FetchedPhoto = {
   attribution?: string | null;
 };
 
-async function fetchGooglePhotos(place_id: string, max = 10): Promise<FetchedPhoto[]> {
+// ---------------- Google Places ----------------
+
+/**
+ * Resolve a Google place_id from name + city using Places Text Search (v1).
+ * Also returns websiteUri so we can populate the hotel website automatically.
+ */
+async function resolveGooglePlace(
+  name: string,
+  city: string,
+): Promise<{ placeId: string; websiteUri?: string } | null> {
+  const key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": key,
+        "X-Goog-FieldMask": "places.id,places.websiteUri,places.displayName",
+      },
+      body: JSON.stringify({
+        textQuery: `${name} hotel ${city}`,
+        maxResultCount: 1,
+      }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      places?: Array<{ id: string; websiteUri?: string }>;
+    };
+    const p = json.places?.[0];
+    if (!p?.id) return null;
+    return { placeId: p.id, websiteUri: p.websiteUri };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchGooglePhotos(place_id: string, max = 20): Promise<FetchedPhoto[]> {
   const key = process.env.GOOGLE_PLACES_API_KEY;
   if (!key) return [];
   const detailsRes = await fetch(
@@ -55,6 +92,8 @@ async function fetchGooglePhotos(place_id: string, max = 10): Promise<FetchedPho
   return resolved.filter((p): p is FetchedPhoto => p !== null);
 }
 
+// ---------------- TripAdvisor ----------------
+
 async function fetchTripadvisorPhotos(location_id: string): Promise<FetchedPhoto[]> {
   const key = process.env.TRIPADVISOR_API_KEY;
   if (!key) return [];
@@ -88,62 +127,24 @@ async function fetchTripadvisorPhotos(location_id: string): Promise<FetchedPhoto
   }
 }
 
-async function fetchWebsitePhotos(url: string): Promise<FetchedPhoto[]> {
-  const key = process.env.FIRECRAWL_API_KEY;
-  if (!key) return [];
-  try {
-    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url,
-        formats: ["html", "links"],
-        onlyMainContent: false,
-      }),
-    });
-    if (!res.ok) return [];
-    const json = (await res.json()) as {
-      data?: { html?: string; metadata?: { ogImage?: string; "og:image"?: string } };
-    };
-    const data = json.data ?? {};
-    const photos: FetchedPhoto[] = [];
-    const seen = new Set<string>();
-    const push = (raw: string) => {
-      const abs = absolutize(raw, url);
-      if (!abs || seen.has(abs)) return;
-      if (!/\.(jpe?g|png|webp|avif)(\?|$)/i.test(abs)) return;
-      if (/(logo|icon|favicon|sprite|placeholder|spinner|loading)/i.test(abs)) return;
-      seen.add(abs);
-      photos.push({ source: "website", url: abs, attribution: "Hotel website" });
-    };
+// ---------------- Firecrawl (multi-page) ----------------
 
-    const og = data.metadata?.ogImage || data.metadata?.["og:image"];
-    if (og) push(og);
-
-    const html = data.html ?? "";
-    // Look for pool-related images first
-    const imgRe = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    const candidates: Array<{ url: string; poolish: boolean }> = [];
-    let m: RegExpExecArray | null;
-    while ((m = imgRe.exec(html)) !== null) {
-      const src = m[1];
-      const ctx = m[0].toLowerCase();
-      const poolish = /pool|piscina|piscine|swim|rooftop|terrace/.test(ctx);
-      candidates.push({ url: src, poolish });
-    }
-    candidates
-      .sort((a, b) => Number(b.poolish) - Number(a.poolish))
-      .slice(0, 10)
-      .forEach((c) => push(c.url));
-
-    return photos.slice(0, 8);
-  } catch {
-    return [];
-  }
-}
+const POOLISH_PATHS = [
+  "pool",
+  "piscina",
+  "piscine",
+  "rooftop",
+  "roof-top",
+  "spa",
+  "wellness",
+  "gallery",
+  "galleri",
+  "photos",
+  "facilities",
+  "rooms",
+  "suites",
+  "amenities",
+];
 
 function absolutize(src: string, base: string): string | null {
   try {
@@ -153,10 +154,148 @@ function absolutize(src: string, base: string): string | null {
   }
 }
 
+function extractImageUrls(html: string, baseUrl: string): Array<{ url: string; poolish: boolean }> {
+  const out: Array<{ url: string; poolish: boolean }> = [];
+  const seen = new Set<string>();
+  // <img src="..."> and srcset
+  const imgRe = /<img\b[^>]*?(?:src|data-src|data-lazy-src)=["']([^"']+)["'][^>]*>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = imgRe.exec(html)) !== null) {
+    const raw = m[1];
+    const ctx = m[0].toLowerCase();
+    const abs = absolutize(raw, baseUrl);
+    if (!abs || seen.has(abs)) continue;
+    if (!/\.(jpe?g|png|webp|avif)(\?|$|#)/i.test(abs)) continue;
+    if (/(logo|favicon|sprite|placeholder|spinner|loading|icon[-_])/i.test(abs)) continue;
+    seen.add(abs);
+    const poolish = /pool|piscina|piscine|swim|rooftop|terrace|spa/.test(ctx + abs.toLowerCase());
+    out.push({ url: abs, poolish });
+  }
+  // background-image: url(...)
+  const bgRe = /background(?:-image)?\s*:\s*url\(["']?([^"')]+)["']?\)/gi;
+  while ((m = bgRe.exec(html)) !== null) {
+    const abs = absolutize(m[1], baseUrl);
+    if (!abs || seen.has(abs)) continue;
+    if (!/\.(jpe?g|png|webp|avif)(\?|$|#)/i.test(abs)) continue;
+    if (/(logo|favicon|sprite|placeholder|icon[-_])/i.test(abs)) continue;
+    seen.add(abs);
+    out.push({ url: abs, poolish: /pool|rooftop|terrace|spa/.test(abs.toLowerCase()) });
+  }
+  return out;
+}
+
+async function firecrawlScrape(url: string): Promise<{ html: string; ogImage?: string } | null> {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ url, formats: ["html"], onlyMainContent: false }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      data?: { html?: string; metadata?: { ogImage?: string; "og:image"?: string } };
+    };
+    const data = json.data ?? {};
+    return {
+      html: data.html ?? "",
+      ogImage: data.metadata?.ogImage || data.metadata?.["og:image"],
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function firecrawlMap(url: string): Promise<string[]> {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return [];
+  try {
+    const res = await fetch("https://api.firecrawl.dev/v2/map", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ url, limit: 200, includeSubdomains: false }),
+    });
+    if (!res.ok) return [];
+    const json = (await res.json()) as { links?: Array<string | { url: string }> };
+    return (json.links ?? [])
+      .map((l) => (typeof l === "string" ? l : l?.url))
+      .filter((x): x is string => typeof x === "string");
+  } catch {
+    return [];
+  }
+}
+
+async function fetchWebsitePhotos(siteUrl: string): Promise<FetchedPhoto[]> {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return [];
+
+  // 1) discover relevant subpages
+  const allLinks = await firecrawlMap(siteUrl);
+  const ranked = allLinks
+    .filter((u) => {
+      try {
+        const x = new URL(u);
+        return x.hostname.endsWith(new URL(siteUrl).hostname);
+      } catch {
+        return false;
+      }
+    })
+    .map((u) => {
+      const lower = u.toLowerCase();
+      const score = POOLISH_PATHS.reduce((s, kw) => s + (lower.includes(kw) ? 1 : 0), 0);
+      return { url: u, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const targets = new Set<string>([siteUrl]);
+  for (const r of ranked) {
+    if (r.score === 0) continue;
+    targets.add(r.url);
+    if (targets.size >= 6) break;
+  }
+
+  // 2) scrape each in parallel
+  const scraped = await Promise.all(
+    Array.from(targets).map(async (u) => ({ url: u, page: await firecrawlScrape(u) })),
+  );
+
+  const seen = new Set<string>();
+  const photos: FetchedPhoto[] = [];
+  const collected: Array<{ url: string; poolish: boolean }> = [];
+
+  for (const { url, page } of scraped) {
+    if (!page) continue;
+    if (page.ogImage) {
+      const abs = absolutize(page.ogImage, url);
+      if (abs && !seen.has(abs) && /\.(jpe?g|png|webp|avif)(\?|$|#)/i.test(abs)) {
+        seen.add(abs);
+        collected.push({ url: abs, poolish: true });
+      }
+    }
+    for (const img of extractImageUrls(page.html, url)) {
+      if (seen.has(img.url)) continue;
+      seen.add(img.url);
+      collected.push(img);
+    }
+  }
+
+  collected
+    .sort((a, b) => Number(b.poolish) - Number(a.poolish))
+    .slice(0, 25)
+    .forEach((c) =>
+      photos.push({ source: "website", url: c.url, attribution: "Hotel website" }),
+    );
+
+  return photos;
+}
+
+// ---------------- Orchestration ----------------
+
 export async function refreshHotelPhotos(hotelId: string) {
   const { data: hotel } = await supabaseAdmin
     .from("hotels")
-    .select("id, website_url")
+    .select("id, name, city, website_url")
     .eq("id", hotelId)
     .maybeSingle();
   if (!hotel) throw new Error("Hotel not found");
@@ -166,15 +305,38 @@ export async function refreshHotelPhotos(hotelId: string) {
     .select("source, source_place_id, source_url")
     .eq("hotel_id", hotelId)
     .eq("is_active", true);
-  const google = (mappings ?? []).find((m) => m.source === "google");
+
+  let google = (mappings ?? []).find((m) => m.source === "google");
   const tripadvisor = (mappings ?? []).find((m) => m.source === "tripadvisor");
+  let websiteUrl = hotel.website_url as string | null;
+
+  // Auto-discover Google place + website if missing
+  if (!google?.source_place_id) {
+    const resolved = await resolveGooglePlace(hotel.name as string, hotel.city as string);
+    if (resolved?.placeId) {
+      await supabaseAdmin.from("source_mappings").insert({
+        hotel_id: hotelId,
+        source: "google",
+        source_place_id: resolved.placeId,
+        is_active: true,
+      });
+      google = { source: "google", source_place_id: resolved.placeId, source_url: null };
+      if (!websiteUrl && resolved.websiteUri) {
+        websiteUrl = resolved.websiteUri;
+        await supabaseAdmin
+          .from("hotels")
+          .update({ website_url: resolved.websiteUri })
+          .eq("id", hotelId);
+      }
+    }
+  }
 
   const [g, t, w] = await Promise.all([
     google?.source_place_id ? fetchGooglePhotos(google.source_place_id) : Promise.resolve([]),
     tripadvisor?.source_place_id
       ? fetchTripadvisorPhotos(tripadvisor.source_place_id)
       : Promise.resolve([]),
-    hotel.website_url ? fetchWebsitePhotos(hotel.website_url) : Promise.resolve([]),
+    websiteUrl ? fetchWebsitePhotos(websiteUrl) : Promise.resolve([]),
   ]);
 
   // Priority order: google > tripadvisor > website. Dedupe by url.
@@ -188,7 +350,6 @@ export async function refreshHotelPhotos(hotelId: string) {
     }
   }
 
-  // Replace existing photos for this hotel
   await supabaseAdmin.from("hotel_photos").delete().eq("hotel_id", hotelId);
 
   if (merged.length > 0) {
@@ -207,5 +368,7 @@ export async function refreshHotelPhotos(hotelId: string) {
 
   return {
     counts: { google: g.length, tripadvisor: t.length, website: w.length, total: merged.length },
+    autoResolvedGoogle: !!google?.source_place_id && !(mappings ?? []).some((m) => m.source === "google"),
+    websiteUrl,
   };
 }
