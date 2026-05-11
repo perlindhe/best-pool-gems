@@ -79,6 +79,7 @@ const HotelUpsertSchema = z.object({
   cover_image_url: z.string().max(1000).nullish().or(z.literal("")),
   rank_position: z.number().int().min(1).max(999).nullish(),
   is_published: z.boolean().optional(),
+  scrape_website: z.boolean().optional(),
 });
 
 export const adminUpsertHotel = createServerFn({ method: "POST" })
