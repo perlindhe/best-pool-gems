@@ -184,10 +184,12 @@ function HotelDetailPage() {
 
       {/* Gallery */}
       {gallery.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 pb-20">
+        <section className="mx-auto max-w-7xl px-6 pb-20">
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Gallery</p>
-          <h2 className="mt-3 font-display text-4xl tracking-wide">More from the property</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
+            More from the property
+          </h2>
+          <div className="mt-8 columns-1 gap-4 sm:columns-2 md:columns-3 [&>figure]:mb-4 [&>figure]:break-inside-avoid">
             {gallery.map((p: HotelPhoto, i: number) => (
               <figure
                 key={i}
@@ -197,7 +199,7 @@ function HotelDetailPage() {
                   src={p.url}
                   alt={`${hotel.name} — photo ${i + 2}`}
                   loading="lazy"
-                  className="h-64 w-full object-cover transition duration-700 group-hover:scale-105"
+                  className="w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                 />
                 {p.attribution && (
                   <figcaption className="px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -208,7 +210,7 @@ function HotelDetailPage() {
             ))}
           </div>
           <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            Photos via Google
+            Photos via Google, TripAdvisor and the hotel's own website
           </p>
         </section>
       )}
