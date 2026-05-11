@@ -1,0 +1,1 @@
+ALTER TABLE public.hotels ADD COLUMN IF NOT EXISTS scrape_website boolean NOT NULL DEFAULT true;

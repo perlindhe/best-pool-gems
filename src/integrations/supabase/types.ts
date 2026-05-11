@@ -81,6 +81,7 @@ export type Database = {
           name: string
           neighborhood: string | null
           rank_position: number | null
+          scrape_website: boolean
           slug: string
           updated_at: string
           website_url: string | null
@@ -100,6 +101,7 @@ export type Database = {
           name: string
           neighborhood?: string | null
           rank_position?: number | null
+          scrape_website?: boolean
           slug: string
           updated_at?: string
           website_url?: string | null
@@ -119,6 +121,7 @@ export type Database = {
           name?: string
           neighborhood?: string | null
           rank_position?: number | null
+          scrape_website?: boolean
           slug?: string
           updated_at?: string
           website_url?: string | null
