@@ -4,6 +4,7 @@ import { barcelonaTop10, type Hotel, type HotelTag } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import barcelonaImg from "@/assets/barcelona.jpg";
+import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 
 const TITLE = "Top 10 pool hotels in Barcelona (Pool Score 2026) — Best Pool Hotels";
 const DESCRIPTION =
