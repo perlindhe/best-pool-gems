@@ -226,9 +226,85 @@ async function firecrawlMap(url: string): Promise<string[]> {
   }
 }
 
+// ---------------- robots.txt (be a polite citizen) ----------------
+
+type RobotsRules = { disallow: string[]; allow: string[] };
+const robotsCache = new Map<string, RobotsRules | null>();
+
+async function getRobotsRules(siteUrl: string): Promise<RobotsRules | null> {
+  let origin: string;
+  try {
+    origin = new URL(siteUrl).origin;
+  } catch {
+    return null;
+  }
+  if (robotsCache.has(origin)) return robotsCache.get(origin) ?? null;
+  try {
+    const res = await fetch(`${origin}/robots.txt`, {
+      headers: { "User-Agent": "BestPoolHotelsBot/1.0 (+https://bestpoolhotels.com)" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) {
+      robotsCache.set(origin, null);
+      return null;
+    }
+    const text = await res.text();
+    // Parse only blocks for * (most common). Stop when another UA group starts.
+    const lines = text.split(/\r?\n/);
+    const rules: RobotsRules = { disallow: [], allow: [] };
+    let active = false;
+    for (const raw of lines) {
+      const line = raw.replace(/#.*$/, "").trim();
+      if (!line) continue;
+      const [k, ...rest] = line.split(":");
+      const key = k.trim().toLowerCase();
+      const value = rest.join(":").trim();
+      if (key === "user-agent") {
+        active = value === "*";
+        continue;
+      }
+      if (!active) continue;
+      if (key === "disallow" && value) rules.disallow.push(value);
+      else if (key === "allow" && value) rules.allow.push(value);
+    }
+    robotsCache.set(origin, rules);
+    return rules;
+  } catch {
+    robotsCache.set(origin, null);
+    return null;
+  }
+}
+
+function isAllowedByRobots(targetUrl: string, rules: RobotsRules | null): boolean {
+  if (!rules) return true; // no robots.txt = allowed
+  let path: string;
+  try {
+    const u = new URL(targetUrl);
+    path = u.pathname + u.search;
+  } catch {
+    return true;
+  }
+  // Longest matching rule wins (allow vs disallow)
+  const match = (patterns: string[]) =>
+    patterns
+      .filter((p) => path.startsWith(p.replace(/\*$/, "")))
+      .reduce((max, p) => Math.max(max, p.length), 0);
+  const dis = match(rules.disallow);
+  const allow = match(rules.allow);
+  if (dis === 0) return true;
+  return allow >= dis;
+}
+
 async function fetchWebsitePhotos(siteUrl: string): Promise<FetchedPhoto[]> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return [];
+
+  // 0) respect robots.txt — skip site entirely if root is disallowed
+  const robots = await getRobotsRules(siteUrl);
+  if (!isAllowedByRobots(siteUrl, robots)) {
+    console.log(`[hotel-photos] robots.txt disallows ${siteUrl} — skipping`);
+    return [];
+  }
 
   // 1) discover relevant subpages
   const allLinks = await firecrawlMap(siteUrl);
@@ -251,6 +327,7 @@ async function fetchWebsitePhotos(siteUrl: string): Promise<FetchedPhoto[]> {
   const targets = new Set<string>([siteUrl]);
   for (const r of ranked) {
     if (r.score === 0) continue;
+    if (!isAllowedByRobots(r.url, robots)) continue;
     targets.add(r.url);
     if (targets.size >= 6) break;
   }
