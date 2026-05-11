@@ -121,7 +121,7 @@ function CityHub() {
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
           <h2 className="font-display text-5xl tracking-wide">Top {city.hotels.length}</h2>
           {city.hotels.map((h: Hotel) => (
-            <HotelCard key={h.rank} hotel={h} />
+            <HotelCard key={h.rank} hotel={h} slug={hotelInfo[h.name.toLowerCase()]?.slug ?? null} />
           ))}
         </section>
       )}
