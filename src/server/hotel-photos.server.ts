@@ -21,29 +21,33 @@ async function resolveGooglePlace(
 ): Promise<{ placeId: string; websiteUri?: string } | null> {
   const key = process.env.GOOGLE_PLACES_API_KEY;
   if (!key) return null;
-  try {
-    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": key,
-        "X-Goog-FieldMask": "places.id,places.websiteUri,places.displayName",
-      },
-      body: JSON.stringify({
-        textQuery: `${name} hotel ${city}`,
-        maxResultCount: 1,
-      }),
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      places?: Array<{ id: string; websiteUri?: string }>;
-    };
-    const p = json.places?.[0];
-    if (!p?.id) return null;
-    return { placeId: p.id, websiteUri: p.websiteUri };
-  } catch {
-    return null;
+  const queries = [
+    `${name} hotel ${city}`,
+    `${name} ${city}`,
+    name,
+  ];
+  for (const textQuery of queries) {
+    try {
+      const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": key,
+          "X-Goog-FieldMask": "places.id,places.websiteUri,places.displayName",
+        },
+        body: JSON.stringify({ textQuery, maxResultCount: 1 }),
+      });
+      if (!res.ok) continue;
+      const json = (await res.json()) as {
+        places?: Array<{ id: string; websiteUri?: string }>;
+      };
+      const p = json.places?.[0];
+      if (p?.id) return { placeId: p.id, websiteUri: p.websiteUri };
+    } catch {
+      // try next variant
+    }
   }
+  return null;
 }
 
 async function fetchGooglePhotos(place_id: string, max = 20): Promise<FetchedPhoto[]> {
