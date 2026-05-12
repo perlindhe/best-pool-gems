@@ -109,7 +109,12 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
   const judgments: PoolJudgment[] = [];
   for (let i = 0; i < photos.length; i += BATCH_SIZE) {
     const batch = photos.slice(i, i + BATCH_SIZE);
-    const result = await classifyBatch(batch.map((p) => p.url));
+    let result = await classifyBatch(batch.map((p) => p.url));
+    // Retry once if the whole batch came back unclassified (gateway/parse fail)
+    if (result.every((r) => r.is_pool === null)) {
+      await new Promise((r) => setTimeout(r, 800));
+      result = await classifyBatch(batch.map((p) => p.url));
+    }
     judgments.push(...result);
     if (i + BATCH_SIZE < photos.length) {
       await new Promise((r) => setTimeout(r, 250));
