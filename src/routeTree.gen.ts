@@ -26,6 +26,7 @@ import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hot
 import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
+import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/api/public/hooks/backfill-tripadvisor'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
 
 const RankingsRoute = RankingsRouteImport.update({
@@ -117,6 +118,12 @@ const ApiPublicHooksRefreshAllPhotosRoute =
     path: '/api/public/hooks/refresh-all-photos',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBackfillTripadvisorRoute =
+  ApiPublicHooksBackfillTripadvisorRouteImport.update({
+    id: '/api/public/hooks/backfill-tripadvisor',
+    path: '/api/public/hooks/backfill-tripadvisor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksAutoScoreAllRoute =
   ApiPublicHooksAutoScoreAllRouteImport.update({
     id: '/api/public/hooks/auto-score-all',
@@ -139,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -159,6 +167,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -180,6 +189,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -242,6 +254,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -262,6 +275,7 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
+  ApiPublicHooksBackfillTripadvisorRoute: typeof ApiPublicHooksBackfillTripadvisorRoute
   ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
   ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
   ApiPublicHooksRefreshMissingPhotosRoute: typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -388,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshAllPhotosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/backfill-tripadvisor': {
+      id: '/api/public/hooks/backfill-tripadvisor'
+      path: '/api/public/hooks/backfill-tripadvisor'
+      fullPath: '/api/public/hooks/backfill-tripadvisor'
+      preLoaderRoute: typeof ApiPublicHooksBackfillTripadvisorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/auto-score-all': {
       id: '/api/public/hooks/auto-score-all'
       path: '/api/public/hooks/auto-score-all'
@@ -436,6 +457,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
+  ApiPublicHooksBackfillTripadvisorRoute:
+    ApiPublicHooksBackfillTripadvisorRoute,
   ApiPublicHooksRefreshAllPhotosRoute: ApiPublicHooksRefreshAllPhotosRoute,
   ApiPublicHooksRefreshGoogleRatingsRoute:
     ApiPublicHooksRefreshGoogleRatingsRoute,
