@@ -66,7 +66,12 @@ export const Route = createFileRoute("/$citySlug")({
 
 function CityHub() {
   const { city, cityGuides, hotelInfo } = Route.useLoaderData();
+  const { page } = Route.useSearch();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
+  const totalPages = Math.max(1, Math.ceil(city.hotels.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const pagedHotels = city.hotels.slice(startIdx, startIdx + PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-background">
