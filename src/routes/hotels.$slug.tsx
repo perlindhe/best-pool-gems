@@ -215,10 +215,10 @@ function HotelDetailPage() {
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      {q.source}
+                      {sourceLabel(q.source)} ↗
                     </a>
                   ) : (
-                    <span>{q.source}</span>
+                    <span>{sourceLabel(q.source)}</span>
                   )}
                 </figcaption>
               </figure>
