@@ -120,9 +120,17 @@ function CityHub() {
         <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
           <h2 className="font-display text-5xl tracking-wide">Top {city.hotels.length}</h2>
-          {city.hotels.map((h: Hotel) => (
-            <HotelCard key={h.rank} hotel={h} slug={hotelInfo[h.name.toLowerCase()]?.slug ?? null} />
-          ))}
+          {city.hotels.map((h: Hotel) => {
+            const info = hotelInfo[h.name.toLowerCase()];
+            return (
+              <HotelCard
+                key={h.rank}
+                hotel={h}
+                slug={info?.slug ?? null}
+                photoUrl={info?.url ?? null}
+              />
+            );
+          })}
         </section>
       )}
 
