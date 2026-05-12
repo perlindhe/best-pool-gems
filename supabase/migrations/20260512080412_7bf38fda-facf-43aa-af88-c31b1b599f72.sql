@@ -1,0 +1,1 @@
+ALTER TABLE public.hotel_photos ADD COLUMN IF NOT EXISTS is_outdoor boolean;
