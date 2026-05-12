@@ -540,6 +540,45 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
     return { pool: row };
   });
 
+export const adminListPoolScores = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context.userId);
+    const { data: hotels, error } = await supabaseAdmin
+      .from("hotels")
+      .select("id, name, city, slug, rank_position")
+      .order("city")
+      .order("name");
+    if (error) throw new Error(error.message);
+    const { data: scores, error: e2 } = await supabaseAdmin
+      .from("pool_scores")
+      .select("hotel_id, pool_score_0_10, components, updated_at");
+    if (e2) throw new Error(e2.message);
+    const byId = new Map((scores ?? []).map((s) => [s.hotel_id as string, s]));
+    return {
+      rows: (hotels ?? []).map((h) => {
+        const s = byId.get(h.id as string);
+        const comps = (s?.components as Record<string, number> | null) ?? null;
+        return {
+          hotel_id: h.id as string,
+          name: h.name as string,
+          city: h.city as string,
+          slug: h.slug as string,
+          rank_position: h.rank_position as number | null,
+          pool_score_0_10: (s?.pool_score_0_10 as number | null) ?? null,
+          components: {
+            vibe: comps?.vibe ?? null,
+            lounging_space: comps?.lounging_space ?? null,
+            service: comps?.service ?? null,
+            uniqueness: comps?.uniqueness ?? null,
+            pool_first_feel: comps?.pool_first_feel ?? null,
+          },
+          updated_at: (s?.updated_at as string | null) ?? null,
+        };
+      }),
+    };
+  });
+
 // ---------- SETTINGS ----------
 const SettingsSchema = z.object({
   weights: z.object({
