@@ -19,6 +19,7 @@ import {
   adminFetchAllRatings,
   adminAutoScoreHotel,
   adminRefreshHotelPhotos,
+  adminListPoolScores,
 } from "@/server/admin.functions";
 import { googleSearchPlace, googleFetchRating } from "@/server/google-places.functions";
 import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/server/tripadvisor.functions";
