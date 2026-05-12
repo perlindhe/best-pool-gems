@@ -45,6 +45,7 @@ export const Route = createFileRoute("/api/public/hooks/classify-pool-photos")({
           status: "classified" | "skipped" | "no_photos" | "error";
           classified?: number;
           pool_count?: number;
+          outdoor_count?: number;
           error?: string;
         }> = [];
 
