@@ -20,8 +20,11 @@ export const getCityHotelPhotos = createServerFn({ method: "GET" })
     const ids = hotels.map((h) => h.id);
     const { data: photos } = await supabaseAdmin
       .from("hotel_photos")
-      .select("hotel_id, url, position")
+      .select("hotel_id, url, position, is_pool, pool_score")
       .in("hotel_id", ids)
+      // Pool photos first (highest pool_score), then fall back to position.
+      .order("is_pool", { ascending: false, nullsFirst: false })
+      .order("pool_score", { ascending: false, nullsFirst: false })
       .order("position", { ascending: true });
 
     const firstByHotel = new Map<string, string>();
