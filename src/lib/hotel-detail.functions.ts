@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getHotelDetail, type HotelPhoto } from "@/server/hotel-detail.server";
+import { getHotelDetail, type HotelPhoto, type PoolQuote } from "@/server/hotel-detail.server";
 import type { PoolFacts } from "@/lib/rankings.functions";
 
 export type HotelDetail = {
@@ -30,6 +30,7 @@ export type HotelDetail = {
 export type HotelDetailResult = {
   hotel: HotelDetail;
   photos: HotelPhoto[];
+  quotes: PoolQuote[];
 } | null;
 
 export const getHotelBySlug = createServerFn({ method: "GET" })
