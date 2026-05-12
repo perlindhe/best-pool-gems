@@ -1,0 +1,1 @@
+DELETE FROM public.hotel_photos WHERE url ~ '\s' OR url LIKE '%staticmap%' OR url LIKE '%&amp;%';

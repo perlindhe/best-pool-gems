@@ -1,0 +1,1 @@
+DELETE FROM public.hotel_photos WHERE url LIKE '%&quot;%' OR url LIKE '%"%';

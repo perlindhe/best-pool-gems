@@ -53,7 +53,7 @@ async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [{ role: "user", content }],
       }),
     });
@@ -106,11 +106,39 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
     return { classified: 0, pool_count: 0, outdoor_count: 0 };
   }
 
-  const judgments: PoolJudgment[] = [];
+  const isLikelyImageUrl = (u: string) => {
+    if (!u || /\s|"|'|&quot;|&amp;quot;/.test(u)) return false;
+    try {
+      const parsed = new URL(u);
+      return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+      return false;
+    }
+  };
+
+  const judgments: PoolJudgment[] = new Array(photos.length).fill(null).map(() => ({ ...EMPTY }));
   for (let i = 0; i < photos.length; i += BATCH_SIZE) {
-    const batch = photos.slice(i, i + BATCH_SIZE);
-    const result = await classifyBatch(batch.map((p) => p.url));
-    judgments.push(...result);
+    const batchIdx = photos.slice(i, i + BATCH_SIZE).map((_, k) => i + k);
+    const validIdx = batchIdx.filter((k) => isLikelyImageUrl(photos[k].url));
+    if (validIdx.length === 0) continue;
+    let result = await classifyBatch(validIdx.map((k) => photos[k].url));
+    if (result.every((r) => r.is_pool === null)) {
+      // Retry whole batch once
+      await new Promise((r) => setTimeout(r, 800));
+      result = await classifyBatch(validIdx.map((k) => photos[k].url));
+    }
+    if (result.every((r) => r.is_pool === null) && validIdx.length > 1) {
+      // Per-image fallback so one bad URL doesn't kill the batch
+      result = [];
+      for (const k of validIdx) {
+        const single = await classifyBatch([photos[k].url]);
+        result.push(single[0] ?? { ...EMPTY });
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+    validIdx.forEach((k, idx) => {
+      judgments[k] = result[idx] ?? { ...EMPTY };
+    });
     if (i + BATCH_SIZE < photos.length) {
       await new Promise((r) => setTimeout(r, 250));
     }
@@ -118,6 +146,9 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
 
   for (let i = 0; i < photos.length; i++) {
     const j = judgments[i];
+    // Don't overwrite a previously good classification with null when the
+    // gateway failed for this run — only persist when we got a real verdict.
+    if (j.is_pool === null && j.is_outdoor === null && j.pool_score === null) continue;
     await supabaseAdmin
       .from("hotel_photos")
       .update({ is_pool: j.is_pool, pool_score: j.pool_score, is_outdoor: j.is_outdoor })
