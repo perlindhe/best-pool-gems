@@ -146,6 +146,9 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
 
   for (let i = 0; i < photos.length; i++) {
     const j = judgments[i];
+    // Don't overwrite a previously good classification with null when the
+    // gateway failed for this run — only persist when we got a real verdict.
+    if (j.is_pool === null && j.is_outdoor === null && j.pool_score === null) continue;
     await supabaseAdmin
       .from("hotel_photos")
       .update({ is_pool: j.is_pool, pool_score: j.pool_score, is_outdoor: j.is_outdoor })
