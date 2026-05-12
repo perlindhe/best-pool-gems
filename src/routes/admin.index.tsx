@@ -36,7 +36,7 @@ type AnyRec = Record<string, any>;
 function AdminPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
-  const [tab, setTab] = useState<"hotels" | "settings">("hotels");
+  const [tab, setTab] = useState<"hotels" | "scores" | "settings">("hotels");
   const [hotels, setHotels] = useState<AnyRec[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<AnyRec | null>(null);
