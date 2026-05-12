@@ -202,6 +202,12 @@ function AdminPage() {
               Hotels
             </button>
             <button
+              onClick={() => setTab("scores")}
+              className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${tab === "scores" ? "bg-primary text-primary-foreground" : "border border-border"}`}
+            >
+              Pool scores
+            </button>
+            <button
               onClick={() => setTab("settings")}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${tab === "settings" ? "bg-primary text-primary-foreground" : "border border-border"}`}
             >
