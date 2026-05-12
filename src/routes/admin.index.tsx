@@ -843,3 +843,193 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
     </div>
   );
 }
+
+const COMPONENT_KEYS = ["vibe", "lounging_space", "service", "uniqueness", "pool_first_feel"] as const;
+type ComponentKey = (typeof COMPONENT_KEYS)[number];
+
+type ScoreRow = {
+  hotel_id: string;
+  name: string;
+  city: string;
+  slug: string;
+  rank_position: number | null;
+  pool_score_0_10: number | null;
+  components: Record<ComponentKey, number | null>;
+  updated_at: string | null;
+};
+
+function PoolScoresTable({ onMsg }: { onMsg: (m: string | null) => void }) {
+  const [rows, setRows] = useState<ScoreRow[]>([]);
+  const [drafts, setDrafts] = useState<Record<string, { components: Record<ComponentKey, number>; total: number }>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const r = await adminListPoolScores();
+      setRows(r.rows as ScoreRow[]);
+      const d: typeof drafts = {};
+      for (const row of r.rows as ScoreRow[]) {
+        const comps = COMPONENT_KEYS.reduce((acc, k) => {
+          acc[k] = Number(row.components[k] ?? 0);
+          return acc;
+        }, {} as Record<ComponentKey, number>);
+        const total = row.pool_score_0_10 != null
+          ? Number(row.pool_score_0_10)
+          : Number(Object.values(comps).reduce((a, b) => a + b, 0).toFixed(1));
+        d[row.hotel_id] = { components: comps, total };
+      }
+      setDrafts(d);
+    } catch (e) {
+      onMsg((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+
+  const updateComponent = (id: string, k: ComponentKey, v: number) => {
+    setDrafts((prev) => {
+      const cur = prev[id];
+      if (!cur) return prev;
+      const next = { ...cur.components, [k]: v };
+      const total = Number(Object.values(next).reduce((a, b) => a + Number(b || 0), 0).toFixed(1));
+      return { ...prev, [id]: { components: next, total } };
+    });
+  };
+
+  const updateTotal = (id: string, newTotal: number) => {
+    setDrafts((prev) => {
+      const cur = prev[id];
+      if (!cur) return prev;
+      const clamped = Math.max(0, Math.min(10, newTotal));
+      const currentSum = Object.values(cur.components).reduce((a, b) => a + Number(b || 0), 0);
+      let nextComps: Record<ComponentKey, number>;
+      if (currentSum > 0) {
+        const factor = clamped / currentSum;
+        nextComps = COMPONENT_KEYS.reduce((acc, k) => {
+          acc[k] = Math.max(0, Math.min(2, Number((cur.components[k] * factor).toFixed(2))));
+          return acc;
+        }, {} as Record<ComponentKey, number>);
+      } else {
+        // distribute evenly
+        const each = Math.max(0, Math.min(2, Number((clamped / COMPONENT_KEYS.length).toFixed(2))));
+        nextComps = COMPONENT_KEYS.reduce((acc, k) => { acc[k] = each; return acc; }, {} as Record<ComponentKey, number>);
+      }
+      return { ...prev, [id]: { components: nextComps, total: clamped } };
+    });
+  };
+
+  const saveRow = async (row: ScoreRow) => {
+    const d = drafts[row.hotel_id];
+    if (!d) return;
+    setSavingId(row.hotel_id);
+    onMsg(null);
+    try {
+      await adminUpsertPoolScore({ data: { hotel_id: row.hotel_id, components: d.components } });
+      onMsg(`Saved ${row.name}`);
+      await load();
+    } catch (e) {
+      onMsg((e as Error).message);
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const filtered = rows.filter(
+    (r) => !search || r.name.toLowerCase().includes(search.toLowerCase()) || r.city.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  return (
+    <div className="mt-8 rounded-lg border border-border/60 bg-surface/40 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-display text-2xl">Pool scores · sub-components</h2>
+          <p className="text-xs text-muted-foreground">Each component 0–2. Edit a sub-score to recalculate the total, or edit the total to scale the components proportionally.</p>
+        </div>
+        <input
+          placeholder="Search hotel or city…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      {loading ? (
+        <p className="mt-6 text-sm text-muted-foreground">Loading…</p>
+      ) : (
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-surface text-muted-foreground">
+              <tr className="text-left">
+                <th className="p-2">Hotel</th>
+                <th className="p-2">Vibe</th>
+                <th className="p-2">Lounging</th>
+                <th className="p-2">Service</th>
+                <th className="p-2">Uniqueness</th>
+                <th className="p-2">Pool-first feel</th>
+                <th className="p-2">Total /10</th>
+                <th className="p-2">Updated</th>
+                <th className="p-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((row) => {
+                const d = drafts[row.hotel_id];
+                if (!d) return null;
+                const cellInput = (k: ComponentKey) => (
+                  <input
+                    type="number"
+                    step="0.1"
+                    min={0}
+                    max={2}
+                    value={d.components[k]}
+                    onChange={(e) => updateComponent(row.hotel_id, k, Number(e.target.value))}
+                    className="w-16 rounded border border-border bg-background px-2 py-1 text-xs"
+                  />
+                );
+                return (
+                  <tr key={row.hotel_id} className="border-t border-border/40">
+                    <td className="p-2">
+                      <div className="font-medium">{row.name}</div>
+                      <div className="text-[10px] text-muted-foreground">{row.city}</div>
+                    </td>
+                    <td className="p-2">{cellInput("vibe")}</td>
+                    <td className="p-2">{cellInput("lounging_space")}</td>
+                    <td className="p-2">{cellInput("service")}</td>
+                    <td className="p-2">{cellInput("uniqueness")}</td>
+                    <td className="p-2">{cellInput("pool_first_feel")}</td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        step="0.1"
+                        min={0}
+                        max={10}
+                        value={d.total}
+                        onChange={(e) => updateTotal(row.hotel_id, Number(e.target.value))}
+                        className="w-20 rounded border border-primary/40 bg-background px-2 py-1 text-xs font-medium text-primary"
+                      />
+                    </td>
+                    <td className="p-2 text-[10px] text-muted-foreground">
+                      {row.updated_at ? new Date(row.updated_at).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="p-2">
+                      <button
+                        disabled={savingId === row.hotel_id}
+                        onClick={() => saveRow(row)}
+                        className="rounded bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-primary-foreground disabled:opacity-50"
+                      >
+                        {savingId === row.hotel_id ? "…" : "Save"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
