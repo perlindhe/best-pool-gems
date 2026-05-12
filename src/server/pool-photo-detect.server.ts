@@ -1,25 +1,24 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 /**
- * Classify a batch of image URLs as "pool photo" or not, using
- * Lovable AI Gateway (Gemini Flash Lite vision). Returns a parallel
- * array of { is_pool, pool_score } in the same order as the input.
- *
- * The model gets a small batch (max ~6 images) and is asked to return
- * strict JSON. We retry once on parse failure, otherwise mark unknown.
+ * Classify a batch of image URLs as "pool photo" (and outdoor vs indoor),
+ * using Lovable AI Gateway (Gemini Flash Lite vision). Returns a parallel
+ * array of judgments in the same order as the input.
  */
 export type PoolJudgment = {
   is_pool: boolean | null;
   pool_score: number | null;
+  is_outdoor: boolean | null;
 };
 
+const EMPTY: PoolJudgment = { is_pool: null, pool_score: null, is_outdoor: null };
 const BATCH_SIZE = 6;
 
 async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) {
     console.warn("[pool-detect] LOVABLE_API_KEY missing — skipping classification");
-    return urls.map(() => ({ is_pool: null, pool_score: null }));
+    return urls.map(() => ({ ...EMPTY }));
   }
 
   const content: Array<
@@ -33,8 +32,11 @@ async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
         `(infinity pool, rooftop pool, indoor pool, plunge pool, lap pool, jacuzzi/hot tub also counts). ` +
         `A bathroom shower or bathtub does NOT count. A spa treatment room without water does NOT count. ` +
         `Empty deck shots without visible water do NOT count. ` +
+        `Also decide if the pool is OUTDOOR (open sky, terrace, rooftop, garden — set is_outdoor=true) ` +
+        `or INDOOR (enclosed room, ceiling visible, spa basement — is_outdoor=false). ` +
+        `If not a pool, set is_outdoor=null. ` +
         `Return ONLY strict JSON in this exact shape (no prose, no markdown fences): ` +
-        `{"items":[{"i":1,"is_pool":true,"score":0.95}, ...]}. ` +
+        `{"items":[{"i":1,"is_pool":true,"score":0.95,"is_outdoor":true}, ...]}. ` +
         `score is 0..1 confidence that it is a clear, hero-quality pool photo.`,
     },
     ...urls.map((u) => ({
@@ -57,7 +59,7 @@ async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
     });
     if (!res.ok) {
       console.warn(`[pool-detect] gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
-      return urls.map(() => ({ is_pool: null, pool_score: null }));
+      return urls.map(() => ({ ...EMPTY }));
     }
     const json = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
@@ -65,27 +67,33 @@ async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
     const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
     const cleaned = raw.replace(/^```(?:json)?\s*|\s*```$/g, "");
     const parsed = JSON.parse(cleaned) as {
-      items?: Array<{ i: number; is_pool: boolean; score?: number }>;
+      items?: Array<{ i: number; is_pool: boolean; score?: number; is_outdoor?: boolean | null }>;
     };
-    const out: PoolJudgment[] = urls.map(() => ({ is_pool: null, pool_score: null }));
+    const out: PoolJudgment[] = urls.map(() => ({ ...EMPTY }));
     for (const item of parsed.items ?? []) {
       const idx = item.i - 1;
       if (idx < 0 || idx >= urls.length) continue;
       out[idx] = {
         is_pool: !!item.is_pool,
         pool_score: typeof item.score === "number" ? Math.max(0, Math.min(1, item.score)) : null,
+        is_outdoor: item.is_pool
+          ? typeof item.is_outdoor === "boolean"
+            ? item.is_outdoor
+            : null
+          : null,
       };
     }
     return out;
   } catch (e) {
     console.warn("[pool-detect] failed:", e instanceof Error ? e.message : e);
-    return urls.map(() => ({ is_pool: null, pool_score: null }));
+    return urls.map(() => ({ ...EMPTY }));
   }
 }
 
 /**
- * Classify all stored photos for a hotel and persist is_pool / pool_score,
- * then re-rank `position` so pool photos come first (highest score first).
+ * Classify all stored photos for a hotel and persist is_pool / pool_score / is_outdoor,
+ * then re-rank `position` so outdoor pool photos come first, then indoor pool photos,
+ * then everything else.
  */
 export async function classifyAndReorderHotelPhotos(hotelId: string) {
   const { data: photos, error } = await supabaseAdmin
@@ -95,7 +103,7 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
     .order("position", { ascending: true });
   if (error) throw new Error(error.message);
   if (!photos || photos.length === 0) {
-    return { classified: 0, pool_count: 0 };
+    return { classified: 0, pool_count: 0, outdoor_count: 0 };
   }
 
   const judgments: PoolJudgment[] = [];
@@ -103,36 +111,38 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
     const batch = photos.slice(i, i + BATCH_SIZE);
     const result = await classifyBatch(batch.map((p) => p.url));
     judgments.push(...result);
-    // be polite to the gateway
     if (i + BATCH_SIZE < photos.length) {
       await new Promise((r) => setTimeout(r, 250));
     }
   }
 
-  // Persist judgments
   for (let i = 0; i < photos.length; i++) {
     const j = judgments[i];
     await supabaseAdmin
       .from("hotel_photos")
-      .update({ is_pool: j.is_pool, pool_score: j.pool_score })
+      .update({ is_pool: j.is_pool, pool_score: j.pool_score, is_outdoor: j.is_outdoor })
       .eq("id", photos[i].id);
   }
 
-  // Re-rank: pool photos first. Among pool photos prefer the hotel's own
-  // website (usually highest quality), then TripAdvisor, then Google.
-  // Within each source group, sort by AI confidence (pool_score desc).
+  // Re-rank: outdoor pools first, then indoor pools, then everything else.
+  // Within pool groups, prefer the hotel's own website, then TripAdvisor, then Google,
+  // and within each source group sort by AI confidence (pool_score desc).
   const sourceRank = (s: string | null) =>
     s === "website" ? 0 : s === "tripadvisor" ? 1 : s === "google" ? 2 : 3;
+  const poolTier = (j: PoolJudgment) => {
+    if (j.is_pool !== true) return 2;
+    return j.is_outdoor === true ? 0 : 1; // unknown indoor/outdoor falls in indoor tier
+  };
   const indexed = photos.map((p, i) => ({
     id: p.id,
-    is_pool: judgments[i].is_pool === true,
+    tier: poolTier(judgments[i]),
     score: judgments[i].pool_score ?? 0,
     sourceRank: sourceRank((p as { source?: string | null }).source ?? null),
     originalIdx: i,
   }));
   indexed.sort((a, b) => {
-    if (a.is_pool !== b.is_pool) return a.is_pool ? -1 : 1;
-    if (a.is_pool && b.is_pool) {
+    if (a.tier !== b.tier) return a.tier - b.tier;
+    if (a.tier < 2) {
       if (a.sourceRank !== b.sourceRank) return a.sourceRank - b.sourceRank;
       return b.score - a.score;
     }
@@ -146,6 +156,7 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
       .eq("id", indexed[pos].id);
   }
 
-  const pool_count = indexed.filter((x) => x.is_pool).length;
-  return { classified: photos.length, pool_count };
+  const pool_count = indexed.filter((x) => x.tier < 2).length;
+  const outdoor_count = indexed.filter((x) => x.tier === 0).length;
+  return { classified: photos.length, pool_count, outdoor_count };
 }
