@@ -26,6 +26,7 @@ import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hot
 import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
+import { Route as ApiPublicHooksClassifyPoolPhotosRouteImport } from './routes/api/public/hooks/classify-pool-photos'
 import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/api/public/hooks/backfill-tripadvisor'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
 
@@ -118,6 +119,12 @@ const ApiPublicHooksRefreshAllPhotosRoute =
     path: '/api/public/hooks/refresh-all-photos',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksClassifyPoolPhotosRoute =
+  ApiPublicHooksClassifyPoolPhotosRouteImport.update({
+    id: '/api/public/hooks/classify-pool-photos',
+    path: '/api/public/hooks/classify-pool-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBackfillTripadvisorRoute =
   ApiPublicHooksBackfillTripadvisorRouteImport.update({
     id: '/api/public/hooks/backfill-tripadvisor',
@@ -147,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
+  '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -168,6 +176,7 @@ export interface FileRoutesByTo {
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
+  '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
+  '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-tripadvisor'
+    | '/api/public/hooks/classify-pool-photos'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-tripadvisor'
+    | '/api/public/hooks/classify-pool-photos'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -255,6 +267,7 @@ export interface FileRouteTypes {
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-tripadvisor'
+    | '/api/public/hooks/classify-pool-photos'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -276,6 +289,7 @@ export interface RootRouteChildren {
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
   ApiPublicHooksBackfillTripadvisorRoute: typeof ApiPublicHooksBackfillTripadvisorRoute
+  ApiPublicHooksClassifyPoolPhotosRoute: typeof ApiPublicHooksClassifyPoolPhotosRoute
   ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
   ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
   ApiPublicHooksRefreshMissingPhotosRoute: typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -402,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshAllPhotosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/classify-pool-photos': {
+      id: '/api/public/hooks/classify-pool-photos'
+      path: '/api/public/hooks/classify-pool-photos'
+      fullPath: '/api/public/hooks/classify-pool-photos'
+      preLoaderRoute: typeof ApiPublicHooksClassifyPoolPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/backfill-tripadvisor': {
       id: '/api/public/hooks/backfill-tripadvisor'
       path: '/api/public/hooks/backfill-tripadvisor'
@@ -459,6 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
   ApiPublicHooksBackfillTripadvisorRoute:
     ApiPublicHooksBackfillTripadvisorRoute,
+  ApiPublicHooksClassifyPoolPhotosRoute: ApiPublicHooksClassifyPoolPhotosRoute,
   ApiPublicHooksRefreshAllPhotosRoute: ApiPublicHooksRefreshAllPhotosRoute,
   ApiPublicHooksRefreshGoogleRatingsRoute:
     ApiPublicHooksRefreshGoogleRatingsRoute,

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { classifyAndReorderHotelPhotos } from "./pool-photo-detect.server";
 
 export type PhotoSource = "google" | "tripadvisor" | "website";
 export type FetchedPhoto = {
@@ -449,8 +450,18 @@ export async function refreshHotelPhotos(hotelId: string) {
     if (error) throw new Error(error.message);
   }
 
+  // AI pass: detect which photos actually show a pool, then reorder so
+  // pool photos come first in galleries and listings.
+  let poolDetect = { classified: 0, pool_count: 0 };
+  try {
+    poolDetect = await classifyAndReorderHotelPhotos(hotelId);
+  } catch (e) {
+    console.warn("[refreshHotelPhotos] pool detection failed:", e);
+  }
+
   return {
     counts: { google: g.length, tripadvisor: t.length, website: w.length, total: merged.length },
+    pool_detect: poolDetect,
     autoResolvedGoogle: !!google?.source_place_id && !(mappings ?? []).some((m) => m.source === "google"),
     websiteUrl,
   };
