@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { classifyAndReorderHotelPhotos } from "./pool-photo-detect.server";
 
 export type PhotoSource = "google" | "tripadvisor" | "website";
 export type FetchedPhoto = {
