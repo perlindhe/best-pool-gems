@@ -21,6 +21,8 @@ export type Database = {
           height: number | null
           hotel_id: string
           id: string
+          is_pool: boolean | null
+          pool_score: number | null
           position: number
           source: string
           url: string
@@ -32,6 +34,8 @@ export type Database = {
           height?: number | null
           hotel_id: string
           id?: string
+          is_pool?: boolean | null
+          pool_score?: number | null
           position?: number
           source: string
           url: string
@@ -43,6 +47,8 @@ export type Database = {
           height?: number | null
           hotel_id?: string
           id?: string
+          is_pool?: boolean | null
+          pool_score?: number | null
           position?: number
           source?: string
           url?: string
