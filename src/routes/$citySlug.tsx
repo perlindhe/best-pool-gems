@@ -1,11 +1,20 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
 import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 
+const PAGE_SIZE = 10;
+
+const citySearchSchema = z.object({
+  page: fallback(z.number().int().min(1).max(20), 1).default(1),
+});
+
 export const Route = createFileRoute("/$citySlug")({
+  validateSearch: zodValidator(citySearchSchema),
   loader: async ({ params }) => {
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
