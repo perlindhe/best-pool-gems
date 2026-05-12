@@ -11,6 +11,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export type PoolJudgment = {
   is_pool: boolean | null;
   pool_score: number | null;
+  is_outdoor: boolean | null;
 };
 
 const BATCH_SIZE = 6;
