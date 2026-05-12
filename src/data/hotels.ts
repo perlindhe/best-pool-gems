@@ -5,6 +5,7 @@ import newyorkImg from "@/assets/newyork.jpg";
 import granCanariaImg from "@/assets/gran-canaria.jpg";
 import mallorcaImg from "@/assets/mallorca.jpg";
 import bangkokImg from "@/assets/bangkok.jpg";
+import malagaImg from "@/assets/malaga.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
