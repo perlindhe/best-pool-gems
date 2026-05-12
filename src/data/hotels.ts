@@ -246,6 +246,16 @@ export const cities: City[] = [
     image: bangkokImg,
     hotels: [],
   },
+  {
+    slug: "malaga",
+    name: "Málaga",
+    country: "Spain",
+    tagline: "Andalusian rooftops above the Costa del Sol",
+    intro:
+      "Málaga's hotel scene has grown up fast — rooftop pools with cathedral views, port-side resorts and warm Andalusian evenings that stretch long into October.",
+    image: malagaImg,
+    hotels: [],
+  },
 ];
 
 export const getCity = (slug: string) => cities.find((c) => c.slug === slug);
