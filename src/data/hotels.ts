@@ -2,6 +2,9 @@ import barcelonaImg from "@/assets/barcelona.jpg";
 import parisImg from "@/assets/paris.jpg";
 import londonImg from "@/assets/london.jpg";
 import newyorkImg from "@/assets/newyork.jpg";
+import granCanariaImg from "@/assets/gran-canaria.jpg";
+import mallorcaImg from "@/assets/mallorca.jpg";
+import bangkokImg from "@/assets/bangkok.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
