@@ -78,6 +78,7 @@ export const Route = createFileRoute("/api/public/hooks/classify-pool-photos")({
               status: r.classified === 0 ? "no_photos" : "classified",
               classified: r.classified,
               pool_count: r.pool_count,
+              outdoor_count: r.outdoor_count,
             });
           } catch (e) {
             const msg = e instanceof Error ? e.message : String(e);
