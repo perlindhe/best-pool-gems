@@ -106,16 +106,39 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
     return { classified: 0, pool_count: 0, outdoor_count: 0 };
   }
 
-  const judgments: PoolJudgment[] = [];
-  for (let i = 0; i < photos.length; i += BATCH_SIZE) {
-    const batch = photos.slice(i, i + BATCH_SIZE);
-    let result = await classifyBatch(batch.map((p) => p.url));
-    // Retry once if the whole batch came back unclassified (gateway/parse fail)
-    if (result.every((r) => r.is_pool === null)) {
-      await new Promise((r) => setTimeout(r, 800));
-      result = await classifyBatch(batch.map((p) => p.url));
+  const isLikelyImageUrl = (u: string) => {
+    if (!u || /\s|"|'|&quot;|&amp;quot;/.test(u)) return false;
+    try {
+      const parsed = new URL(u);
+      return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+      return false;
     }
-    judgments.push(...result);
+  };
+
+  const judgments: PoolJudgment[] = new Array(photos.length).fill(null).map(() => ({ ...EMPTY }));
+  for (let i = 0; i < photos.length; i += BATCH_SIZE) {
+    const batchIdx = photos.slice(i, i + BATCH_SIZE).map((_, k) => i + k);
+    const validIdx = batchIdx.filter((k) => isLikelyImageUrl(photos[k].url));
+    if (validIdx.length === 0) continue;
+    let result = await classifyBatch(validIdx.map((k) => photos[k].url));
+    if (result.every((r) => r.is_pool === null)) {
+      // Retry whole batch once
+      await new Promise((r) => setTimeout(r, 800));
+      result = await classifyBatch(validIdx.map((k) => photos[k].url));
+    }
+    if (result.every((r) => r.is_pool === null) && validIdx.length > 1) {
+      // Per-image fallback so one bad URL doesn't kill the batch
+      result = [];
+      for (const k of validIdx) {
+        const single = await classifyBatch([photos[k].url]);
+        result.push(single[0] ?? { ...EMPTY });
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+    validIdx.forEach((k, idx) => {
+      judgments[k] = result[idx] ?? { ...EMPTY };
+    });
     if (i + BATCH_SIZE < photos.length) {
       await new Promise((r) => setTimeout(r, 250));
     }
