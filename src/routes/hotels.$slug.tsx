@@ -215,10 +215,10 @@ function HotelDetailPage() {
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      {q.source}
+                      {sourceLabel(q.source)} ↗
                     </a>
                   ) : (
-                    <span>{q.source}</span>
+                    <span>{sourceLabel(q.source)}</span>
                   )}
                 </figcaption>
               </figure>
@@ -311,3 +311,11 @@ function SourceBadge({
     </span>
   );
 }
+
+function sourceLabel(s: string) {
+  if (s === "tripadvisor") return "TripAdvisor";
+  if (s === "google") return "Google";
+  if (s === "web") return "Web";
+  return s;
+}
+
