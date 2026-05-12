@@ -176,6 +176,39 @@ export type Database = {
           },
         ]
       }
+      pool_quotes: {
+        Row: {
+          author: string | null
+          created_at: string
+          hotel_id: string
+          id: string
+          position: number
+          quote: string
+          source: string
+          source_url: string | null
+        }
+        Insert: {
+          author?: string | null
+          created_at?: string
+          hotel_id: string
+          id?: string
+          position?: number
+          quote: string
+          source: string
+          source_url?: string | null
+        }
+        Update: {
+          author?: string | null
+          created_at?: string
+          hotel_id?: string
+          id?: string
+          position?: number
+          quote?: string
+          source?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
       pool_scores: {
         Row: {
           best_time: string | null
