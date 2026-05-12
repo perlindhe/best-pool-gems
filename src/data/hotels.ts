@@ -2,6 +2,9 @@ import barcelonaImg from "@/assets/barcelona.jpg";
 import parisImg from "@/assets/paris.jpg";
 import londonImg from "@/assets/london.jpg";
 import newyorkImg from "@/assets/newyork.jpg";
+import granCanariaImg from "@/assets/gran-canaria.jpg";
+import mallorcaImg from "@/assets/mallorca.jpg";
+import bangkokImg from "@/assets/bangkok.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
@@ -210,6 +213,36 @@ export const cities: City[] = [
     tagline: "Rooftop pools with skyscrapers in the background",
     intro: "Manhattan's pools are nearly always on the roof — and often worth the hype.",
     image: newyorkImg,
+    hotels: [],
+  },
+  {
+    slug: "gran-canaria",
+    name: "Gran Canaria",
+    country: "Spain",
+    tagline: "Volcanic coastline and year-round pool weather",
+    intro:
+      "Gran Canaria's resort hotels turn the Atlantic into a backdrop — infinity pools above black-rock cliffs, palm-lined decks and warm water from January to December.",
+    image: granCanariaImg,
+    hotels: [],
+  },
+  {
+    slug: "mallorca",
+    name: "Mallorca",
+    country: "Spain",
+    tagline: "Cliffside pools above the Mediterranean",
+    intro:
+      "From Deià to Cap de Formentor, Mallorca hides some of Europe's most beautifully placed hotel pools — pine forests, stone terraces and that very specific Balearic blue.",
+    image: mallorcaImg,
+    hotels: [],
+  },
+  {
+    slug: "bangkok",
+    name: "Bangkok",
+    country: "Thailand",
+    tagline: "Sky pools high above the tropical metropolis",
+    intro:
+      "Bangkok perfected the rooftop infinity pool. We rank the city's most spectacular sky pools — the ones with the skyline view, the cocktail program and the warm tropical evenings.",
+    image: bangkokImg,
     hotels: [],
   },
 ];
