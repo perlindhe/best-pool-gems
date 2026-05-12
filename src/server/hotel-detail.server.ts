@@ -33,6 +33,26 @@ export async function getHotelDetail(slug: string) {
     source: (p.source as string) ?? undefined,
   }));
 
-  return { hotel, photos };
+  const { data: quoteRows } = await supabaseAdmin
+    .from("pool_quotes")
+    .select("quote, author, source, source_url, position")
+    .eq("hotel_id", hotel.id as string)
+    .order("position", { ascending: true });
+
+  const quotes: PoolQuote[] = (quoteRows ?? []).map((q) => ({
+    quote: q.quote as string,
+    author: (q.author as string | null) ?? null,
+    source: (q.source as string) ?? "tripadvisor",
+    source_url: (q.source_url as string | null) ?? null,
+  }));
+
+  return { hotel, photos, quotes };
 }
+
+export type PoolQuote = {
+  quote: string;
+  author: string | null;
+  source: string;
+  source_url: string | null;
+};
 

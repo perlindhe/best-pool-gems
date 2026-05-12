@@ -61,7 +61,7 @@ export const Route = createFileRoute("/hotels/$slug")({
 });
 
 function HotelDetailPage() {
-  const { hotel, photos } = Route.useLoaderData() as NonNullable<
+  const { hotel, photos, quotes } = Route.useLoaderData() as NonNullable<
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
@@ -182,6 +182,51 @@ function HotelDetailPage() {
         </div>
       </section>
 
+      {/* Pool quotes from guests */}
+      {quotes.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-20">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">
+            What guests say about the pool
+          </p>
+          <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
+            In their own words
+          </h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {quotes.slice(0, 3).map((q, i) => (
+              <figure
+                key={i}
+                className="relative flex flex-col rounded-2xl border border-border/60 bg-surface/50 p-7 shadow-elegant"
+              >
+                <span
+                  aria-hidden
+                  className="font-display text-7xl leading-none text-primary/40"
+                >
+                  &ldquo;
+                </span>
+                <blockquote className="mt-2 flex-1 text-base leading-relaxed text-foreground/90">
+                  {q.quote}
+                </blockquote>
+                <figcaption className="mt-5 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  <span>{q.author ? `— ${q.author}` : "— Verified guest"}</span>
+                  {q.source_url ? (
+                    <a
+                      href={q.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {q.source}
+                    </a>
+                  ) : (
+                    <span>{q.source}</span>
+                  )}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Gallery */}
       {gallery.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
@@ -260,7 +305,9 @@ function SourceBadge({
   return (
     <span className="rounded-sm border border-border/60 bg-background/40 px-2.5 py-1 text-muted-foreground">
       {label} <strong className="text-foreground">{(rating / 20).toFixed(1)}★</strong>
-      {count > 0 && <span className="ml-1 text-[10px]">({count.toLocaleString()})</span>}
+      {count > 0 && (
+        <span className="ml-1 text-[10px]">({count.toLocaleString("en-US")})</span>
+      )}
     </span>
   );
 }

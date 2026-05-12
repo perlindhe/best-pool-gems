@@ -28,6 +28,7 @@ import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes
 import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
 import { Route as ApiPublicHooksClassifyPoolPhotosRouteImport } from './routes/api/public/hooks/classify-pool-photos'
 import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/api/public/hooks/backfill-tripadvisor'
+import { Route as ApiPublicHooksBackfillPoolQuotesRouteImport } from './routes/api/public/hooks/backfill-pool-quotes'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
 
 const RankingsRoute = RankingsRouteImport.update({
@@ -131,6 +132,12 @@ const ApiPublicHooksBackfillTripadvisorRoute =
     path: '/api/public/hooks/backfill-tripadvisor',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBackfillPoolQuotesRoute =
+  ApiPublicHooksBackfillPoolQuotesRouteImport.update({
+    id: '/api/public/hooks/backfill-pool-quotes',
+    path: '/api/public/hooks/backfill-pool-quotes',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksAutoScoreAllRoute =
   ApiPublicHooksAutoScoreAllRouteImport.update({
     id: '/api/public/hooks/auto-score-all',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
@@ -175,6 +183,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
@@ -198,6 +207,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
+  '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/backfill-pool-quotes'
     | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/classify-pool-photos'
     | '/api/public/hooks/refresh-all-photos'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/backfill-pool-quotes'
     | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/classify-pool-photos'
     | '/api/public/hooks/refresh-all-photos'
@@ -266,6 +278,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
+    | '/api/public/hooks/backfill-pool-quotes'
     | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/classify-pool-photos'
     | '/api/public/hooks/refresh-all-photos'
@@ -288,6 +301,7 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
+  ApiPublicHooksBackfillPoolQuotesRoute: typeof ApiPublicHooksBackfillPoolQuotesRoute
   ApiPublicHooksBackfillTripadvisorRoute: typeof ApiPublicHooksBackfillTripadvisorRoute
   ApiPublicHooksClassifyPoolPhotosRoute: typeof ApiPublicHooksClassifyPoolPhotosRoute
   ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
@@ -430,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBackfillTripadvisorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/backfill-pool-quotes': {
+      id: '/api/public/hooks/backfill-pool-quotes'
+      path: '/api/public/hooks/backfill-pool-quotes'
+      fullPath: '/api/public/hooks/backfill-pool-quotes'
+      preLoaderRoute: typeof ApiPublicHooksBackfillPoolQuotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/auto-score-all': {
       id: '/api/public/hooks/auto-score-all'
       path: '/api/public/hooks/auto-score-all'
@@ -478,6 +499,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
+  ApiPublicHooksBackfillPoolQuotesRoute: ApiPublicHooksBackfillPoolQuotesRoute,
   ApiPublicHooksBackfillTripadvisorRoute:
     ApiPublicHooksBackfillTripadvisorRoute,
   ApiPublicHooksClassifyPoolPhotosRoute: ApiPublicHooksClassifyPoolPhotosRoute,
