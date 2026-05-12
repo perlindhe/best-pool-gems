@@ -118,17 +118,24 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
       .eq("id", photos[i].id);
   }
 
-  // Re-rank: pool photos first (sorted by pool_score desc), then the rest
-  // in their original order.
+  // Re-rank: pool photos first. Among pool photos prefer the hotel's own
+  // website (usually highest quality), then TripAdvisor, then Google.
+  // Within each source group, sort by AI confidence (pool_score desc).
+  const sourceRank = (s: string | null) =>
+    s === "website" ? 0 : s === "tripadvisor" ? 1 : s === "google" ? 2 : 3;
   const indexed = photos.map((p, i) => ({
     id: p.id,
     is_pool: judgments[i].is_pool === true,
     score: judgments[i].pool_score ?? 0,
+    sourceRank: sourceRank((p as { source?: string | null }).source ?? null),
     originalIdx: i,
   }));
   indexed.sort((a, b) => {
     if (a.is_pool !== b.is_pool) return a.is_pool ? -1 : 1;
-    if (a.is_pool && b.is_pool) return b.score - a.score;
+    if (a.is_pool && b.is_pool) {
+      if (a.sourceRank !== b.sourceRank) return a.sourceRank - b.sourceRank;
+      return b.score - a.score;
+    }
     return a.originalIdx - b.originalIdx;
   });
 
