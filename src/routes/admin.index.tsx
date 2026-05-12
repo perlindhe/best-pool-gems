@@ -351,6 +351,8 @@ function AdminPage() {
 
         {tab === "settings" ? (
           <SettingsPanel onSaved={() => setMsg("Settings saved")} />
+        ) : tab === "scores" ? (
+          <PoolScoresTable onMsg={setMsg} />
         ) : (
           <div className="mt-8 grid gap-6 lg:grid-cols-[360px_1fr]">
             <aside className="rounded-lg border border-border/60 bg-surface/40 p-4">
