@@ -61,7 +61,7 @@ export const Route = createFileRoute("/hotels/$slug")({
 });
 
 function HotelDetailPage() {
-  const { hotel, photos } = Route.useLoaderData() as NonNullable<
+  const { hotel, photos, quotes } = Route.useLoaderData() as NonNullable<
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
@@ -260,7 +260,9 @@ function SourceBadge({
   return (
     <span className="rounded-sm border border-border/60 bg-background/40 px-2.5 py-1 text-muted-foreground">
       {label} <strong className="text-foreground">{(rating / 20).toFixed(1)}★</strong>
-      {count > 0 && <span className="ml-1 text-[10px]">({count.toLocaleString()})</span>}
+      {count > 0 && (
+        <span className="ml-1 text-[10px]">({count.toLocaleString("en-US")})</span>
+      )}
     </span>
   );
 }
