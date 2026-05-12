@@ -80,8 +80,9 @@ function pickBestMatch(
     if (hc && rc && (rc === hc || rc.includes(hc) || hc.includes(rc))) score += 30;
     if (!best || score > best.score) best = { r, score };
   }
-  // Require at least some reasonable confidence
-  if (!best || best.score < 30) return null;
+  // Require strong confidence: full or substring name match (60+) plus city bonus,
+  // OR overwhelming token overlap. Pure city-token matches are rejected.
+  if (!best || best.score < 70) return null;
   return best.r;
 }
 
