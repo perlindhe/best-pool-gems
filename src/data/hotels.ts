@@ -5,6 +5,7 @@ import newyorkImg from "@/assets/newyork.jpg";
 import granCanariaImg from "@/assets/gran-canaria.jpg";
 import mallorcaImg from "@/assets/mallorca.jpg";
 import bangkokImg from "@/assets/bangkok.jpg";
+import malagaImg from "@/assets/malaga.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
@@ -243,6 +244,16 @@ export const cities: City[] = [
     intro:
       "Bangkok perfected the rooftop infinity pool. We rank the city's most spectacular sky pools — the ones with the skyline view, the cocktail program and the warm tropical evenings.",
     image: bangkokImg,
+    hotels: [],
+  },
+  {
+    slug: "malaga",
+    name: "Málaga",
+    country: "Spain",
+    tagline: "Andalusian rooftops above the Costa del Sol",
+    intro:
+      "Málaga's hotel scene has grown up fast — rooftop pools with cathedral views, port-side resorts and warm Andalusian evenings that stretch long into October.",
+    image: malagaImg,
     hotels: [],
   },
 ];
