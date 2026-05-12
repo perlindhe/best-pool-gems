@@ -132,9 +132,20 @@ function CityHub() {
       {/* Top hotels list (if any) */}
       {city.hotels.length > 0 && (
         <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
-          <h2 className="font-display text-5xl tracking-wide">Top {city.hotels.length}</h2>
-          {city.hotels.map((h: Hotel) => {
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
+              <h2 className="mt-2 font-display text-5xl tracking-wide">
+                Top {city.hotels.length}
+              </h2>
+            </div>
+            {totalPages > 1 && (
+              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                #{startIdx + 1}–{startIdx + pagedHotels.length} · Page {currentPage} of {totalPages}
+              </p>
+            )}
+          </div>
+          {pagedHotels.map((h: Hotel) => {
             const info = hotelInfo[h.name.toLowerCase()];
             return (
               <HotelCard
@@ -145,6 +156,51 @@ function CityHub() {
               />
             );
           })}
+          {totalPages > 1 && (
+            <nav className="mt-10 flex items-center justify-between border-t border-border/40 pt-8">
+              {currentPage > 1 ? (
+                <Link
+                  to="/$citySlug"
+                  params={{ citySlug: city.slug }}
+                  search={{ page: currentPage - 1 }}
+                  className="text-sm uppercase tracking-[0.25em] text-primary hover:underline"
+                >
+                  ← Page {currentPage - 1}
+                </Link>
+              ) : (
+                <span />
+              )}
+              <div className="flex gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Link
+                    key={p}
+                    to="/$citySlug"
+                    params={{ citySlug: city.slug }}
+                    search={{ page: p }}
+                    className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.25em] transition ${
+                      p === currentPage
+                        ? "bg-primary text-primary-foreground"
+                        : "border border-border text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                    }`}
+                  >
+                    {p}
+                  </Link>
+                ))}
+              </div>
+              {currentPage < totalPages ? (
+                <Link
+                  to="/$citySlug"
+                  params={{ citySlug: city.slug }}
+                  search={{ page: currentPage + 1 }}
+                  className="text-sm uppercase tracking-[0.25em] text-primary hover:underline"
+                >
+                  Page {currentPage + 1} →
+                </Link>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
         </section>
       )}
 
