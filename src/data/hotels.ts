@@ -316,7 +316,7 @@ export const barcelonaTop10: Hotel[] = [
   },
 ];
 
-export const barcelonaTop20: Hotel[] = [...barcelonaTop10, ...barcelonaExtra];
+
 
 export const cities: City[] = [
   {
