@@ -311,3 +311,11 @@ function SourceBadge({
     </span>
   );
 }
+
+function sourceLabel(s: string) {
+  if (s === "tripadvisor") return "TripAdvisor";
+  if (s === "google") return "Google";
+  if (s === "web") return "Web";
+  return s;
+}
+
