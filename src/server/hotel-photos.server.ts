@@ -178,7 +178,7 @@ function extractImageUrls(html: string, baseUrl: string): Array<{ url: string; p
     if (!/\.(jpe?g|png|webp|avif)(\?|$|#)/i.test(abs)) continue;
     if (/(logo|favicon|sprite|placeholder|spinner|loading|icon[-_])/i.test(abs)) continue;
     seen.add(abs);
-    const poolish = /pool|piscina|piscine|swim|rooftop|terrace|spa/.test(ctx + abs.toLowerCase());
+    const poolish = /pool|piscina|piscine|swim|rooftop|terrace|spa|infinity|jacuzzi|sundeck/.test(ctx + abs.toLowerCase());
     out.push({ url: abs, poolish });
   }
   // background-image: url(...)
@@ -189,7 +189,7 @@ function extractImageUrls(html: string, baseUrl: string): Array<{ url: string; p
     if (!/\.(jpe?g|png|webp|avif)(\?|$|#)/i.test(abs)) continue;
     if (/(logo|favicon|sprite|placeholder|icon[-_])/i.test(abs)) continue;
     seen.add(abs);
-    out.push({ url: abs, poolish: /pool|rooftop|terrace|spa/.test(abs.toLowerCase()) });
+    out.push({ url: abs, poolish: /pool|rooftop|terrace|spa|infinity|jacuzzi|sundeck/.test(abs.toLowerCase()) });
   }
   return out;
 }
