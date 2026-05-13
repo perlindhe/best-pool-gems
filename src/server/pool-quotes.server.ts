@@ -65,11 +65,15 @@ async function fetchGoogleReviews(placeId: string): Promise<RawReview[]> {
     .filter((r) => r.text.length > 20);
 }
 
-// ---------- Firecrawl web search (editorial / blogs / Booking snippets) ----------
-async function fetchWebReviews(hotelName: string, city: string): Promise<RawReview[]> {
+// ---------- Firecrawl web search (editorial / Reddit / hotel guides) ----------
+const POOL_RE = /pool|rooftop|infinity|jacuzzi|hot tub|sundeck|plunge|piscina|piscine|swim/i;
+
+async function firecrawlSearchOne(
+  query: string,
+  limit = 4,
+): Promise<RawReview[]> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return [];
-  const query = `"${hotelName}" ${city} pool review`;
   try {
     const res = await fetch("https://api.firecrawl.dev/v2/search", {
       method: "POST",
@@ -79,7 +83,7 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
       },
       body: JSON.stringify({
         query,
-        limit: 5,
+        limit,
         scrapeOptions: { formats: ["markdown"], onlyMainContent: true },
       }),
     });
@@ -98,10 +102,40 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
         author: r.title ?? null,
         url: r.url ?? null,
       }))
-      .filter((r) => r.text.length > 80 && /pool|rooftop|deck/i.test(r.text));
+      .filter((r) => r.text.length > 80 && POOL_RE.test(r.text));
   } catch {
     return [];
   }
+}
+
+async function fetchWebReviews(hotelName: string, city: string): Promise<RawReview[]> {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return [];
+  const base = `"${hotelName}" ${city} pool`;
+  // Run targeted searches in parallel — each scoped to a different
+  // category of source so the AI gets diverse, pool-specific candidates.
+  const queries: string[] = [
+    // Generic web (editorial blogs, Booking snippets, etc.)
+    `${base} review`,
+    // Reddit threads — honest first-hand traveler comments
+    `${base} (site:reddit.com/r/travel OR site:reddit.com/r/hotels OR site:reddit.com/r/luxurytravel)`,
+    // Top-tier travel editorial
+    `${base} (site:cntraveler.com OR site:travelandleisure.com OR site:telegraph.co.uk OR site:mrandmrssmith.com OR site:fivestaralliance.com OR site:forbestravelguide.com)`,
+    // Pool-focused hotel guides
+    `${base} (site:thehotelguru.com OR site:oyster.com)`,
+  ];
+  const lists = await Promise.all(queries.map((q) => firecrawlSearchOne(q, 4)));
+  const seen = new Set<string>();
+  const out: RawReview[] = [];
+  for (const list of lists) {
+    for (const r of list) {
+      const key = r.url ?? r.text.slice(0, 120);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(r);
+    }
+  }
+  return out;
 }
 
 // ---------- AI quote extraction ----------
