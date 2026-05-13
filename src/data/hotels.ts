@@ -607,6 +607,26 @@ export const cities: City[] = [
     image: malagaImg,
     hotels: malagaTop20,
   },
+  {
+    slug: "los-angeles",
+    name: "Los Angeles",
+    country: "USA",
+    tagline: "Hollywood pool decks under California sun",
+    intro:
+      "From Bel Air's pink-tiled icon to rooftop infinity pools above the Sunset Strip, Los Angeles invented the cinematic hotel pool. Year-round sun, palm trees and cabanas included.",
+    image: losAngelesImg,
+    hotels: losAngelesTop20,
+  },
+  {
+    slug: "sydney",
+    name: "Sydney",
+    country: "Australia",
+    tagline: "Harbour-view pools facing the Opera House",
+    intro:
+      "Sydney's best hotel pools are aimed straight at the harbour — rooftop decks framing the Opera House, sky-high indoor pools above Circular Quay and one boutique that lets you swim in the harbour itself.",
+    image: sydneyImg,
+    hotels: sydneyTop20,
+  },
 ];
 
 export const getCity = (slug: string) => cities.find((c) => c.slug === slug);
