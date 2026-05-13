@@ -6,6 +6,8 @@ import granCanariaImg from "@/assets/gran-canaria.jpg";
 import mallorcaImg from "@/assets/mallorca.jpg";
 import bangkokImg from "@/assets/bangkok.jpg";
 import malagaImg from "@/assets/malaga.jpg";
+import losAngelesImg from "@/assets/los-angeles.jpg";
+import sydneyImg from "@/assets/sydney.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
