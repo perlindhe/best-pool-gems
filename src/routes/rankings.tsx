@@ -209,7 +209,7 @@ function SourceBadge({
       {label}{" "}
       <strong className="text-foreground">{(rating / 20).toFixed(1)}★</strong>
       {count > 0 && (
-        <span className="ml-1 text-[10px]">({count.toLocaleString()})</span>
+        <span className="ml-1 text-[10px]">({count.toLocaleString("en-US")})</span>
       )}
     </span>
   );
