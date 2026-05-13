@@ -146,7 +146,7 @@ async function aiPickPoolQuotes(
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
-  const items = reviews.slice(0, 24).map((r, i) => ({
+  const items = reviews.slice(0, 32).map((r, i) => ({
     idx: i,
     source: r.source,
     author: r.author,
@@ -155,8 +155,12 @@ async function aiPickPoolQuotes(
   if (items.length === 0) return [];
 
   const sys =
-    "You extract short verbatim quotes that talk specifically about a hotel's swimming pool, rooftop pool, pool deck, pool bar, or pool view. Pick at most 3 quotes total. Try to pick from DIFFERENT sources if possible (one TripAdvisor, one Google, one web/editorial). Each quote must be a verbatim sentence (or two adjacent sentences) copied from the source — never paraphrase. Skip items that don't mention the pool/rooftop/deck.";
-  const user = `Hotel: ${hotelName}\n\nSources (JSON array):\n${JSON.stringify(items)}\n\nReturn the best up-to-3 pool-related verbatim quotes, prefer source diversity.`;
+    "You extract short verbatim quotes that talk SPECIFICALLY about a hotel's swimming pool, rooftop pool, infinity pool, pool deck, pool bar, jacuzzi, or pool view. " +
+    "Pick at most 5 quotes total. STRONGLY prefer source diversity — mix TripAdvisor, Google, Reddit, editorial outlets (Condé Nast Traveler, Travel + Leisure, Telegraph, Mr & Mrs Smith, Five Star Alliance, Forbes Travel Guide), and pool-focused guides (The Hotel Guru, Oyster). " +
+    "Each quote must be a verbatim sentence (or two adjacent sentences) copied from the source — never paraphrase, never invent. " +
+    "Skip any item that does not explicitly mention the pool / rooftop / deck / jacuzzi. " +
+    "Prefer concrete pool details (size, view, temperature, atmosphere, hours) over generic praise.";
+  const user = `Hotel: ${hotelName}\n\nSources (JSON array, mixed origins):\n${JSON.stringify(items)}\n\nReturn the best up-to-5 pool-specific verbatim quotes, maximizing source diversity.`;
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -175,13 +179,13 @@ async function aiPickPoolQuotes(
           type: "function",
           function: {
             name: "save_pool_quotes",
-            description: "Save up to 3 pool-related guest/editorial quotes",
+            description: "Save up to 5 pool-related guest/editorial quotes",
             parameters: {
               type: "object",
               properties: {
                 quotes: {
                   type: "array",
-                  maxItems: 3,
+                  maxItems: 5,
                   items: {
                     type: "object",
                     properties: {
