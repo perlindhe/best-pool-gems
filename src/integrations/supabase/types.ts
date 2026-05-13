@@ -83,12 +83,15 @@ export type Database = {
           country: string
           cover_image_url: string | null
           created_at: string
+          has_pool: boolean | null
           id: string
           is_published: boolean
           latitude: number | null
           longitude: number | null
           name: string
           neighborhood: string | null
+          pool_verification_notes: string | null
+          pool_verified_at: string | null
           rank_position: number | null
           scrape_website: boolean
           slug: string
@@ -103,12 +106,15 @@ export type Database = {
           country: string
           cover_image_url?: string | null
           created_at?: string
+          has_pool?: boolean | null
           id?: string
           is_published?: boolean
           latitude?: number | null
           longitude?: number | null
           name: string
           neighborhood?: string | null
+          pool_verification_notes?: string | null
+          pool_verified_at?: string | null
           rank_position?: number | null
           scrape_website?: boolean
           slug: string
@@ -123,12 +129,15 @@ export type Database = {
           country?: string
           cover_image_url?: string | null
           created_at?: string
+          has_pool?: boolean | null
           id?: string
           is_published?: boolean
           latitude?: number | null
           longitude?: number | null
           name?: string
           neighborhood?: string | null
+          pool_verification_notes?: string | null
+          pool_verified_at?: string | null
           rank_position?: number | null
           scrape_website?: boolean
           slug?: string
@@ -419,6 +428,7 @@ export type Database = {
           country: string | null
           cover_image_url: string | null
           editorial_notes: string | null
+          has_pool: boolean | null
           id: string | null
           meta_computed_at: string | null
           meta_rating_0_100: number | null
@@ -429,6 +439,7 @@ export type Database = {
           pool_score_0_10: number | null
           pool_score_updated_at: string | null
           pool_type: string | null
+          pool_verified_at: string | null
           rank_position: number | null
           slug: string | null
           sources_used: Json | null
