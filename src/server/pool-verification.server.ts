@@ -149,23 +149,28 @@ export async function verifyHotelHasPool(hotelId: string): Promise<Verdict> {
   //   NO  only if we have evidence: 0 pool photos AND google_amenity != true
   //        AND website_mentions < 2 AND we actually checked the website.
   //   Otherwise leave NULL (unverified) — keep showing on the site for now.
-  let has_pool: boolean | null;
+  const positive = pool_photos >= 2 || google_amenity === true || website_mentions >= 2;
+  let has_pool: boolean;
   let notes: string;
 
-  if (pool_photos >= 2 || google_amenity === true || website_mentions >= 2) {
+  if (positive) {
     has_pool = true;
     const reasons: string[] = [];
     if (pool_photos >= 2) reasons.push(`${pool_photos} pool photos`);
     if (google_amenity === true) reasons.push("Google amenity");
     if (website_mentions >= 2) reasons.push(`${website_mentions} website mentions`);
     notes = `Verified: ${reasons.join(", ")}`;
-  } else if (pool_photos === 0 && google_amenity !== true && hotel.website_url && website_mentions < 2) {
+  } else if (
+    pool_photos === 0 &&
+    hotel.website_url &&
+    website_mentions < 2
+  ) {
     has_pool = false;
     notes = `No pool photos, no Google pool amenity, only ${website_mentions} pool mention(s) on official site`;
   } else {
     // Inconclusive — don't flip the bit. Leave existing value untouched.
     return {
-      has_pool: false, // value not used since we won't update
+      has_pool: false,
       notes: "inconclusive",
       signals: { pool_photos, google_amenity, website_mentions },
     };
