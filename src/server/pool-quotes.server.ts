@@ -65,11 +65,15 @@ async function fetchGoogleReviews(placeId: string): Promise<RawReview[]> {
     .filter((r) => r.text.length > 20);
 }
 
-// ---------- Firecrawl web search (editorial / blogs / Booking snippets) ----------
-async function fetchWebReviews(hotelName: string, city: string): Promise<RawReview[]> {
+// ---------- Firecrawl web search (editorial / Reddit / hotel guides) ----------
+const POOL_RE = /pool|rooftop|infinity|jacuzzi|hot tub|sundeck|plunge|piscina|piscine|swim/i;
+
+async function firecrawlSearchOne(
+  query: string,
+  limit = 4,
+): Promise<RawReview[]> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return [];
-  const query = `"${hotelName}" ${city} pool review`;
   try {
     const res = await fetch("https://api.firecrawl.dev/v2/search", {
       method: "POST",
@@ -79,7 +83,7 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
       },
       body: JSON.stringify({
         query,
-        limit: 5,
+        limit,
         scrapeOptions: { formats: ["markdown"], onlyMainContent: true },
       }),
     });
@@ -98,10 +102,40 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
         author: r.title ?? null,
         url: r.url ?? null,
       }))
-      .filter((r) => r.text.length > 80 && /pool|rooftop|deck/i.test(r.text));
+      .filter((r) => r.text.length > 80 && POOL_RE.test(r.text));
   } catch {
     return [];
   }
+}
+
+async function fetchWebReviews(hotelName: string, city: string): Promise<RawReview[]> {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return [];
+  const base = `"${hotelName}" ${city} pool`;
+  // Run targeted searches in parallel — each scoped to a different
+  // category of source so the AI gets diverse, pool-specific candidates.
+  const queries: string[] = [
+    // Generic web (editorial blogs, Booking snippets, etc.)
+    `${base} review`,
+    // Reddit threads — honest first-hand traveler comments
+    `${base} (site:reddit.com/r/travel OR site:reddit.com/r/hotels OR site:reddit.com/r/luxurytravel)`,
+    // Top-tier travel editorial
+    `${base} (site:cntraveler.com OR site:travelandleisure.com OR site:telegraph.co.uk OR site:mrandmrssmith.com OR site:fivestaralliance.com OR site:forbestravelguide.com)`,
+    // Pool-focused hotel guides
+    `${base} (site:thehotelguru.com OR site:oyster.com)`,
+  ];
+  const lists = await Promise.all(queries.map((q) => firecrawlSearchOne(q, 4)));
+  const seen = new Set<string>();
+  const out: RawReview[] = [];
+  for (const list of lists) {
+    for (const r of list) {
+      const key = r.url ?? r.text.slice(0, 120);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(r);
+    }
+  }
+  return out;
 }
 
 // ---------- AI quote extraction ----------
@@ -112,7 +146,7 @@ async function aiPickPoolQuotes(
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
-  const items = reviews.slice(0, 24).map((r, i) => ({
+  const items = reviews.slice(0, 32).map((r, i) => ({
     idx: i,
     source: r.source,
     author: r.author,
@@ -121,8 +155,12 @@ async function aiPickPoolQuotes(
   if (items.length === 0) return [];
 
   const sys =
-    "You extract short verbatim quotes that talk specifically about a hotel's swimming pool, rooftop pool, pool deck, pool bar, or pool view. Pick at most 3 quotes total. Try to pick from DIFFERENT sources if possible (one TripAdvisor, one Google, one web/editorial). Each quote must be a verbatim sentence (or two adjacent sentences) copied from the source — never paraphrase. Skip items that don't mention the pool/rooftop/deck.";
-  const user = `Hotel: ${hotelName}\n\nSources (JSON array):\n${JSON.stringify(items)}\n\nReturn the best up-to-3 pool-related verbatim quotes, prefer source diversity.`;
+    "You extract short verbatim quotes that talk SPECIFICALLY about a hotel's swimming pool, rooftop pool, infinity pool, pool deck, pool bar, jacuzzi, or pool view. " +
+    "Pick at most 5 quotes total. STRONGLY prefer source diversity — mix TripAdvisor, Google, Reddit, editorial outlets (Condé Nast Traveler, Travel + Leisure, Telegraph, Mr & Mrs Smith, Five Star Alliance, Forbes Travel Guide), and pool-focused guides (The Hotel Guru, Oyster). " +
+    "Each quote must be a verbatim sentence (or two adjacent sentences) copied from the source — never paraphrase, never invent. " +
+    "Skip any item that does not explicitly mention the pool / rooftop / deck / jacuzzi. " +
+    "Prefer concrete pool details (size, view, temperature, atmosphere, hours) over generic praise.";
+  const user = `Hotel: ${hotelName}\n\nSources (JSON array, mixed origins):\n${JSON.stringify(items)}\n\nReturn the best up-to-5 pool-specific verbatim quotes, maximizing source diversity.`;
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -141,13 +179,13 @@ async function aiPickPoolQuotes(
           type: "function",
           function: {
             name: "save_pool_quotes",
-            description: "Save up to 3 pool-related guest/editorial quotes",
+            description: "Save up to 5 pool-related guest/editorial quotes",
             parameters: {
               type: "object",
               properties: {
                 quotes: {
                   type: "array",
-                  maxItems: 3,
+                  maxItems: 5,
                   items: {
                     type: "object",
                     properties: {
