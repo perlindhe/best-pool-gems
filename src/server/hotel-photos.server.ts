@@ -140,6 +140,10 @@ const POOLISH_PATHS = [
   "piscine",
   "rooftop",
   "roof-top",
+  "infinity",
+  "jacuzzi",
+  "sundeck",
+  "sun-deck",
   "spa",
   "wellness",
   "gallery",
@@ -149,6 +153,7 @@ const POOLISH_PATHS = [
   "rooms",
   "suites",
   "amenities",
+  "experiences",
 ];
 
 function absolutize(src: string, base: string): string | null {
