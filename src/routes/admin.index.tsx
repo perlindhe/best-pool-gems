@@ -51,6 +51,52 @@ function AdminPage() {
   const [batchProgress, setBatchProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [batchResults, setBatchResults] = useState<BatchResult[]>([]);
 
+  // "Score next batch" — calls the public hook in small chunks; persists offset.
+  type NextBatchResult = { id: string; name: string; ok: boolean; score?: number; error?: string };
+  const [nextBatchRunning, setNextBatchRunning] = useState(false);
+  const [nextBatchOffset, setNextBatchOffset] = useState<number>(() => {
+    if (typeof window === "undefined") return 0;
+    const v = parseInt(localStorage.getItem("admin_score_next_offset") ?? "0", 10);
+    return Number.isFinite(v) ? v : 0;
+  });
+  const [nextBatchTotal, setNextBatchTotal] = useState<number | null>(null);
+  const [nextBatchResults, setNextBatchResults] = useState<NextBatchResult[]>([]);
+  const NEXT_BATCH_SIZE = 10;
+
+  const runScoreNextBatch = async () => {
+    if (nextBatchRunning) return;
+    setNextBatchRunning(true);
+    setMsg(null);
+    try {
+      const url = `${import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "") ? "" : ""}/api/public/hooks/auto-score-all?limit=${NEXT_BATCH_SIZE}&offset=${nextBatchOffset}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+        },
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error ?? `HTTP ${res.status}`);
+      setNextBatchResults(json.results ?? []);
+      setNextBatchTotal(json.total ?? null);
+      const next = json.has_more ? json.next_offset : 0;
+      setNextBatchOffset(next);
+      if (typeof window !== "undefined") localStorage.setItem("admin_score_next_offset", String(next));
+      setMsg(`Batch done: ${json.succeeded}/${json.processed} ok${json.has_more ? ` · next offset ${json.next_offset}` : " · finished, offset reset"}`);
+    } catch (e) {
+      setMsg((e as Error).message);
+    } finally {
+      setNextBatchRunning(false);
+    }
+  };
+
+  const resetNextBatchOffset = () => {
+    setNextBatchOffset(0);
+    if (typeof window !== "undefined") localStorage.setItem("admin_score_next_offset", "0");
+    setMsg("Offset reset to 0");
+  };
+
   type PhotoResult = { id: string; name: string; ok: boolean; total?: number; msg: string };
   const [photosBatchRunning, setPhotosBatchRunning] = useState(false);
   const photosBatchCancelRef = useRef(false);
