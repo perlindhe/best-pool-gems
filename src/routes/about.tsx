@@ -17,7 +17,10 @@ export const Route = createFileRoute("/about")({
         content:
           "We're pool-first: we review the pool experience (vibe, lounging space, service, uniqueness) and rank hotels using Pool Score.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bestpoolhotels.com/about" },
     ],
+    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/about" }],
   }),
   component: AboutPage,
 });
