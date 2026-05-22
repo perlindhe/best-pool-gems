@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getCityGuides, getGuideByParts } from "@/data/hotels";
-import { guideContent, buildGuideMeta, type GuideContent } from "@/data/guideContent";
+import { guideContent, buildGuideMeta, type GuideContent, type GuideTableRow } from "@/data/guideContent";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GuideMeta } from "@/components/GuideMeta";
@@ -135,7 +135,7 @@ function GuidePage() {
                   <thead>
                     <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                       <th className="px-5 py-3 font-normal">Hotel</th>
-                      {content.table.rows[0]?.cells.map((c) => (
+                      {content.table.rows[0]?.cells.map((c: { label: string; value: string }) => (
                         <th key={c.label} className="px-5 py-3 font-normal">
                           {c.label}
                         </th>
@@ -143,7 +143,7 @@ function GuidePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {content.table.rows.map((row) => (
+                    {content.table.rows.map((row: GuideTableRow) => (
                       <tr key={row.hotel} className="border-t border-border/40 align-top">
                         <td className="px-5 py-4">
                           <p className="font-display text-lg tracking-wide text-foreground">
@@ -153,7 +153,7 @@ function GuidePage() {
                             {row.neighborhood}
                           </p>
                         </td>
-                        {row.cells.map((c) => (
+                        {row.cells.map((c: { label: string; value: string }) => (
                           <td key={c.label} className="px-5 py-4 text-foreground/85">
                             {c.value}
                           </td>
@@ -168,7 +168,7 @@ function GuidePage() {
         )}
 
         <AlsoConsidered
-          items={content.alsoConsidered.map((i) => ({
+          items={content.alsoConsidered.map((i: { name: string; neighborhood?: string; reason: string }) => ({
             name: i.name,
             neighborhood: i.neighborhood,
             reason: i.reason,
