@@ -128,13 +128,16 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return [];
   const base = `"${hotelName}" ${city} pool`;
+  const citySlug = city.toLowerCase().replace(/\s+/g, "");
   // Run targeted searches in parallel — each scoped to a different
   // category of source so the AI gets diverse, pool-specific candidates.
   const queries: string[] = [
     // Generic web (editorial blogs, Booking snippets, etc.)
     `${base} review`,
-    // Reddit threads — honest first-hand traveler comments
-    `${base} (site:reddit.com/r/travel OR site:reddit.com/r/hotels OR site:reddit.com/r/luxurytravel)`,
+    // Reddit — general travel subs
+    `${base} (site:reddit.com/r/travel OR site:reddit.com/r/hotels OR site:reddit.com/r/luxurytravel OR site:reddit.com/r/solotravel OR site:reddit.com/r/digitalnomad)`,
+    // Reddit — destination-specific subs (city + country)
+    `${base} (site:reddit.com/r/${citySlug} OR site:reddit.com/r/spain OR site:reddit.com/r/europe OR site:reddit.com/r/AskEurope)`,
     // Top-tier travel editorial
     `${base} (site:cntraveler.com OR site:travelandleisure.com OR site:telegraph.co.uk OR site:mrandmrssmith.com OR site:fivestaralliance.com OR site:forbestravelguide.com)`,
     // Pool-focused hotel guides
@@ -145,10 +148,12 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
   const out: RawReview[] = [];
   for (const list of lists) {
     for (const r of list) {
-      const key = r.url ?? r.text.slice(0, 120);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(r);
+      const dedupeKey = r.url ?? r.text.slice(0, 120);
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+      // Re-tag based on URL so Reddit/YouTube/Instagram show as themselves,
+      // not as generic "web", in the UI and quote diversity logic.
+      out.push({ ...r, source: classifySource(r.url, r.source) });
     }
   }
   return out;
