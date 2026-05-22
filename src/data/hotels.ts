@@ -11,6 +11,14 @@ import sydneyImg from "@/assets/sydney.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
+export type PoolSubscores = {
+  view: number;
+  size: number;
+  loungers: number;
+  service: number;
+  wow: number;
+};
+
 export type Hotel = {
   rank: number;
   name: string;
@@ -23,6 +31,7 @@ export type Hotel = {
   vibe?: string;
   bestTime?: string;
   tags?: HotelTag[];
+  subscores?: PoolSubscores;
 };
 
 export type City = {
