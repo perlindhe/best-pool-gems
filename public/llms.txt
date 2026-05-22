@@ -1,0 +1,32 @@
+# Best Pool Hotels
+
+> Independent editorial guide to the world's best hotel pools. We rank hotels with a pool-first methodology (Pool Score 0–10) blended with live guest ratings from Google and TripAdvisor (Meta Rating 0–100). No sponsored placements.
+
+## Pages
+
+- [Home](/): Overview of the world's best pool hotels, by city.
+- [Live rankings](/rankings): Live, continuously-updated ranking of every hotel we track.
+- [About & method](/about): How Pool Score and Meta Rating work.
+- [Affiliate disclosure](/disclosure): How affiliate links work on the site.
+- [Cookies](/cookies): Cookie usage.
+- [Privacy policy](/integritetspolicy): Privacy policy.
+
+## Cities
+
+- [Barcelona](/barcelona): Pool hotels in Barcelona.
+- [Paris](/paris): Pool hotels in Paris.
+- [London](/london): Pool hotels in London.
+- [New York](/new-york): Pool hotels in New York.
+- [Gran Canaria](/gran-canaria): Pool hotels on Gran Canaria.
+- [Mallorca](/mallorca): Pool hotels on Mallorca.
+- [Bangkok](/bangkok): Sky-pool hotels in Bangkok.
+- [Málaga](/malaga): Pool hotels in Málaga.
+- [Los Angeles](/los-angeles): Pool hotels in Los Angeles.
+- [Sydney](/sydney): Pool hotels in Sydney.
+
+## Guides
+
+- [Top 10 luxury pool hotels in Barcelona](/barcelona/luxury-pool-hotels): Full editor's ranking.
+- [Best rooftop pools in Barcelona](/barcelona/rooftop-pool-hotels): Rooftop-only guide.
+- [Pool hotels near the beach in Barcelona](/barcelona/pool-hotels-near-beach): Beach-adjacent hotels.
+- [Pool season in Barcelona](/barcelona/pool-season): When pools open and close.

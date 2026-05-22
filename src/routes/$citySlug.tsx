@@ -22,21 +22,25 @@ export const Route = createFileRoute("/$citySlug")({
     const hotelInfo = await getCityHotelPhotos({ data: { citySlug: city.slug } });
     return { city, cityGuides, hotelInfo };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const city = loaderData?.city;
     if (!city) return {};
     const title = `Best pool hotels in ${city.name} — Best Pool Hotels`;
     const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
+    const url = `https://bestpoolhotels.com/${params.citySlug}`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
         { property: "og:image", content: city.image },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: city.image },
       ],
+      links: [{ rel: "canonical", href: url }],
     };
   },
   notFoundComponent: () => (

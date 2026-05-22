@@ -11,6 +11,14 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Independent guide to the best hotel pools in the world's biggest travel cities. Rankings, guides and insider tips." },
       { property: "og:title", content: "Best hotel pools — Best Pool Hotels" },
       { property: "og:description", content: "Independent rankings of the world's most beautiful hotel pools." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bestpoolhotels.com/" },
+      { property: "og:image", content: `https://bestpoolhotels.com${heroImg}` },
+      { name: "twitter:image", content: `https://bestpoolhotels.com${heroImg}` },
+    ],
+    links: [
+      { rel: "canonical", href: "https://bestpoolhotels.com/" },
+      { rel: "preload", as: "image", href: heroImg, fetchpriority: "high" } as unknown as Record<string, string>,
     ],
   }),
   component: Home,
@@ -30,6 +38,7 @@ function Home() {
           alt="Rooftop pool at sunset"
           width={1920}
           height={1280}
+          fetchPriority="high"
           className="absolute inset-0 -z-10 h-full w-full object-cover"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />

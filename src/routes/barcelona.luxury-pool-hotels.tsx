@@ -21,9 +21,12 @@ export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:image", content: barcelonaImg },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: "https://bestpoolhotels.com/barcelona/luxury-pool-hotels" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: barcelonaImg },
     ],
+    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/barcelona/luxury-pool-hotels" }],
   }),
   component: LuxuryPoolHotels,
 });

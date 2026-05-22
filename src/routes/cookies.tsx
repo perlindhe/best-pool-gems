@@ -7,7 +7,12 @@ export const Route = createFileRoute("/cookies")({
     meta: [
       { title: "Cookies — Best Pool Hotels" },
       { name: "description", content: "How Best Pool Hotels uses cookies for analytics and affiliate links." },
+      { property: "og:title", content: "Cookies — Best Pool Hotels" },
+      { property: "og:description", content: "How Best Pool Hotels uses cookies for analytics and affiliate links." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bestpoolhotels.com/cookies" },
     ],
+    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/cookies" }],
   }),
   component: CookiesPage,
 });

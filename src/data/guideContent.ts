@@ -109,14 +109,37 @@ export const guideContent: Record<string, GuideContent> = {
   },
 };
 
-export const buildGuideMeta = (guide: Guide) => ({
-  meta: [
-    { title: `${guide.title} — Best Pool Hotels` },
-    { name: "description", content: guide.excerpt },
-    { property: "og:title", content: guide.title },
-    { property: "og:description", content: guide.excerpt },
-    { property: "og:image", content: guide.image },
-    { property: "article:published_time", content: guide.date },
-    { name: "twitter:card", content: "summary_large_image" },
-  ],
-});
+export const buildGuideMeta = (guide: Guide) => {
+  const url = `https://bestpoolhotels.com/${guide.slug}`;
+  return {
+    meta: [
+      { title: `${guide.title} — Best Pool Hotels` },
+      { name: "description", content: guide.excerpt },
+      { property: "og:title", content: guide.title },
+      { property: "og:description", content: guide.excerpt },
+      { property: "og:image", content: guide.image },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: url },
+      { property: "article:published_time", content: guide.date },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: url }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: guide.title,
+          description: guide.excerpt,
+          image: guide.image,
+          datePublished: guide.date,
+          author: { "@type": "Organization", name: "Best Pool Hotels" },
+          publisher: { "@type": "Organization", name: "Best Pool Hotels" },
+          mainEntityOfPage: url,
+        }),
+      },
+    ],
+  };
+};
+
