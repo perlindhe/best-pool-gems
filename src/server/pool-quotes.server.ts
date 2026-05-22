@@ -2,19 +2,35 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const TA_BASE = "https://api.content.tripadvisor.com/api/v1";
 
+type QuoteSource =
+  | "tripadvisor"
+  | "google"
+  | "web"
+  | "reddit"
+  | "youtube"
+  | "instagram";
+
 type RawReview = {
-  source: "tripadvisor" | "google" | "web";
+  source: QuoteSource;
   text: string;
   author: string | null;
   url: string | null;
 };
 
 type ExtractedQuote = {
-  source: "tripadvisor" | "google" | "web";
+  source: QuoteSource;
   quote: string;
   author: string | null;
   source_url: string | null;
 };
+
+function classifySource(url: string | null, fallback: QuoteSource): QuoteSource {
+  if (!url) return fallback;
+  if (/reddit\.com/i.test(url)) return "reddit";
+  if (/youtube\.com|youtu\.be/i.test(url)) return "youtube";
+  if (/instagram\.com/i.test(url)) return "instagram";
+  return fallback;
+}
 
 // ---------- TripAdvisor ----------
 async function fetchTripadvisorReviews(locationId: string): Promise<RawReview[]> {
