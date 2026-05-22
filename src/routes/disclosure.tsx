@@ -7,7 +7,12 @@ export const Route = createFileRoute("/disclosure")({
     meta: [
       { title: "Affiliate links & disclosure — Best Pool Hotels" },
       { name: "description", content: "How affiliate links and partnerships work on Best Pool Hotels. Transparency is central to us." },
+      { property: "og:title", content: "Affiliate links & disclosure — Best Pool Hotels" },
+      { property: "og:description", content: "How affiliate links and partnerships work on Best Pool Hotels. Transparency is central to us." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bestpoolhotels.com/disclosure" },
     ],
+    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/disclosure" }],
   }),
   component: Disclosure,
 });
