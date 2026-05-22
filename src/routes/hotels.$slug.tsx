@@ -12,7 +12,7 @@ export const Route = createFileRoute("/hotels/$slug")({
     if (!result) throw notFound();
     return result;
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     if (!loaderData) return {};
     const { hotel, photos } = loaderData;
     const title = `${hotel.name} — Pool review · Best Pool Hotels`;
@@ -20,12 +20,41 @@ export const Route = createFileRoute("/hotels/$slug")({
       hotel.editorial_notes?.slice(0, 155) ||
       `Pool review of ${hotel.name} in ${hotel.city}. Live guest ratings and pool facts.`;
     const image = photos[0]?.url || hotel.cover_image_url || undefined;
+    const url = `https://bestpoolhotels.com/hotels/${params.slug}`;
+    const google = hotel.sources_used?.find((s) => s.source === "google");
+    const ratingValue =
+      hotel.meta_rating_0_100 != null ? +(hotel.meta_rating_0_100 / 20).toFixed(2) : null;
+    const reviewCount = google?.rating_count ?? 0;
+    const jsonLd: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Hotel",
+      name: hotel.name,
+      description: hotel.editorial_notes || description,
+      url,
+      ...(image ? { image } : {}),
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: hotel.city,
+        addressCountry: hotel.country,
+        ...(hotel.neighborhood ? { addressRegion: hotel.neighborhood } : {}),
+      },
+    };
+    if (ratingValue != null) {
+      jsonLd.aggregateRating = {
+        "@type": "AggregateRating",
+        ratingValue,
+        bestRating: 5,
+        ...(reviewCount > 0 ? { reviewCount } : { ratingCount: 1 }),
+      };
+    }
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
         ...(image
           ? [
               { property: "og:image", content: image },
@@ -33,6 +62,10 @@ export const Route = createFileRoute("/hotels/$slug")({
               { name: "twitter:image", content: image },
             ]
           : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
       ],
     };
   },
