@@ -31,6 +31,7 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Best Pool Hotels — The world's best hotel pools, ranked" },
       { name: "description", content: "Independent guide to the best pool hotels in the world's biggest travel cities. Rankings, guides and insider tips." },
+      { name: "google-site-verification", content: "xTHfqVVPqRvkGICxIEm6qfWWjkt5lRKBuFXsYqDc46Q" },
       { property: "og:site_name", content: "Best Pool Hotels" },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "Best Pool Hotels — The world's best hotel pools, ranked" },
