@@ -58,6 +58,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Resort in the city — palms, sea breeze, calm elegance",
     bestTime: "June–September, late afternoon",
     tags: ["resort", "spa"],
+    subscores: { view: 9.8, size: 9.5, loungers: 9.7, service: 9.6, wow: 9.4 },
   },
   {
     rank: 2,
@@ -72,6 +73,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Cool, young, DJ sets at sunset",
     bestTime: "July–August, 6–10pm",
     tags: ["rooftop"],
+    subscores: { view: 9.0, size: 8.8, loungers: 9.2, service: 9.4, wow: 9.8 },
   },
   {
     rank: 3,
@@ -86,6 +88,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Quiet, grown-up, world-class service",
     bestTime: "Year-round — heated",
     tags: ["rooftop", "spa", "quiet"],
+    subscores: { view: 9.2, size: 9.0, loungers: 9.3, service: 9.7, wow: 9.2 },
   },
   {
     rank: 4,
@@ -100,6 +103,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Bohemian, design-led, young crowd",
     bestTime: "May–October, afternoon",
     tags: ["rooftop"],
+    subscores: { view: 9.0, size: 8.4, loungers: 8.8, service: 9.0, wow: 9.3 },
   },
   {
     rank: 5,
@@ -114,6 +118,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Party, high energy, big groups",
     bestTime: "Saturdays June–August",
     tags: ["resort"],
+    subscores: { view: 9.2, size: 9.3, loungers: 8.8, service: 8.6, wow: 9.0 },
   },
   {
     rank: 6,
@@ -128,6 +133,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Modern, minimalist, calmer",
     bestTime: "June–September, evenings",
     tags: ["rooftop", "spa", "quiet"],
+    subscores: { view: 9.9, size: 8.8, loungers: 8.8, service: 8.9, wow: 9.2 },
   },
   {
     rank: 7,
@@ -142,6 +148,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Boutique, intimate, polished",
     bestTime: "May–September, afternoon",
     tags: ["rooftop", "quiet"],
+    subscores: { view: 8.8, size: 8.2, loungers: 8.6, service: 9.2, wow: 9.0 },
   },
   {
     rank: 8,
@@ -156,6 +163,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Classic, calm, grown-up",
     bestTime: "May–October, mornings",
     tags: ["quiet"],
+    subscores: { view: 8.5, size: 7.8, loungers: 8.4, service: 9.0, wow: 8.8 },
   },
   {
     rank: 9,
@@ -170,6 +178,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Energetic, drink-led, party",
     bestTime: "Thursday–Saturday nights",
     tags: ["rooftop"],
+    subscores: { view: 8.9, size: 8.4, loungers: 8.6, service: 8.6, wow: 9.2 },
   },
   {
     rank: 10,
@@ -338,6 +347,7 @@ export const barcelonaTop10: Hotel[] = [
     vibe: "Calm luxury, grown-up, design-led",
     bestTime: "Late morning for guests, sunset for the rooftop bar",
     tags: ["rooftop", "quiet"],
+    subscores: { view: 9.5, size: 8.6, loungers: 9.0, service: 9.2, wow: 9.5 },
   },
 ];
 
