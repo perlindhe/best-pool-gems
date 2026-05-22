@@ -26,9 +26,25 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
           return json({ error: "Unauthorized" }, 401);
         }
 
+        const url = new URL(request.url);
+        const limit = Math.min(
+          Math.max(parseInt(url.searchParams.get("limit") ?? "10", 10) || 10, 1),
+          50,
+        );
+        const offset = Math.max(
+          parseInt(url.searchParams.get("offset") ?? "0", 10) || 0,
+          0,
+        );
+
+        const { count: total } = await supabaseAdmin
+          .from("hotels")
+          .select("id", { count: "exact", head: true });
+
         const { data: hotels, error } = await supabaseAdmin
           .from("hotels")
-          .select("id, name");
+          .select("id, name")
+          .order("name", { ascending: true })
+          .range(offset, offset + limit - 1);
         if (error) return json({ error: error.message }, 500);
 
         const results: Array<{
@@ -70,10 +86,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
         }
 
         const ok = results.filter((r) => r.ok).length;
+        const nextOffset = offset + (hotels?.length ?? 0);
+        const hasMore = total != null ? nextOffset < total : (hotels?.length ?? 0) === limit;
         return json({
           processed: results.length,
           succeeded: ok,
           failed: results.length - ok,
+          offset,
+          limit,
+          next_offset: hasMore ? nextOffset : null,
+          total,
+          has_more: hasMore,
           results,
           ran_at: new Date().toISOString(),
         });
