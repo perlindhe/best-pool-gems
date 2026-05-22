@@ -7,7 +7,12 @@ export const Route = createFileRoute("/integritetspolicy")({
     meta: [
       { title: "Privacy policy — Best Pool Hotels" },
       { name: "description", content: "How Best Pool Hotels collects and handles personal data." },
+      { property: "og:title", content: "Privacy policy — Best Pool Hotels" },
+      { property: "og:description", content: "How Best Pool Hotels collects and handles personal data." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bestpoolhotels.com/integritetspolicy" },
     ],
+    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/integritetspolicy" }],
   }),
   component: PrivacyPage,
 });
