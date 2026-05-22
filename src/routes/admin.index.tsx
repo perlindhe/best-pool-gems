@@ -68,7 +68,7 @@ function AdminPage() {
     setNextBatchRunning(true);
     setMsg(null);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "") ? "" : ""}/api/public/hooks/auto-score-all?limit=${NEXT_BATCH_SIZE}&offset=${nextBatchOffset}`;
+      const url = `/api/public/hooks/auto-score-all?limit=${NEXT_BATCH_SIZE}&offset=${nextBatchOffset}`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
