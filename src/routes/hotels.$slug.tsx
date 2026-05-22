@@ -225,7 +225,7 @@ function HotelDetailPage() {
               <a
                 href={hotel.booking_url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="sponsored noopener noreferrer"
                 className="rounded-sm border border-primary/60 px-4 py-2 text-primary transition hover:bg-primary hover:text-primary-foreground"
               >
                 Book ↗
