@@ -2,19 +2,35 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const TA_BASE = "https://api.content.tripadvisor.com/api/v1";
 
+type QuoteSource =
+  | "tripadvisor"
+  | "google"
+  | "web"
+  | "reddit"
+  | "youtube"
+  | "instagram";
+
 type RawReview = {
-  source: "tripadvisor" | "google" | "web";
+  source: QuoteSource;
   text: string;
   author: string | null;
   url: string | null;
 };
 
 type ExtractedQuote = {
-  source: "tripadvisor" | "google" | "web";
+  source: QuoteSource;
   quote: string;
   author: string | null;
   source_url: string | null;
 };
+
+function classifySource(url: string | null, fallback: QuoteSource): QuoteSource {
+  if (!url) return fallback;
+  if (/reddit\.com/i.test(url)) return "reddit";
+  if (/youtube\.com|youtu\.be/i.test(url)) return "youtube";
+  if (/instagram\.com/i.test(url)) return "instagram";
+  return fallback;
+}
 
 // ---------- TripAdvisor ----------
 async function fetchTripadvisorReviews(locationId: string): Promise<RawReview[]> {
@@ -65,8 +81,74 @@ async function fetchGoogleReviews(placeId: string): Promise<RawReview[]> {
     .filter((r) => r.text.length > 20);
 }
 
-// ---------- Firecrawl web search (editorial / Reddit / hotel guides) ----------
+// ---------- YouTube comments on hotel vlogs ----------
 const POOL_RE = /pool|rooftop|infinity|jacuzzi|hot tub|sundeck|plunge|piscina|piscine|swim/i;
+
+async function fetchYouTubeComments(
+  hotelName: string,
+  city: string,
+): Promise<RawReview[]> {
+  const key = process.env.YOUTUBE_API_KEY;
+  if (!key) return [];
+  try {
+    // 1) Search for hotel vlogs / room tours.
+    const q = encodeURIComponent(`${hotelName} ${city} pool`);
+    const searchRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&relevanceLanguage=en&q=${q}&key=${encodeURIComponent(key)}`,
+    );
+    const searchJson = await searchRes.json();
+    if (!searchRes.ok) return [];
+    const items = (searchJson?.items ?? []) as Array<{
+      id?: { videoId?: string };
+      snippet?: { title?: string; channelTitle?: string };
+    }>;
+    const videoIds = items
+      .map((v) => v.id?.videoId)
+      .filter((id): id is string => !!id)
+      .slice(0, 3);
+    if (videoIds.length === 0) return [];
+
+    // 2) Pull top comment threads for each video in parallel.
+    const commentLists = await Promise.all(
+      videoIds.map(async (videoId) => {
+        const cRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=30&order=relevance&textFormat=plainText&key=${encodeURIComponent(key)}`,
+        );
+        const cJson = await cRes.json();
+        if (!cRes.ok) return [] as RawReview[];
+        const threads = (cJson?.items ?? []) as Array<{
+          snippet?: {
+            topLevelComment?: {
+              snippet?: {
+                textDisplay?: string;
+                authorDisplayName?: string;
+                authorChannelUrl?: string;
+              };
+            };
+          };
+        }>;
+        return threads
+          .map<RawReview | null>((t) => {
+            const c = t.snippet?.topLevelComment?.snippet;
+            const text = (c?.textDisplay ?? "").trim();
+            if (!text || !POOL_RE.test(text)) return null;
+            return {
+              source: "youtube" as const,
+              text,
+              author: c?.authorDisplayName ?? null,
+              url: `https://www.youtube.com/watch?v=${videoId}`,
+            };
+          })
+          .filter((r): r is RawReview => r !== null);
+      }),
+    );
+    return commentLists.flat().slice(0, 20);
+  } catch {
+    return [];
+  }
+}
+
+// ---------- Firecrawl web search (editorial / Reddit / hotel guides) ----------
 
 async function firecrawlSearchOne(
   query: string,
@@ -112,13 +194,16 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return [];
   const base = `"${hotelName}" ${city} pool`;
+  const citySlug = city.toLowerCase().replace(/\s+/g, "");
   // Run targeted searches in parallel — each scoped to a different
   // category of source so the AI gets diverse, pool-specific candidates.
   const queries: string[] = [
     // Generic web (editorial blogs, Booking snippets, etc.)
     `${base} review`,
-    // Reddit threads — honest first-hand traveler comments
-    `${base} (site:reddit.com/r/travel OR site:reddit.com/r/hotels OR site:reddit.com/r/luxurytravel)`,
+    // Reddit — general travel subs
+    `${base} (site:reddit.com/r/travel OR site:reddit.com/r/hotels OR site:reddit.com/r/luxurytravel OR site:reddit.com/r/solotravel OR site:reddit.com/r/digitalnomad)`,
+    // Reddit — destination-specific subs (city + country)
+    `${base} (site:reddit.com/r/${citySlug} OR site:reddit.com/r/spain OR site:reddit.com/r/europe OR site:reddit.com/r/AskEurope)`,
     // Top-tier travel editorial
     `${base} (site:cntraveler.com OR site:travelandleisure.com OR site:telegraph.co.uk OR site:mrandmrssmith.com OR site:fivestaralliance.com OR site:forbestravelguide.com)`,
     // Pool-focused hotel guides
@@ -129,10 +214,12 @@ async function fetchWebReviews(hotelName: string, city: string): Promise<RawRevi
   const out: RawReview[] = [];
   for (const list of lists) {
     for (const r of list) {
-      const key = r.url ?? r.text.slice(0, 120);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(r);
+      const dedupeKey = r.url ?? r.text.slice(0, 120);
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+      // Re-tag based on URL so Reddit/YouTube/Instagram show as themselves,
+      // not as generic "web", in the UI and quote diversity logic.
+      out.push({ ...r, source: classifySource(r.url, r.source) });
     }
   }
   return out;
@@ -156,7 +243,7 @@ async function aiPickPoolQuotes(
 
   const sys =
     "You extract short verbatim quotes that talk SPECIFICALLY about a hotel's swimming pool, rooftop pool, infinity pool, pool deck, pool bar, jacuzzi, or pool view. " +
-    "Pick at most 5 quotes total. STRONGLY prefer source diversity — mix TripAdvisor, Google, Reddit, editorial outlets (Condé Nast Traveler, Travel + Leisure, Telegraph, Mr & Mrs Smith, Five Star Alliance, Forbes Travel Guide), and pool-focused guides (The Hotel Guru, Oyster). " +
+    "Pick at most 5 quotes total. STRONGLY prefer source diversity — mix TripAdvisor, Google, Reddit threads, YouTube vlog comments, editorial outlets (Condé Nast Traveler, Travel + Leisure, Telegraph, Mr & Mrs Smith, Five Star Alliance, Forbes Travel Guide), and pool-focused guides (The Hotel Guru, Oyster). Aim for AT MOST 2 quotes from any single source category. " +
     "Each quote must be a verbatim sentence (or two adjacent sentences) copied from the source — never paraphrase, never invent. " +
     "Skip any item that does not explicitly mention the pool / rooftop / deck / jacuzzi. " +
     "Prefer concrete pool details (size, view, temperature, atmosphere, hours) over generic praise.";
@@ -248,13 +335,14 @@ export async function refreshPoolQuotesForHotel(hotelId: string) {
   const taId = mappings?.find((m) => m.source === "tripadvisor")?.source_place_id ?? null;
   const gId = mappings?.find((m) => m.source === "google")?.source_place_id ?? null;
 
-  const [taReviews, gReviews, webReviews] = await Promise.all([
+  const [taReviews, gReviews, webReviews, ytReviews] = await Promise.all([
     taId ? fetchTripadvisorReviews(taId) : Promise.resolve([] as RawReview[]),
     gId ? fetchGoogleReviews(gId) : Promise.resolve([] as RawReview[]),
     fetchWebReviews(hotel.name as string, (hotel.city as string) ?? ""),
+    fetchYouTubeComments(hotel.name as string, (hotel.city as string) ?? ""),
   ]);
 
-  const all = [...taReviews, ...gReviews, ...webReviews];
+  const all = [...taReviews, ...gReviews, ...webReviews, ...ytReviews];
   if (all.length === 0) {
     return { quotes: 0, status: "no_sources" as const };
   }
@@ -281,6 +369,7 @@ export async function refreshPoolQuotesForHotel(hotelId: string) {
       tripadvisor: taReviews.length,
       google: gReviews.length,
       web: webReviews.length,
+      youtube: ytReviews.length,
     },
   };
 }
