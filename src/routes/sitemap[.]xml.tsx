@@ -44,14 +44,13 @@ export const Route = createFileRoute("/sitemap.xml")({
         try {
           const { data } = await supabaseAdmin
             .from("public_hotels_view")
-            .select("slug, updated_at")
+            .select("slug")
             .limit(2000);
           if (data) {
-            for (const h of data as Array<{ slug: string; updated_at?: string }>) {
+            for (const h of data as Array<{ slug: string | null }>) {
               if (!h.slug) continue;
               entries.push({
                 path: `/hotels/${h.slug}`,
-                lastmod: h.updated_at,
                 changefreq: "weekly",
                 priority: "0.6",
               });

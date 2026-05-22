@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
@@ -32,6 +33,11 @@ import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/
 import { Route as ApiPublicHooksBackfillPoolQuotesRouteImport } from './routes/api/public/hooks/backfill-pool-quotes'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RankingsRoute = RankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/rankings': typeof RankingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/rankings': typeof RankingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/rankings': typeof RankingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/integritetspolicy'
     | '/rankings'
+    | '/sitemap.xml'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/integritetspolicy'
     | '/rankings'
+    | '/sitemap.xml'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/integritetspolicy'
     | '/rankings'
+    | '/sitemap.xml'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -308,6 +320,7 @@ export interface RootRouteChildren {
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
   RankingsRoute: typeof RankingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   HotelsSlugRoute: typeof HotelsSlugRoute
@@ -325,6 +338,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rankings': {
       id: '/rankings'
       path: '/rankings'
@@ -514,6 +534,7 @@ const rootRouteChildren: RootRouteChildren = {
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
   RankingsRoute: RankingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   HotelsSlugRoute: HotelsSlugRoute,
