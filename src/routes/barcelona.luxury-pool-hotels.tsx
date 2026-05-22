@@ -3,12 +3,104 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { barcelonaTop10, type Hotel, type HotelTag } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { GuideMeta } from "@/components/GuideMeta";
+import { AlsoConsidered } from "@/components/AlsoConsidered";
 import barcelonaImg from "@/assets/barcelona.jpg";
 import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 
-const TITLE = "Top 10 pool hotels in Barcelona (Pool Score 2026) — Best Pool Hotels";
+const TITLE = "Top 10 pool hotels in Barcelona — Pool Score 2026";
 const DESCRIPTION =
-  "Pool-first ranking of Barcelona's ten best hotel pools 2026. Pool Score, pool type, vibe, best time to visit, neighborhood guide and FAQ.";
+  "Editorial top 10 of Barcelona's best hotel pools, scored on five criteria and re-verified for the 2026 season. Rooftop, beachfront and quiet rooftop picks side by side.";
+const PAGE_URL = "https://bestpoolhotels.com/barcelona/luxury-pool-hotels";
+const PUBLISHED_DATE = "2024-05-18";
+const LAST_UPDATED = "2026-05-22";
+
+// Top 10 = highest pool scores, including Grand Hotel Central (9.2).
+const TOP_10: Hotel[] = [...barcelonaTop10]
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 10);
+
+const ALSO_CONSIDERED = [
+  {
+    name: "Cotton House Hotel",
+    neighborhood: "Eixample",
+    reason:
+      "Charming plunge on a 19th-century palace, but the water is small enough to be a hot-tub on busy days.",
+  },
+  {
+    name: "Ohla Eixample",
+    neighborhood: "Eixample",
+    reason:
+      "Glass-bottom rooftop is architecturally spectacular, but the lounging deck is tight and book-ahead-only beds limit drop-in use.",
+  },
+  {
+    name: "Hotel Casa Fuster",
+    neighborhood: "Gràcia",
+    reason:
+      "Stunning Modernist landmark, but the rooftop pool is a small plunge that doesn't compete with our top 10 for actual swimming.",
+  },
+  {
+    name: "Hotel Brummell",
+    neighborhood: "Poble-sec",
+    reason:
+      "Best low-key neighbourhood pool in Barcelona — held out of this luxury list because the price tier is different.",
+  },
+];
+
+const SOURCES = [
+  { label: "Hotel Arts Barcelona", url: "https://www.ritzcarlton.com/en/hotels/bcnrz-hotel-arts-barcelona/overview/" },
+  { label: "The Barcelona EDITION", url: "https://www.marriott.com/en-us/hotels/bcneb-the-barcelona-edition/overview/" },
+  { label: "Mandarin Oriental Barcelona", url: "https://www.mandarinoriental.com/en/barcelona/passeig-de-gracia" },
+  { label: "Grand Hotel Central", url: "https://www.grandhotelcentral.com/" },
+  { label: "Hotel SOFIA Barcelona", url: "https://www.hotelsofiabarcelona.com/" },
+];
+
+const buildJsonLd = () => ({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: TITLE,
+      description: DESCRIPTION,
+      image: barcelonaImg,
+      datePublished: PUBLISHED_DATE,
+      dateModified: LAST_UPDATED,
+      author: { "@type": "Organization", name: "BestPoolHotels Editorial" },
+      publisher: { "@type": "Organization", name: "Best Pool Hotels" },
+      mainEntityOfPage: PAGE_URL,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://bestpoolhotels.com/" },
+        { "@type": "ListItem", position: 2, name: "Barcelona", item: "https://bestpoolhotels.com/barcelona" },
+        { "@type": "ListItem", position: 3, name: "Top 10 pool hotels", item: PAGE_URL },
+      ],
+    },
+    {
+      "@type": "ItemList",
+      name: TITLE,
+      itemListOrder: "https://schema.org/ItemListOrderDescending",
+      numberOfItems: TOP_10.length,
+      itemListElement: TOP_10.map((h, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: h.name,
+        item: {
+          "@type": "Hotel",
+          name: h.name,
+          address: { "@type": "PostalAddress", addressLocality: "Barcelona", addressRegion: h.neighborhood, addressCountry: "ES" },
+          review: {
+            "@type": "Review",
+            reviewRating: { "@type": "Rating", ratingValue: h.score, bestRating: 10, worstRating: 0 },
+            author: { "@type": "Organization", name: "BestPoolHotels Editorial" },
+            reviewBody: h.description,
+          },
+        },
+      })),
+    },
+  ],
+});
 
 export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
   loader: async () => ({
@@ -22,11 +114,16 @@ export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
       { property: "og:description", content: DESCRIPTION },
       { property: "og:image", content: barcelonaImg },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: "https://bestpoolhotels.com/barcelona/luxury-pool-hotels" },
+      { property: "og:url", content: PAGE_URL },
+      { property: "article:published_time", content: PUBLISHED_DATE },
+      { property: "article:modified_time", content: LAST_UPDATED },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: barcelonaImg },
     ],
-    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/barcelona/luxury-pool-hotels" }],
+    links: [{ rel: "canonical", href: PAGE_URL }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(buildJsonLd()) },
+    ],
   }),
   component: LuxuryPoolHotels,
 });
