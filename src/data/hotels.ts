@@ -316,6 +316,20 @@ export const barcelonaTop10: Hotel[] = [
     bestTime: "May–October, mornings",
     tags: ["quiet"],
   },
+  {
+    rank: 21,
+    name: "Grand Hotel Central",
+    neighborhood: "Gòtic / El Born",
+    score: 9.2,
+    pricePerNight: "from $460",
+    poolType: "Rooftop infinity pool · skyline",
+    highlight: "Iconic Old Town rooftop infinity",
+    description:
+      "Elegant rooftop infinity pool above Via Laietana with skyline views, Balinese beds, sunset atmosphere and a calm luxury feel.",
+    vibe: "Calm luxury, grown-up, design-led",
+    bestTime: "Late morning for guests, sunset for the rooftop bar",
+    tags: ["rooftop", "quiet"],
+  },
 ];
 
 export const parisTop20: Hotel[] = [
