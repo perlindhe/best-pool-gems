@@ -61,29 +61,54 @@ function AdminPage() {
   });
   const [nextBatchTotal, setNextBatchTotal] = useState<number | null>(null);
   const [nextBatchResults, setNextBatchResults] = useState<NextBatchResult[]>([]);
-  const NEXT_BATCH_SIZE = 10;
+  const NEXT_BATCH_SIZE = 5; // hotels per click
+  const PER_CALL = 1; // hotels per HTTP call (avoids worker timeout)
 
   const runScoreNextBatch = async () => {
     if (nextBatchRunning) return;
     setNextBatchRunning(true);
     setMsg(null);
+    setNextBatchResults([]);
+    let offset = nextBatchOffset;
+    const acc: NextBatchResult[] = [];
+    let succeeded = 0;
+    let processed = 0;
+    let total: number | null = nextBatchTotal;
+    let hasMore = true;
+
     try {
-      const url = `/api/public/hooks/auto-score-all?limit=${NEXT_BATCH_SIZE}&offset=${nextBatchOffset}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
-        },
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error ?? `HTTP ${res.status}`);
-      setNextBatchResults(json.results ?? []);
-      setNextBatchTotal(json.total ?? null);
-      const next = json.has_more ? json.next_offset : 0;
-      setNextBatchOffset(next);
-      if (typeof window !== "undefined") localStorage.setItem("admin_score_next_offset", String(next));
-      setMsg(`Batch done: ${json.succeeded}/${json.processed} ok${json.has_more ? ` · next offset ${json.next_offset}` : " · finished, offset reset"}`);
+      for (let i = 0; i < NEXT_BATCH_SIZE && hasMore; i++) {
+        const url = `/api/public/hooks/auto-score-all?limit=${PER_CALL}&offset=${offset}`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+          },
+        });
+        const text = await res.text();
+        let json: any = null;
+        try { json = JSON.parse(text); } catch { /* non-JSON (e.g. 504 upstream timeout) */ }
+
+        if (!res.ok || !json) {
+          const errMsg = json?.error ?? (text ? text.slice(0, 200) : `HTTP ${res.status}`);
+          throw new Error(`offset ${offset}: ${errMsg}`);
+        }
+
+        acc.push(...(json.results ?? []));
+        succeeded += json.succeeded ?? 0;
+        processed += json.processed ?? 0;
+        total = json.total ?? total;
+        hasMore = !!json.has_more;
+        offset = json.has_more ? json.next_offset : 0;
+
+        setNextBatchResults([...acc]);
+        setNextBatchTotal(total);
+        setNextBatchOffset(offset);
+        if (typeof window !== "undefined") localStorage.setItem("admin_score_next_offset", String(offset));
+        setMsg(`Scoring… ${processed} done (offset ${offset}${total ? `/${total}` : ""})`);
+      }
+      setMsg(`Batch done: ${succeeded}/${processed} ok${hasMore ? ` · next offset ${offset}` : " · finished, offset reset"}`);
     } catch (e) {
       setMsg((e as Error).message);
     } finally {
