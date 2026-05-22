@@ -23,7 +23,7 @@ export function SiteFooter() {
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-primary">Legal</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li><Link to="/integritetspolicy" className="hover:text-primary">Privacy policy</Link></li>
+            <li><Link to="/privacy" className="hover:text-primary">Privacy policy</Link></li>
             <li><Link to="/cookies" className="hover:text-primary">Cookies</Link></li>
           </ul>
         </div>
