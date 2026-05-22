@@ -335,13 +335,14 @@ export async function refreshPoolQuotesForHotel(hotelId: string) {
   const taId = mappings?.find((m) => m.source === "tripadvisor")?.source_place_id ?? null;
   const gId = mappings?.find((m) => m.source === "google")?.source_place_id ?? null;
 
-  const [taReviews, gReviews, webReviews] = await Promise.all([
+  const [taReviews, gReviews, webReviews, ytReviews] = await Promise.all([
     taId ? fetchTripadvisorReviews(taId) : Promise.resolve([] as RawReview[]),
     gId ? fetchGoogleReviews(gId) : Promise.resolve([] as RawReview[]),
     fetchWebReviews(hotel.name as string, (hotel.city as string) ?? ""),
+    fetchYouTubeComments(hotel.name as string, (hotel.city as string) ?? ""),
   ]);
 
-  const all = [...taReviews, ...gReviews, ...webReviews];
+  const all = [...taReviews, ...gReviews, ...webReviews, ...ytReviews];
   if (all.length === 0) {
     return { quotes: 0, status: "no_sources" as const };
   }
@@ -368,6 +369,7 @@ export async function refreshPoolQuotesForHotel(hotelId: string) {
       tripadvisor: taReviews.length,
       google: gReviews.length,
       web: webReviews.length,
+      youtube: ytReviews.length,
     },
   };
 }
