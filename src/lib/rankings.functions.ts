@@ -2,6 +2,20 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+export type PoolCitation = { source: "website" | "google" | "reviews"; quote: string };
+
+export type PoolDescriptor = {
+  name: string | null;
+  type: "outdoor" | "indoor" | "rooftop" | "infinity" | "plunge" | "lap" | "kids" | "spa_pool" | "jacuzzi";
+  indoor: boolean | null;
+  heated: boolean | null;
+  length_m: number | null;
+  adults_only: boolean | null;
+  season: string | null;
+  source: "website" | "google" | "reviews";
+  quote: string;
+};
+
 export type PoolFacts = {
   pool_count?: number | null;
   is_rooftop?: boolean | null;
@@ -21,6 +35,9 @@ export type PoolFacts = {
   length_m?: number | null;
   view?: string | null;
   season?: string | null;
+  // Extended (added by source-cited pipeline):
+  pools?: PoolDescriptor[];
+  sources?: Record<string, PoolCitation[]>;
 };
 
 export type RankedHotel = {
