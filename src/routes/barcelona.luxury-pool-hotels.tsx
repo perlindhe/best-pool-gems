@@ -208,8 +208,8 @@ function LuxuryPoolHotels() {
   const visible = useMemo(
     () =>
       filter === "all"
-        ? barcelonaTop10
-        : barcelonaTop10.filter((h) => h.tags?.includes(filter)),
+        ? TOP_10
+        : TOP_10.filter((h) => h.tags?.includes(filter)),
     [filter],
   );
 
