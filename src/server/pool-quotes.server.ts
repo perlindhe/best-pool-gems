@@ -81,8 +81,74 @@ async function fetchGoogleReviews(placeId: string): Promise<RawReview[]> {
     .filter((r) => r.text.length > 20);
 }
 
-// ---------- Firecrawl web search (editorial / Reddit / hotel guides) ----------
+// ---------- YouTube comments on hotel vlogs ----------
 const POOL_RE = /pool|rooftop|infinity|jacuzzi|hot tub|sundeck|plunge|piscina|piscine|swim/i;
+
+async function fetchYouTubeComments(
+  hotelName: string,
+  city: string,
+): Promise<RawReview[]> {
+  const key = process.env.YOUTUBE_API_KEY;
+  if (!key) return [];
+  try {
+    // 1) Search for hotel vlogs / room tours.
+    const q = encodeURIComponent(`${hotelName} ${city} pool`);
+    const searchRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&relevanceLanguage=en&q=${q}&key=${encodeURIComponent(key)}`,
+    );
+    const searchJson = await searchRes.json();
+    if (!searchRes.ok) return [];
+    const items = (searchJson?.items ?? []) as Array<{
+      id?: { videoId?: string };
+      snippet?: { title?: string; channelTitle?: string };
+    }>;
+    const videoIds = items
+      .map((v) => v.id?.videoId)
+      .filter((id): id is string => !!id)
+      .slice(0, 3);
+    if (videoIds.length === 0) return [];
+
+    // 2) Pull top comment threads for each video in parallel.
+    const commentLists = await Promise.all(
+      videoIds.map(async (videoId) => {
+        const cRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=30&order=relevance&textFormat=plainText&key=${encodeURIComponent(key)}`,
+        );
+        const cJson = await cRes.json();
+        if (!cRes.ok) return [] as RawReview[];
+        const threads = (cJson?.items ?? []) as Array<{
+          snippet?: {
+            topLevelComment?: {
+              snippet?: {
+                textDisplay?: string;
+                authorDisplayName?: string;
+                authorChannelUrl?: string;
+              };
+            };
+          };
+        }>;
+        return threads
+          .map<RawReview | null>((t) => {
+            const c = t.snippet?.topLevelComment?.snippet;
+            const text = (c?.textDisplay ?? "").trim();
+            if (!text || !POOL_RE.test(text)) return null;
+            return {
+              source: "youtube" as const,
+              text,
+              author: c?.authorDisplayName ?? null,
+              url: `https://www.youtube.com/watch?v=${videoId}`,
+            };
+          })
+          .filter((r): r is RawReview => r !== null);
+      }),
+    );
+    return commentLists.flat().slice(0, 20);
+  } catch {
+    return [];
+  }
+}
+
+// ---------- Firecrawl web search (editorial / Reddit / hotel guides) ----------
 
 async function firecrawlSearchOne(
   query: string,
