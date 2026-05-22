@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RankingsRouteImport } from './routes/rankings'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -41,6 +42,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const RankingsRoute = RankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/privacy'
     | '/rankings'
     | '/sitemap.xml'
     | '/$citySlug/$articleSlug'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/privacy'
     | '/rankings'
     | '/sitemap.xml'
     | '/$citySlug/$articleSlug'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclosure'
     | '/integritetspolicy'
+    | '/privacy'
     | '/rankings'
     | '/sitemap.xml'
     | '/$citySlug/$articleSlug'
@@ -319,6 +331,7 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
+  PrivacyRoute: typeof PrivacyRoute
   RankingsRoute: typeof RankingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -350,6 +363,13 @@ declare module '@tanstack/react-router' {
       path: '/rankings'
       fullPath: '/rankings'
       preLoaderRoute: typeof RankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integritetspolicy': {
@@ -533,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
+  PrivacyRoute: PrivacyRoute,
   RankingsRoute: RankingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminLoginRoute: AdminLoginRoute,
