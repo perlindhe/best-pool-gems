@@ -287,6 +287,24 @@ function AdminPage() {
               </button>
             )}
             <button
+              onClick={runScoreNextBatch}
+              disabled={nextBatchRunning}
+              className="rounded-full border border-primary/60 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
+              title={`Scores ${NEXT_BATCH_SIZE} hotels starting at offset ${nextBatchOffset}`}
+            >
+              {nextBatchRunning
+                ? `Scoring batch…`
+                : `▶ Score next batch (${nextBatchOffset}${nextBatchTotal != null ? `/${nextBatchTotal}` : ""})`}
+            </button>
+            <button
+              onClick={resetNextBatchOffset}
+              disabled={nextBatchRunning || nextBatchOffset === 0}
+              className="rounded-full border border-border px-3 py-2 text-xs uppercase tracking-[0.2em] disabled:opacity-40"
+              title="Reset batch offset to 0"
+            >
+              ↺
+            </button>
+            <button
               onClick={runBatchPhotos}
               disabled={photosBatchRunning || hotels.length === 0}
               className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary disabled:opacity-50"
