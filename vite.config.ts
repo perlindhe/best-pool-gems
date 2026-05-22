@@ -12,7 +12,7 @@ export default defineConfig({
       { path: "/about", prerender: { enabled: true } },
       { path: "/disclosure", prerender: { enabled: true } },
       { path: "/cookies", prerender: { enabled: true } },
-      { path: "/integritetspolicy", prerender: { enabled: true } },
+      { path: "/privacy", prerender: { enabled: true } },
       { path: "/barcelona", prerender: { enabled: true } },
       { path: "/paris", prerender: { enabled: true } },
       { path: "/london", prerender: { enabled: true } },
