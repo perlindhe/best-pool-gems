@@ -225,7 +225,7 @@ function HotelDetailPage() {
               <a
                 href={hotel.booking_url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="sponsored noopener noreferrer"
                 className="rounded-sm border border-primary/60 px-4 py-2 text-primary transition hover:bg-primary hover:text-primary-foreground"
               >
                 Book ↗
@@ -319,10 +319,96 @@ function HotelDetailPage() {
         </section>
       )}
 
+      {/* Sources & verification */}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">
+            Sources &amp; verification
+          </p>
+          <h2 className="mt-3 font-display text-2xl tracking-wide md:text-3xl">
+            How we verified this pool
+          </h2>
+          <div className="mt-5 grid gap-6 md:grid-cols-2">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Last verified
+              </p>
+              <p className="mt-2 text-base text-foreground">
+                {hotel.last_verified_date
+                  ? new Date(hotel.last_verified_date).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : "Not yet verified — we are still checking this property."}
+              </p>
+              {hotel.why_included && (
+                <>
+                  <p className="mt-5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                    Why it's on the list
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                    {hotel.why_included}
+                  </p>
+                </>
+              )}
+              {hotel.why_not_higher && (
+                <>
+                  <p className="mt-5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                    Why it's not higher
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                    {hotel.why_not_higher}
+                  </p>
+                </>
+              )}
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Sources we used
+              </p>
+              {hotel.editorial_sources.length > 0 ? (
+                <ul className="mt-3 space-y-2 text-sm">
+                  {hotel.editorial_sources.map((s, i) => (
+                    <li key={i} className="leading-relaxed">
+                      {s.url ? (
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer nofollow"
+                          className="text-primary hover:underline"
+                        >
+                          {s.label} ↗
+                        </a>
+                      ) : (
+                        <span className="text-foreground/90">{s.label}</span>
+                      )}
+                      {s.note && (
+                        <span className="ml-2 text-muted-foreground">— {s.note}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Editorial review based on the hotel's own website, recent guest reviews
+                  on Google and TripAdvisor, and our notes from the property.
+                </p>
+              )}
+              <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/80">
+                Affiliate disclosure: booking links may earn us a commission at no
+                extra cost to you. Rankings are editorial and not paid placements.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <SiteFooter />
     </div>
   );
 }
+
 
 function ScoreBlock({
   label,

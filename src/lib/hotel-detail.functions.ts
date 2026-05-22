@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getHotelDetail, type HotelPhoto, type PoolQuote } from "@/server/hotel-detail.server";
+import { getHotelDetail, type HotelPhoto, type PoolQuote, type HotelSource } from "@/server/hotel-detail.server";
 import type { PoolFacts } from "@/lib/rankings.functions";
 
 export type HotelDetail = {
@@ -25,7 +25,12 @@ export type HotelDetail = {
   sources_used: Array<{ source: string; normalized: number; rating_count: number }> | null;
   pool_score_updated_at: string | null;
   meta_computed_at: string | null;
+  last_verified_date: string | null;
+  editorial_sources: HotelSource[];
+  why_included: string | null;
+  why_not_higher: string | null;
 };
+
 
 export type HotelDetailResult = {
   hotel: HotelDetail;
