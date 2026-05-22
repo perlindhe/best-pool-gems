@@ -77,72 +77,132 @@ export type Database = {
       hotels: {
         Row: {
           address: string | null
+          beachfront: boolean | null
+          best_time_to_visit: string | null
           booking_url: string | null
           city: string
           city_slug: string
           country: string
           cover_image_url: string | null
           created_at: string
+          day_pass_available: boolean | null
+          family_friendly: boolean | null
+          guest_only: boolean | null
           has_pool: boolean | null
+          heated_pool: boolean | null
           id: string
           is_published: boolean
+          last_verified_date: string | null
           latitude: number | null
           longitude: number | null
+          lounging_space: string | null
           name: string
           neighborhood: string | null
+          party_level: number | null
+          pool_opening_hours: string | null
+          pool_size: string | null
+          pool_type: string | null
           pool_verification_notes: string | null
           pool_verified_at: string | null
+          price_from_eur: number | null
           rank_position: number | null
+          rooftop: boolean | null
           scrape_website: boolean
           slug: string
+          sources: Json | null
+          tags: string[] | null
           updated_at: string
+          vibe: string | null
+          view_description: string | null
           website_url: string | null
+          why_included: string | null
+          why_not_higher: string | null
         }
         Insert: {
           address?: string | null
+          beachfront?: boolean | null
+          best_time_to_visit?: string | null
           booking_url?: string | null
           city: string
           city_slug: string
           country: string
           cover_image_url?: string | null
           created_at?: string
+          day_pass_available?: boolean | null
+          family_friendly?: boolean | null
+          guest_only?: boolean | null
           has_pool?: boolean | null
+          heated_pool?: boolean | null
           id?: string
           is_published?: boolean
+          last_verified_date?: string | null
           latitude?: number | null
           longitude?: number | null
+          lounging_space?: string | null
           name: string
           neighborhood?: string | null
+          party_level?: number | null
+          pool_opening_hours?: string | null
+          pool_size?: string | null
+          pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
+          price_from_eur?: number | null
           rank_position?: number | null
+          rooftop?: boolean | null
           scrape_website?: boolean
           slug: string
+          sources?: Json | null
+          tags?: string[] | null
           updated_at?: string
+          vibe?: string | null
+          view_description?: string | null
           website_url?: string | null
+          why_included?: string | null
+          why_not_higher?: string | null
         }
         Update: {
           address?: string | null
+          beachfront?: boolean | null
+          best_time_to_visit?: string | null
           booking_url?: string | null
           city?: string
           city_slug?: string
           country?: string
           cover_image_url?: string | null
           created_at?: string
+          day_pass_available?: boolean | null
+          family_friendly?: boolean | null
+          guest_only?: boolean | null
           has_pool?: boolean | null
+          heated_pool?: boolean | null
           id?: string
           is_published?: boolean
+          last_verified_date?: string | null
           latitude?: number | null
           longitude?: number | null
+          lounging_space?: string | null
           name?: string
           neighborhood?: string | null
+          party_level?: number | null
+          pool_opening_hours?: string | null
+          pool_size?: string | null
+          pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
+          price_from_eur?: number | null
           rank_position?: number | null
+          rooftop?: boolean | null
           scrape_website?: boolean
           slug?: string
+          sources?: Json | null
+          tags?: string[] | null
           updated_at?: string
+          vibe?: string | null
+          view_description?: string | null
           website_url?: string | null
+          why_included?: string | null
+          why_not_higher?: string | null
         }
         Relationships: []
       }

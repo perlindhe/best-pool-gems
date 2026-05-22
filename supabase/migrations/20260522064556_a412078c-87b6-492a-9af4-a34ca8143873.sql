@@ -1,0 +1,22 @@
+
+ALTER TABLE public.hotels
+  ADD COLUMN IF NOT EXISTS pool_type text,
+  ADD COLUMN IF NOT EXISTS rooftop boolean,
+  ADD COLUMN IF NOT EXISTS beachfront boolean,
+  ADD COLUMN IF NOT EXISTS heated_pool boolean,
+  ADD COLUMN IF NOT EXISTS guest_only boolean,
+  ADD COLUMN IF NOT EXISTS day_pass_available boolean,
+  ADD COLUMN IF NOT EXISTS pool_opening_hours text,
+  ADD COLUMN IF NOT EXISTS best_time_to_visit text,
+  ADD COLUMN IF NOT EXISTS view_description text,
+  ADD COLUMN IF NOT EXISTS pool_size text,
+  ADD COLUMN IF NOT EXISTS lounging_space text,
+  ADD COLUMN IF NOT EXISTS vibe text,
+  ADD COLUMN IF NOT EXISTS family_friendly boolean,
+  ADD COLUMN IF NOT EXISTS party_level smallint,
+  ADD COLUMN IF NOT EXISTS price_from_eur integer,
+  ADD COLUMN IF NOT EXISTS last_verified_date date,
+  ADD COLUMN IF NOT EXISTS sources jsonb,
+  ADD COLUMN IF NOT EXISTS why_included text,
+  ADD COLUMN IF NOT EXISTS why_not_higher text,
+  ADD COLUMN IF NOT EXISTS tags text[];
