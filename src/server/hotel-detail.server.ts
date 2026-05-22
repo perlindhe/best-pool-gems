@@ -8,6 +8,12 @@ export type HotelPhoto = {
   source?: string;
 };
 
+export type HotelSource = {
+  label: string;
+  url?: string;
+  note?: string;
+};
+
 export async function getHotelDetail(slug: string) {
   const { data: hotel, error } = await supabaseAdmin
     .from("public_hotels_view")
@@ -18,6 +24,39 @@ export async function getHotelDetail(slug: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!hotel) return null;
+
+  const { data: editorial } = await supabaseAdmin
+    .from("hotels")
+    .select("last_verified_date, sources, why_included, why_not_higher")
+    .eq("id", hotel.id as string)
+    .maybeSingle();
+
+  const rawSources = (editorial?.sources ?? null) as unknown;
+  let editorial_sources: HotelSource[] = [];
+  if (Array.isArray(rawSources)) {
+    editorial_sources = rawSources
+      .map((s) => {
+        if (typeof s === "string") return { label: s };
+        if (s && typeof s === "object") {
+          const o = s as Record<string, unknown>;
+          return {
+            label: String(o.label ?? o.name ?? o.title ?? o.url ?? "Source"),
+            url: typeof o.url === "string" ? o.url : undefined,
+            note: typeof o.note === "string" ? o.note : undefined,
+          };
+        }
+        return null;
+      })
+      .filter((x): x is HotelSource => !!x);
+  }
+
+  const hotelWithEditorial = {
+    ...hotel,
+    last_verified_date: (editorial?.last_verified_date as string | null) ?? null,
+    editorial_sources,
+    why_included: (editorial?.why_included as string | null) ?? null,
+    why_not_higher: (editorial?.why_not_higher as string | null) ?? null,
+  };
 
   const { data: photoRows } = await supabaseAdmin
     .from("hotel_photos")
@@ -46,8 +85,9 @@ export async function getHotelDetail(slug: string) {
     source_url: (q.source_url as string | null) ?? null,
   }));
 
-  return { hotel, photos, quotes };
+  return { hotel: hotelWithEditorial, photos, quotes };
 }
+
 
 export type PoolQuote = {
   quote: string;
