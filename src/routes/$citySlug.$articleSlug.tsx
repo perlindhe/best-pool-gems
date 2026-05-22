@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getCityGuides, getGuideByParts } from "@/data/hotels";
-import { guideContent, buildGuideMeta, type GuideContent } from "@/data/guideContent";
+import { guideContent, buildGuideMeta, type GuideContent, type GuideTableRow } from "@/data/guideContent";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { GuideMeta } from "@/components/GuideMeta";
+import { AlsoConsidered } from "@/components/AlsoConsidered";
 
 export const Route = createFileRoute("/$citySlug/$articleSlug")({
   loader: ({ params }) => {
@@ -70,16 +72,19 @@ function GuidePage() {
           />
           <div className="absolute inset-0 -z-10 bg-gradient-hero" />
           <div className="mx-auto flex min-h-[60vh] max-w-5xl flex-col justify-end px-6 pb-16 pt-28">
-            <p className="text-xs uppercase tracking-[0.35em] text-primary">
+            <nav className="text-xs uppercase tracking-[0.35em] text-primary">
+              <Link to="/" className="hover:text-foreground">Home</Link>
+              <span className="mx-2 text-muted-foreground">/</span>
               <Link
                 to="/$citySlug"
                 params={{ citySlug: guide.citySlug }}
                 className="hover:text-foreground"
               >
                 {guide.city}
-              </Link>{" "}
-              · {guide.category} · {guide.readingTime}
-            </p>
+              </Link>
+              <span className="mx-2 text-muted-foreground">/</span>
+              <span className="text-foreground">{guide.category}</span>
+            </nav>
             <h1 className="mt-5 font-display text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] tracking-tight text-balance">
               {guide.title}
             </h1>
@@ -87,7 +92,14 @@ function GuidePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-6 py-20">
+        <section className="mx-auto max-w-3xl px-6 py-16">
+          <GuideMeta
+            publishedDate={content.publishedDate}
+            lastUpdated={content.lastUpdated}
+            sources={content.sources}
+            verificationNote={content.verificationNote}
+          />
+
           <div className="space-y-12">
             {content.body.map((block: GuideContent["body"][number], i: number) => (
               <div key={i}>
@@ -104,13 +116,73 @@ function GuidePage() {
               </div>
             ))}
           </div>
+        </section>
 
-          <div className="mt-16 rounded-lg border border-primary/30 bg-primary/5 p-6 text-sm text-muted-foreground">
+        {content.table && (
+          <section className="border-t border-border/40 bg-surface/40">
+            <div className="mx-auto max-w-5xl px-6 py-16">
+              <h2 className="font-display text-4xl tracking-wide text-primary md:text-5xl">
+                {content.table.heading}
+              </h2>
+              {content.table.intro && (
+                <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+                  {content.table.intro}
+                </p>
+              )}
+
+              <div className="mt-8 overflow-x-auto rounded-xl border border-border/60 bg-background/60">
+                <table className="w-full min-w-[640px] text-sm">
+                  <thead>
+                    <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                      <th className="px-5 py-3 font-normal">Hotel</th>
+                      {content.table.rows[0]?.cells.map((c: { label: string; value: string }) => (
+                        <th key={c.label} className="px-5 py-3 font-normal">
+                          {c.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {content.table.rows.map((row: GuideTableRow) => (
+                      <tr key={row.hotel} className="border-t border-border/40 align-top">
+                        <td className="px-5 py-4">
+                          <p className="font-display text-lg tracking-wide text-foreground">
+                            {row.hotel}
+                          </p>
+                          <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                            {row.neighborhood}
+                          </p>
+                        </td>
+                        {row.cells.map((c: { label: string; value: string }) => (
+                          <td key={c.label} className="px-5 py-4 text-foreground/85">
+                            {c.value}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <AlsoConsidered
+          items={content.alsoConsidered.map((i: { name: string; neighborhood?: string; reason: string }) => ({
+            name: i.name,
+            neighborhood: i.neighborhood,
+            reason: i.reason,
+          }))}
+        />
+
+        <section className="mx-auto max-w-3xl px-6 py-12">
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 text-sm text-muted-foreground">
             <p className="text-xs uppercase tracking-[0.25em] text-primary">Disclosure</p>
             <p className="mt-2">
-              Some links in this guide may be affiliate links. They never affect our ranking — read more on{" "}
+              Some links in this guide are affiliate links and carry{" "}
+              <code className="text-foreground">rel="sponsored nofollow"</code>. They never affect our ranking — read more on{" "}
               <Link to="/disclosure" className="underline hover:text-primary">
-                Affiliate links & disclosure
+                Affiliate links &amp; disclosure
               </Link>.
             </p>
           </div>
