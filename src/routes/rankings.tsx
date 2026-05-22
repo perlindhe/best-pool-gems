@@ -20,7 +20,10 @@ export const Route = createFileRoute("/rankings")({
         content:
           "Hotels ranked by pool score and live guest ratings from Google and TripAdvisor.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bestpoolhotels.com/rankings" },
     ],
+    links: [{ rel: "canonical", href: "https://bestpoolhotels.com/rankings" }],
   }),
   errorComponent: ({ error }) => (
     <div className="min-h-screen bg-background">
