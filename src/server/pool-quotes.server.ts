@@ -243,7 +243,7 @@ async function aiPickPoolQuotes(
 
   const sys =
     "You extract short verbatim quotes that talk SPECIFICALLY about a hotel's swimming pool, rooftop pool, infinity pool, pool deck, pool bar, jacuzzi, or pool view. " +
-    "Pick at most 5 quotes total. STRONGLY prefer source diversity — mix TripAdvisor, Google, Reddit, editorial outlets (Condé Nast Traveler, Travel + Leisure, Telegraph, Mr & Mrs Smith, Five Star Alliance, Forbes Travel Guide), and pool-focused guides (The Hotel Guru, Oyster). " +
+    "Pick at most 5 quotes total. STRONGLY prefer source diversity — mix TripAdvisor, Google, Reddit threads, YouTube vlog comments, editorial outlets (Condé Nast Traveler, Travel + Leisure, Telegraph, Mr & Mrs Smith, Five Star Alliance, Forbes Travel Guide), and pool-focused guides (The Hotel Guru, Oyster). Aim for AT MOST 2 quotes from any single source category. " +
     "Each quote must be a verbatim sentence (or two adjacent sentences) copied from the source — never paraphrase, never invent. " +
     "Skip any item that does not explicitly mention the pool / rooftop / deck / jacuzzi. " +
     "Prefer concrete pool details (size, view, temperature, atmosphere, hours) over generic praise.";
