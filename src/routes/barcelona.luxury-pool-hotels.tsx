@@ -413,6 +413,75 @@ function LuxuryPoolHotels() {
         })}
       </section>
 
+      {/* Pool Score breakdown — transparent per-criterion view */}
+      <section className="border-t border-border/40 bg-surface/40">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Score breakdown</p>
+          <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
+            Pool Score, criterion by criterion
+          </h2>
+          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+            Five sub-scores per hotel, each rated 0–10. The Pool Score is a
+            weighted blend — View &amp; Wow factor count for ~20% each, Size,
+            Loungers and Service for ~20% each. Full method on{" "}
+            <Link to="/about" className="text-primary underline-offset-2 hover:underline">
+              About
+            </Link>.
+          </p>
+
+          <div className="mt-8 overflow-x-auto rounded-xl border border-border/60 bg-background/60">
+            <table className="w-full min-w-[760px] text-sm">
+              <thead>
+                <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  <th className="px-5 py-3 font-normal">Hotel</th>
+                  <th className="px-3 py-3 text-right font-normal">View</th>
+                  <th className="px-3 py-3 text-right font-normal">Pool size</th>
+                  <th className="px-3 py-3 text-right font-normal">Loungers</th>
+                  <th className="px-3 py-3 text-right font-normal">Service</th>
+                  <th className="px-3 py-3 text-right font-normal">Wow</th>
+                  <th className="px-5 py-3 text-right font-normal text-primary">Pool Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {TOP_10.filter((h) => h.subscores).map((h) => (
+                  <tr key={h.name} className="border-t border-border/40 align-top">
+                    <td className="px-5 py-4">
+                      <p className="font-display text-lg tracking-wide text-foreground">{h.name}</p>
+                      <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                        {h.neighborhood}
+                      </p>
+                    </td>
+                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
+                      {h.subscores!.view.toFixed(1)}
+                    </td>
+                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
+                      {h.subscores!.size.toFixed(1)}
+                    </td>
+                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
+                      {h.subscores!.loungers.toFixed(1)}
+                    </td>
+                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
+                      {h.subscores!.service.toFixed(1)}
+                    </td>
+                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
+                      {h.subscores!.wow.toFixed(1)}
+                    </td>
+                    <td className="px-5 py-4 text-right font-display text-xl text-primary tabular-nums">
+                      {h.score.toFixed(1)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Sub-scores are editorial assessments by the Best Pool Hotels team,
+            re-evaluated each season against on-site visits, hotel pool / wellness
+            pages and recent guest reviews. Last refreshed: {LAST_UPDATED}.
+          </p>
+        </div>
+      </section>
+
       <AlsoConsidered items={ALSO_CONSIDERED} />
 
       {/* Areas / map section */}
