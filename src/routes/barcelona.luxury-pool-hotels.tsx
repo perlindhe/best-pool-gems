@@ -305,6 +305,16 @@ function LuxuryPoolHotels() {
         </div>
       </section>
 
+      {/* Editorial trust block */}
+      <section className="mx-auto max-w-3xl px-6 pt-6">
+        <GuideMeta
+          publishedDate={PUBLISHED_DATE}
+          lastUpdated={LAST_UPDATED}
+          sources={SOURCES}
+          verificationNote="Every hotel in this top 10 was re-verified against the property's own pool / wellness page within the last 30 days. Opening dates and access rules can shift in season — always re-check on the hotel's official site before booking."
+        />
+      </section>
+
       {/* Top 10 list */}
       <section className="mx-auto max-w-5xl space-y-6 px-6 py-16">
         {visible.length === 0 && (
@@ -312,10 +322,11 @@ function LuxuryPoolHotels() {
             No hotel matches that filter. Try a different vibe.
           </p>
         )}
-        {visible.map((h: Hotel) => {
+        {visible.map((h: Hotel, idx: number) => {
           const info = photos[h.name.toLowerCase()];
           const photo = info?.url ?? null;
           const slug = info?.slug ?? null;
+          const position = idx + 1;
           const CardInner = (
           <article
             className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 shadow-card transition hover:border-primary/60"
@@ -331,11 +342,11 @@ function LuxuryPoolHotels() {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center font-display text-5xl text-primary-foreground/70">
-                    {h.rank}
+                    {position}
                   </div>
                 )}
                 <div className="absolute left-3 top-3 flex h-12 w-12 items-center justify-center rounded-md bg-background/85 font-display text-2xl text-primary shadow-glow backdrop-blur">
-                  {h.rank}
+                  {position}
                 </div>
               </div>
               <div className="flex-1 p-6 md:p-8">
@@ -393,14 +404,16 @@ function LuxuryPoolHotels() {
           </article>
           );
           return slug ? (
-            <Link key={h.rank} to="/hotels/$slug" params={{ slug }} className="block">
+            <Link key={h.name} to="/hotels/$slug" params={{ slug }} className="block">
               {CardInner}
             </Link>
           ) : (
-            <div key={h.rank}>{CardInner}</div>
+            <div key={h.name}>{CardInner}</div>
           );
         })}
       </section>
+
+      <AlsoConsidered items={ALSO_CONSIDERED} />
 
       {/* Areas / map section */}
       <section className="border-t border-border/40 bg-surface/40">
