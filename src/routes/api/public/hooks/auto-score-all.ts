@@ -86,10 +86,17 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
         }
 
         const ok = results.filter((r) => r.ok).length;
+        const nextOffset = offset + (hotels?.length ?? 0);
+        const hasMore = total != null ? nextOffset < total : (hotels?.length ?? 0) === limit;
         return json({
           processed: results.length,
           succeeded: ok,
           failed: results.length - ok,
+          offset,
+          limit,
+          next_offset: hasMore ? nextOffset : null,
+          total,
+          has_more: hasMore,
           results,
           ran_at: new Date().toISOString(),
         });
