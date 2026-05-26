@@ -77,18 +77,80 @@ export function computeMeta(
   };
 }
 
+// =============================================================================
+// CANONICAL POOL SCORE — 5 weighted criteria, each rated 0–10.
+// Weights MUST match About page, guide tables and profile breakdowns.
+// =============================================================================
+
 export type PoolComponents = {
-  vibe: number;
-  lounging_space: number;
-  service: number;
-  uniqueness: number;
-  pool_first_feel: number;
+  pool_design_setting: number;   // 25%
+  view_atmosphere: number;       // 25%
+  size_lounging_space: number;   // 20%
+  access_seasonality: number;    // 15%
+  service_maintenance: number;   // 15%
 };
 
-// Each component is 0–2; sum = 0–10.
-export function computePoolScore(c: PoolComponents): number {
-  const vals = [c.vibe, c.lounging_space, c.service, c.uniqueness, c.pool_first_feel];
-  const total = vals.reduce((a, b) => a + clamp(Number(b) || 0, 0, 2), 0);
+export const POOL_WEIGHTS: Record<keyof PoolComponents, number> = {
+  pool_design_setting: 0.25,
+  view_atmosphere: 0.25,
+  size_lounging_space: 0.20,
+  access_seasonality: 0.15,
+  service_maintenance: 0.15,
+};
+
+export const POOL_CRITERIA: Array<{
+  key: keyof PoolComponents;
+  label: string;
+  hint: string;
+}> = [
+  { key: "pool_design_setting", label: "Pool design & setting", hint: "Architecture, materials, how the pool sits in the hotel" },
+  { key: "view_atmosphere",     label: "View & atmosphere",     hint: "Skyline, sea, gardens, light, music, vibe" },
+  { key: "size_lounging_space", label: "Size & lounging space", hint: "Pool dimensions, sunbeds, cabanas, deck space" },
+  { key: "access_seasonality",  label: "Access & seasonality",  hint: "Opening hours, season length, guest-only vs day-pass" },
+  { key: "service_maintenance", label: "Service & maintenance", hint: "Attendants, towels, food and drink, cleanliness" },
+];
+
+type AnyComponents = Partial<PoolComponents> & Partial<{
+  // Legacy 0–2 keys
+  pool_first_feel: number;
+  vibe: number;
+  lounging_space: number;
+  uniqueness: number;
+  service: number;
+}>;
+
+/** Normalize either the new (0–10) shape OR the legacy (0–2) shape into canonical. */
+export function toCanonicalComponents(c: AnyComponents | null | undefined): PoolComponents {
+  const safe = c ?? {};
+  // New shape already present?
+  if (safe.pool_design_setting != null || safe.view_atmosphere != null) {
+    return {
+      pool_design_setting:  clamp(Number(safe.pool_design_setting  ?? 0), 0, 10),
+      view_atmosphere:      clamp(Number(safe.view_atmosphere      ?? 0), 0, 10),
+      size_lounging_space:  clamp(Number(safe.size_lounging_space  ?? 0), 0, 10),
+      access_seasonality:   clamp(Number(safe.access_seasonality   ?? 0), 0, 10),
+      service_maintenance:  clamp(Number(safe.service_maintenance  ?? 0), 0, 10),
+    };
+  }
+  // Legacy 0–2 shape — multiply by 5 to map into 0–10.
+  return {
+    pool_design_setting:  clamp(Number(safe.pool_first_feel ?? 0) * 5, 0, 10),
+    view_atmosphere:      clamp(Number(safe.vibe            ?? 0) * 5, 0, 10),
+    size_lounging_space:  clamp(Number(safe.lounging_space  ?? 0) * 5, 0, 10),
+    access_seasonality:   clamp(Number(safe.uniqueness      ?? 0) * 5, 0, 10),
+    service_maintenance:  clamp(Number(safe.service         ?? 0) * 5, 0, 10),
+  };
+}
+
+/** Canonical weighted pool score (0–10). Accepts old or new shape. */
+export function computePoolScore(c: AnyComponents): number {
+  const n = toCanonicalComponents(c);
+  const total =
+    n.pool_design_setting * POOL_WEIGHTS.pool_design_setting +
+    n.view_atmosphere     * POOL_WEIGHTS.view_atmosphere +
+    n.size_lounging_space * POOL_WEIGHTS.size_lounging_space +
+    n.access_seasonality  * POOL_WEIGHTS.access_seasonality +
+    n.service_maintenance * POOL_WEIGHTS.service_maintenance;
   return round(total, 1);
 }
 
