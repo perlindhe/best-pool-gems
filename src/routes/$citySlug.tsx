@@ -269,7 +269,7 @@ function CityHub() {
                     <h3 className="font-display text-2xl tracking-wide text-primary">{s.label}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">{s.intro}</p>
                     <ol className="mt-5 space-y-3">
-                      {s.items.map((h) => (
+                      {s.items.map((h: Hotel) => (
                         <li key={h.rank} className="flex items-baseline justify-between gap-4 border-t border-border/30 pt-3 first:border-none first:pt-0">
                           <div>
                             <p className="font-display text-lg tracking-wide text-foreground">{h.name}</p>
