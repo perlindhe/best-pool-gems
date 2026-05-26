@@ -421,8 +421,58 @@ function HotelDetailPage() {
         </div>
       </section>
 
+      {/* Compared with — only renders for hotels with curated comparisons */}
+      <ComparedWith slug={hotel.slug} />
+
       <SiteFooter />
     </div>
+  );
+}
+
+const COMPARISONS: Record<string, Array<{ pair: string; label: string }>> = {
+  "barcelona-grand-hotel-central": [
+    { pair: "grand-hotel-central-vs-barcelona-edition", label: "Grand Hotel Central vs The Barcelona EDITION" },
+    { pair: "grand-hotel-central-vs-kimpton-vividora", label: "Grand Hotel Central vs Kimpton Vividora" },
+  ],
+  "barcelona-edition": [
+    { pair: "grand-hotel-central-vs-barcelona-edition", label: "Grand Hotel Central vs The Barcelona EDITION" },
+  ],
+  "barcelona-kimpton-vividora": [
+    { pair: "grand-hotel-central-vs-kimpton-vividora", label: "Grand Hotel Central vs Kimpton Vividora" },
+  ],
+  "barcelona-hotel-arts": [
+    { pair: "hotel-arts-vs-w-barcelona", label: "Hotel Arts vs W Barcelona" },
+  ],
+  "barcelona-w": [
+    { pair: "hotel-arts-vs-w-barcelona", label: "Hotel Arts vs W Barcelona" },
+  ],
+};
+
+function ComparedWith({ slug }: { slug: string }) {
+  const items = COMPARISONS[slug];
+  if (!items?.length) return null;
+  return (
+    <section className="mx-auto max-w-6xl px-6 pb-20">
+      <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
+        <p className="text-xs uppercase tracking-[0.3em] text-primary">Compared with</p>
+        <h2 className="mt-3 font-display text-2xl tracking-wide md:text-3xl">
+          Side-by-side comparisons
+        </h2>
+        <ul className="mt-5 space-y-2 text-sm">
+          {items.map((c) => (
+            <li key={c.pair}>
+              <Link
+                to="/compare/$pair"
+                params={{ pair: c.pair }}
+                className="text-primary underline-offset-2 hover:underline"
+              >
+                {c.label} →
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
