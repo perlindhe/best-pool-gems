@@ -8,6 +8,8 @@ export type GuideMetaProps = {
   lastUpdated: string; // ISO yyyy-mm-dd
   sources?: Source[];
   verificationNote?: string;
+  hotelsChecked?: number;
+  hotelsIncluded?: number;
 };
 
 function formatDate(iso: string) {
