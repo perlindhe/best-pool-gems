@@ -385,9 +385,23 @@ export const buildGuideMeta = (guide: Guide) => {
                 { "@type": "ListItem", position: 3, name: guide.title, item: url },
               ],
             },
+            ...(content?.table
+              ? [
+                  {
+                    "@type": "ItemList",
+                    name: content.table.heading,
+                    itemListElement: content.table.rows.map((row, i) => ({
+                      "@type": "ListItem",
+                      position: i + 1,
+                      name: row.hotel,
+                    })),
+                  },
+                ]
+              : []),
           ],
         }),
       },
     ],
   };
 };
+
