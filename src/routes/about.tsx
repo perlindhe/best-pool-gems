@@ -210,8 +210,8 @@ function AboutPage() {
               advertising disclosure
             </Link>
             . Questions? Email{" "}
-            <a href="mailto:hej@poollist.se" className="text-primary underline">
-              hej@poollist.se
+            <a href="mailto:hello@bestpoolhotels.com" className="text-primary underline">
+              hello@bestpoolhotels.com
             </a>
             .
           </p>
