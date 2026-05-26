@@ -28,6 +28,39 @@ export const Route = createFileRoute("/$citySlug")({
     const title = `Best pool hotels in ${city.name} — Best Pool Hotels`;
     const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
     const url = `https://bestpoolhotels.com/${params.citySlug}`;
+    const ld = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          name: title,
+          description,
+          url,
+          inLanguage: "en",
+          isPartOf: { "@type": "WebSite", name: "Best Pool Hotels", url: "https://bestpoolhotels.com/" },
+        },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://bestpoolhotels.com/" },
+            { "@type": "ListItem", position: 2, name: city.name, item: url },
+          ],
+        },
+        ...(city.hotels.length
+          ? [
+              {
+                "@type": "ItemList",
+                name: `Top ${city.hotels.length} pool hotels in ${city.name}`,
+                itemListElement: city.hotels.slice(0, 10).map((h, i) => ({
+                  "@type": "ListItem",
+                  position: i + 1,
+                  name: h.name,
+                })),
+              },
+            ]
+          : []),
+      ],
+    };
     return {
       meta: [
         { title },
@@ -41,8 +74,10 @@ export const Route = createFileRoute("/$citySlug")({
         { name: "twitter:image", content: city.image },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
     };
   },
+
   notFoundComponent: () => (
     <div className="min-h-screen bg-background">
       <SiteHeader />
