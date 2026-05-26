@@ -317,6 +317,8 @@ function LuxuryPoolHotels() {
           publishedDate={PUBLISHED_DATE}
           lastUpdated={LAST_UPDATED}
           sources={SOURCES}
+          hotelsChecked={32}
+          hotelsIncluded={visible.length}
           verificationNote="Every hotel in this top 10 was re-verified against the property's own pool / wellness page within the last 30 days. Opening dates and access rules can shift in season — always re-check on the hotel's official site before booking."
         />
       </section>
