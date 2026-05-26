@@ -6,9 +6,11 @@ import {
   computeMeta,
   computePoolScore,
   DEFAULT_WEIGHTS,
+  toCanonicalComponents,
   type SourceKey,
   type Weights,
 } from "./scoring";
+
 
 const SOURCES = ["google", "tripadvisor", "booking", "hotels_com"] as const;
 
@@ -499,15 +501,25 @@ export const adminAutoScoreHotel = createServerFn({ method: "POST" })
   });
 
 // ---------- POOL SCORE ----------
+// Accept either the new canonical 0–10 shape OR the legacy 0–2 admin shape
+// (the admin UI hasn't been migrated yet). We normalize at write time.
+const LegacyPoolComponentsSchema = z.object({
+  vibe: z.number().min(0).max(2),
+  lounging_space: z.number().min(0).max(2),
+  service: z.number().min(0).max(2),
+  uniqueness: z.number().min(0).max(2),
+  pool_first_feel: z.number().min(0).max(2),
+});
+const CanonicalPoolComponentsSchema = z.object({
+  pool_design_setting: z.number().min(0).max(10),
+  view_atmosphere: z.number().min(0).max(10),
+  size_lounging_space: z.number().min(0).max(10),
+  access_seasonality: z.number().min(0).max(10),
+  service_maintenance: z.number().min(0).max(10),
+});
 const PoolScoreSchema = z.object({
   hotel_id: z.string().uuid(),
-  components: z.object({
-    vibe: z.number().min(0).max(2),
-    lounging_space: z.number().min(0).max(2),
-    service: z.number().min(0).max(2),
-    uniqueness: z.number().min(0).max(2),
-    pool_first_feel: z.number().min(0).max(2),
-  }),
+  components: z.union([CanonicalPoolComponentsSchema, LegacyPoolComponentsSchema]),
   best_time: z.string().max(200).nullish().or(z.literal("")),
   pool_type: z.string().max(200).nullish().or(z.literal("")),
   editorial_notes: z.string().max(2000).nullish().or(z.literal("")),
@@ -519,14 +531,15 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => PoolScoreSchema.parse(input))
   .handler(async ({ context, data }) => {
     await ensureAdmin(context.userId);
-    const score = computePoolScore(data.components);
+    const canonical = toCanonicalComponents(data.components);
+    const score = computePoolScore(canonical);
     const { data: row, error } = await supabaseAdmin
       .from("pool_scores")
       .upsert(
         {
           hotel_id: data.hotel_id,
           pool_score_0_10: score,
-          components: data.components,
+          components: canonical,
           best_time: data.best_time || null,
           pool_type: data.pool_type || null,
           editorial_notes: data.editorial_notes || null,
@@ -539,6 +552,7 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { pool: row };
   });
+
 
 export const adminListPoolScores = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -559,6 +573,17 @@ export const adminListPoolScores = createServerFn({ method: "GET" })
       rows: (hotels ?? []).map((h) => {
         const s = byId.get(h.id as string);
         const comps = (s?.components as Record<string, number> | null) ?? null;
+        // Map canonical (0–10) DB shape back to legacy (0–2) so the existing
+        // admin UI sliders keep working until the admin form is migrated.
+        const legacy = comps
+          ? {
+              vibe: (comps.view_atmosphere ?? 0) / 5,
+              lounging_space: (comps.size_lounging_space ?? 0) / 5,
+              service: (comps.service_maintenance ?? 0) / 5,
+              uniqueness: (comps.access_seasonality ?? 0) / 5,
+              pool_first_feel: (comps.pool_design_setting ?? 0) / 5,
+            }
+          : { vibe: null, lounging_space: null, service: null, uniqueness: null, pool_first_feel: null };
         return {
           hotel_id: h.id as string,
           name: h.name as string,
@@ -566,13 +591,8 @@ export const adminListPoolScores = createServerFn({ method: "GET" })
           slug: h.slug as string,
           rank_position: h.rank_position as number | null,
           pool_score_0_10: (s?.pool_score_0_10 as number | null) ?? null,
-          components: {
-            vibe: comps?.vibe ?? null,
-            lounging_space: comps?.lounging_space ?? null,
-            service: comps?.service ?? null,
-            uniqueness: comps?.uniqueness ?? null,
-            pool_first_feel: comps?.pool_first_feel ?? null,
-          },
+          components: legacy,
+
           updated_at: (s?.updated_at as string | null) ?? null,
         };
       }),

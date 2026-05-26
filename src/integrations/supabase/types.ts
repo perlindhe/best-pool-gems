@@ -16,13 +16,16 @@ export type Database = {
     Tables: {
       hotel_photos: {
         Row: {
+          alt_text: string | null
           attribution: string | null
           created_at: string
           height: number | null
           hotel_id: string
           id: string
+          image_credit: string | null
           is_outdoor: boolean | null
           is_pool: boolean | null
+          license_source: string | null
           pool_score: number | null
           position: number
           source: string
@@ -30,13 +33,16 @@ export type Database = {
           width: number | null
         }
         Insert: {
+          alt_text?: string | null
           attribution?: string | null
           created_at?: string
           height?: number | null
           hotel_id: string
           id?: string
+          image_credit?: string | null
           is_outdoor?: boolean | null
           is_pool?: boolean | null
+          license_source?: string | null
           pool_score?: number | null
           position?: number
           source: string
@@ -44,13 +50,16 @@ export type Database = {
           width?: number | null
         }
         Update: {
+          alt_text?: string | null
           attribution?: string | null
           created_at?: string
           height?: number | null
           hotel_id?: string
           id?: string
+          image_credit?: string | null
           is_outdoor?: boolean | null
           is_pool?: boolean | null
+          license_source?: string | null
           pool_score?: number | null
           position?: number
           source?: string
@@ -77,6 +86,8 @@ export type Database = {
       hotels: {
         Row: {
           address: string | null
+          affiliate_url: string | null
+          amenities: Json | null
           beachfront: boolean | null
           best_time_to_visit: string | null
           booking_url: string | null
@@ -86,6 +97,8 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           day_pass_available: boolean | null
+          distance_to_beach_m: number | null
+          editorial_notes: string | null
           family_friendly: boolean | null
           guest_only: boolean | null
           has_pool: boolean | null
@@ -98,28 +111,38 @@ export type Database = {
           lounging_space: string | null
           name: string
           neighborhood: string | null
+          official_url: string | null
           party_level: number | null
+          pool_floor: number | null
           pool_opening_hours: string | null
+          pool_setting: string | null
           pool_size: string | null
           pool_type: string | null
           pool_verification_notes: string | null
           pool_verified_at: string | null
           price_from_eur: number | null
+          quiet_party_level: number | null
           rank_position: number | null
           rooftop: boolean | null
+          score_last_updated: string | null
           scrape_website: boolean
+          season: string | null
           slug: string
           sources: Json | null
           tags: string[] | null
           updated_at: string
           vibe: string | null
           view_description: string | null
+          view_type: string | null
           website_url: string | null
           why_included: string | null
           why_not_higher: string | null
+          year_round: boolean | null
         }
         Insert: {
           address?: string | null
+          affiliate_url?: string | null
+          amenities?: Json | null
           beachfront?: boolean | null
           best_time_to_visit?: string | null
           booking_url?: string | null
@@ -129,6 +152,8 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           day_pass_available?: boolean | null
+          distance_to_beach_m?: number | null
+          editorial_notes?: string | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
           has_pool?: boolean | null
@@ -141,28 +166,38 @@ export type Database = {
           lounging_space?: string | null
           name: string
           neighborhood?: string | null
+          official_url?: string | null
           party_level?: number | null
+          pool_floor?: number | null
           pool_opening_hours?: string | null
+          pool_setting?: string | null
           pool_size?: string | null
           pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
           price_from_eur?: number | null
+          quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
+          score_last_updated?: string | null
           scrape_website?: boolean
+          season?: string | null
           slug: string
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
           vibe?: string | null
           view_description?: string | null
+          view_type?: string | null
           website_url?: string | null
           why_included?: string | null
           why_not_higher?: string | null
+          year_round?: boolean | null
         }
         Update: {
           address?: string | null
+          affiliate_url?: string | null
+          amenities?: Json | null
           beachfront?: boolean | null
           best_time_to_visit?: string | null
           booking_url?: string | null
@@ -172,6 +207,8 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           day_pass_available?: boolean | null
+          distance_to_beach_m?: number | null
+          editorial_notes?: string | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
           has_pool?: boolean | null
@@ -184,25 +221,33 @@ export type Database = {
           lounging_space?: string | null
           name?: string
           neighborhood?: string | null
+          official_url?: string | null
           party_level?: number | null
+          pool_floor?: number | null
           pool_opening_hours?: string | null
+          pool_setting?: string | null
           pool_size?: string | null
           pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
           price_from_eur?: number | null
+          quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
+          score_last_updated?: string | null
           scrape_website?: boolean
+          season?: string | null
           slug?: string
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
           vibe?: string | null
           view_description?: string | null
+          view_type?: string | null
           website_url?: string | null
           why_included?: string | null
           why_not_higher?: string | null
+          year_round?: boolean | null
         }
         Relationships: []
       }
