@@ -6,9 +6,11 @@ import {
   computeMeta,
   computePoolScore,
   DEFAULT_WEIGHTS,
+  toCanonicalComponents,
   type SourceKey,
   type Weights,
 } from "./scoring";
+
 
 const SOURCES = ["google", "tripadvisor", "booking", "hotels_com"] as const;
 
