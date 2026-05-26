@@ -243,7 +243,93 @@ function CityHub() {
         </section>
       )}
 
+      {/* Themed mini-rankings */}
+      {city.hotels.length > 0 && (() => {
+        const themes: { key: string; label: string; intro: string; pick: (h: Hotel) => boolean }[] = [
+          { key: "rooftop", label: "Best rooftop pools", intro: "Skyline views, sunset DJs, plunge pools above the city.", pick: (h) => !!h.tags?.includes("rooftop") },
+          { key: "resort", label: "Resort & beachfront", intro: "Big-water, full-cabana hotels — closest thing to a beach resort in town.", pick: (h) => !!h.tags?.includes("resort") },
+          { key: "quiet", label: "Quiet & grown-up", intro: "Low-key crowd, no party soundtrack, real swimming space.", pick: (h) => !!h.tags?.includes("quiet") },
+          { key: "spa", label: "Pool + serious spa", intro: "Where the pool comes with a proper wellness floor.", pick: (h) => !!h.tags?.includes("spa") },
+        ];
+        const slices = themes
+          .map((t) => ({ ...t, items: city.hotels.filter(t.pick).slice(0, 3) }))
+          .filter((t) => t.items.length > 0);
+        if (slices.length === 0) return null;
+        return (
+          <section className="border-t border-border/40 bg-surface/30">
+            <div className="mx-auto max-w-7xl px-6 py-20">
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">By style</p>
+              <h2 className="mt-3 font-display text-5xl tracking-wide">Pick your vibe</h2>
+              <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+                The Top 10 in {city.name} ranks every pool by overall score. These shortlists narrow it down by what kind of afternoon you want.
+              </p>
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                {slices.map((s) => (
+                  <div key={s.key} className="rounded-xl border border-border/60 bg-background/60 p-6">
+                    <h3 className="font-display text-2xl tracking-wide text-primary">{s.label}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{s.intro}</p>
+                    <ol className="mt-5 space-y-3">
+                      {s.items.map((h) => (
+                        <li key={h.rank} className="flex items-baseline justify-between gap-4 border-t border-border/30 pt-3 first:border-none first:pt-0">
+                          <div>
+                            <p className="font-display text-lg tracking-wide text-foreground">{h.name}</p>
+                            <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{h.neighborhood} · {h.poolType}</p>
+                          </div>
+                          <span className="font-mono text-sm text-primary">{h.score.toFixed(1)}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* Neighborhood snapshot */}
+      {city.hotels.length > 0 && (() => {
+        const byHood = new Map<string, Hotel[]>();
+        for (const h of city.hotels) {
+          const list = byHood.get(h.neighborhood) ?? [];
+          list.push(h);
+          byHood.set(h.neighborhood, list);
+        }
+        const hoods = Array.from(byHood.entries())
+          .sort((a, b) => b[1].length - a[1].length)
+          .slice(0, 6);
+        if (hoods.length < 2) return null;
+        return (
+          <section className="mx-auto max-w-7xl px-6 py-20">
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">Neighborhoods</p>
+            <h2 className="mt-3 font-display text-5xl tracking-wide">Where to stay</h2>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+              A quick map of which {city.name} neighborhoods have the most pool hotels — and what to expect from each.
+            </p>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {hoods.map(([hood, list]) => (
+                <div key={hood} className="rounded-lg border border-border/60 bg-surface/40 p-5">
+                  <h3 className="font-display text-xl tracking-wide text-foreground">{hood}</h3>
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                    {list.length} hotel{list.length === 1 ? "" : "s"}
+                  </p>
+                  <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                    {list.slice(0, 3).map((h) => (
+                      <li key={h.rank} className="flex justify-between gap-2">
+                        <span className="truncate text-foreground/80">{h.name}</span>
+                        <span className="font-mono text-xs text-primary">{h.score.toFixed(1)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
       {/* Other cities */}
+
       <section className="border-t border-border/50 bg-surface/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Keep exploring</p>
