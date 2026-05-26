@@ -1,93 +1,77 @@
-This is a large request touching schema, content, four guide pages, structured data, footer and more. Confirming the approach before I start so I don't spend hours building the wrong shape.
+# BestPoolHotels — Site Audit & Rebuild Plan
 
-## 1. Hotel database extension (Barcelona)
+The site already has a real backend (Supabase `hotels` + `pool_scores` + `meta_scores` + `pool_quotes`) but it competes with a parallel hardcoded list in `src/data/hotels.ts`. That split is the root cause of the inconsistencies you flagged (Grand Hotel Central at 6.0 in one place, 9.2 in another). Several Barcelona guide pages also read from the hardcoded file instead of Supabase. The plan below fixes all 15 priorities in a sequence that minimizes rework.
 
-Add the missing editorial fields to the `hotels` table (some already exist):
+## Phase 1 — Single source of truth (Priorities 1, 2, 3, 4, 9)
 
-Already present: `name`, `city`, `neighborhood`, `website_url` (= officialHotelUrl), `booking_url` (= affiliateUrl).
+**Make Supabase the only hotel data source. Retire `src/data/hotels.ts` for Barcelona.**
 
-New columns on `hotels`:
-`pool_type`, `rooftop` (bool), `beachfront` (bool), `heated_pool` (bool), `guest_only` (bool), `day_pass_available` (bool), `pool_opening_hours`, `best_time_to_visit`, `view_description`, `pool_size`, `lounging_space`, `vibe`, `family_friendly` (bool), `party_level` (smallint 1–5), `price_from_eur` (int), `last_verified_date` (date), `sources` (jsonb — array of `{label, url}`), `why_included` (text), `why_not_higher` (text), `tags` (text[]).
+1. Extend the `hotels` table with the fields from your spec that aren't there yet: `pool_setting`, `view_type`, `year_round`, `season`, `amenities` (jsonb), `vibe` (text — already exists), `official_url`, `affiliate_url`, `score_last_updated`, `image_credit`, `license_source`. Keep existing field names that already match (`pool_type`, `neighborhood`, `slug`, `heated_pool`, `guest_only`, `day_pass_available`, `price_from_eur`, `last_verified_date`, `sources`, `why_included`, `why_not_higher`, `tags`).
 
-`poolScore` and `metaRating` already live in `pool_scores.pool_score_0_10` and `meta_scores.meta_rating_0_100` — I'll keep those.
+2. Update `src/server/scoring.ts` to the canonical 5-weight method:
 
-Public read RLS already exists on `hotels`; I'll only ALTER the table (no policy changes).
+   ```text
+   pool_design_setting:       25%   (renamed from pool_first_feel)
+   view_atmosphere:           25%   (merged from view + vibe)
+   size_lounging_space:       20%   (renamed from lounging_space)
+   access_seasonality:        15%   (new — replaces uniqueness)
+   service_maintenance:       15%   (renamed from service)
+   ```
+   Each component is rated 0–10 (not 0–2), weighted, summed to 0–10. Update `PoolComponents` type, `computePoolScore()`, `ScoreBreakdown.tsx` labels + hints + weight column, and re-score every published hotel in `pool_scores` so DB and UI agree.
 
-I will only **populate** these new fields for hotels that appear in the four Barcelona guides. The rest stay NULL and the UI hides empty fields.
+3. Lock Grand Hotel Central to 9.2 by writing real component values that sum to 9.2 — not by hardcoding. The hotel profile, the luxury guide ranking, the Also-Considered card, and `/about` will then all read the same number from `pool_scores` automatically.
 
-## 2. Add Grand Hotel Central
+4. Fix the duplicate problem: add a guard in `getBarcelonaGuideData()` that filters Also-Considered to exclude anything already in the Top 10. Remove Cotton House Hotel from the hardcoded also-considered list.
 
-Insert a new `hotels` row + `pool_scores` row using the data you provided. Slug `barcelona-grand-hotel-central`, pool_score 9.2, tags `["Rooftop","Quiet","Iconic","Guest-only"]`, rank_position chosen so it slots into the top 10.
+## Phase 2 — Rebuild Barcelona pages from the database (Priorities 5, 6, 7, 8)
 
-## 3. Make each Barcelona guide unique
+5. **`/barcelona` becomes a true city hub** (replaces current pagination):
+   - 6 themed mini-rankings (top 3 each): Best Overall, Best Rooftop, Best Beach + Pool, Best Heated / Year-Round, Best Quiet, Best Family
+   - Neighborhood guide block (Eixample, Born, Gothic, Barceloneta, Diagonal Mar)
+   - Comparison table: top 10 with Pool Score, Type, Setting, Best Time, Price From
+   - Internal links to every Barcelona guide
+   - Schema: `CollectionPage` + `BreadcrumbList`
 
-Today only `/barcelona/luxury-pool-hotels` exists as a hand-written route. I'll convert the existing dynamic `/$citySlug/$articleSlug` content into four distinct guide modules driven by data, with different filtering + framing:
+6. **`/barcelona/rooftop-pool-hotels`** — query `tags @> ['rooftop']` only. New per-hotel block: floor/height, view, sunset quality, access, opening season, pool size, vibe, best time, quiet/party level. The cards already render most of this — we just wire it to the new DB fields.
 
-- `/barcelona/luxury-pool-hotels` — overall top 10 (current page, rewritten in English, deduped from the others).
-- `/barcelona/rooftop-pool-hotels` — filters `rooftop = true`; shows view, access, opening hours columns.
-- `/barcelona/pool-hotels-near-beach` — filters `beachfront = true OR neighborhood IN (Barceloneta, Poblenou, Vila Olímpica)`; adds walking distance to beach.
-- `/barcelona/pool-season` — editorial seasonal guide (month-by-month, heated-pool list from `heated_pool = true`). Not a ranking.
+7. **`/barcelona/pool-hotels-near-beach`** — query `tags @> ['beach']` or distance threshold. New fields: walking distance to beach, beach area, pool quality vs beach quality, family suitability, wind/sun exposure.
 
-Each guide gets its own intro, criteria explanation, table columns, FAQ, and unique title/meta.
+8. **`/barcelona/pool-season`** — rebuild as a practical seasonal guide, not a ranking. Month-by-month advice (Jan–Dec), heated-pool table, year-round table, April / May / October recommendations, pool-season-by-hotel table (sourced from DB `season` + `heated_pool` + `year_round`).
 
-## 4. "Also considered" section
+## Phase 3 — Trust, legal, schema (Priorities 10, 11, 12, 13, 14)
 
-Per-guide list of 3–5 hotels that nearly made it, with a one-sentence reason. Stored in a small `guide_also_considered` config in `src/data/guideContent.ts` keyed by guide slug.
+10. Search and remove every "Edit with lovable.dev" footer link. Call `publish_settings--set_badge_visibility(hide_badge: true)` to hide the published badge.
 
-## 5. Pool Score method page
+11. Replace `hej@poollist.se` with `hello@bestpoolhotels.com` everywhere (disclosure, about, footer, contact).
 
-Rewrite the methodology section on `/about` (or a dedicated `/method` route — I'll add `/method` since `/about` is general). Five criteria with explicit weightings:
+12. The existing `GuideMeta` component already handles trust blocks — extend it with: hotels checked count, hotels included count, verification method paragraph, affiliate disclosure line, "no paid placements" line. Wire into all guide pages.
 
-| Criterion | Weight |
-|---|---|
-| Pool design & setting | 30% |
-| View & atmosphere | 20% |
-| Size & lounging space | 15% |
-| Water quality & maintenance | 15% |
-| Access & opening hours | 20% |
+13. **Structured data** (JSON-LD via `head().scripts`):
+    - `/` — `WebSite` + `Organization`
+    - `/barcelona` — `CollectionPage` + `BreadcrumbList`
+    - guide pages — `Article` + `ItemList` (hotels) + `BreadcrumbList`; `FAQPage` only when the page renders a visible FAQ
+    - `/hotels/$slug` — `Article` + `Hotel`/`LodgingBusiness` + `BreadcrumbList` + `ImageObject`
 
-Includes a worked example table and a section explaining Pool Score (editorial, ours) vs Meta Rating (aggregated Google + Tripadvisor + Booking, external). Hotel pages already hide Meta Rating when `meta_rating_0_100` is null — I'll verify and tighten.
+14. Image SEO: rename `cover_image_url` semantics to require descriptive alt text. Add `image_credit` + `license_source` columns to `hotel_photos`. Render credit under photos. Skip any photo without a license source.
 
-## 6. Author box + last updated + sources + verification notes
+## Phase 4 — Internal linking (Priority 15)
 
-New `GuideMeta` component rendered at the top of every guide:
-- Author: "BestPoolHotels Editorial" with short bio
-- Last updated date (from a per-guide constant)
-- Sources list (links)
-- Verification notes ("each hotel re-verified via official site on <date>")
+15. On every hotel profile, render a "Featured in" block listing every guide the hotel appears in. On every guide, every hotel name links to its profile (already true). Add a "Compared with" block on profiles linking to:
+    - Grand Hotel Central vs The Barcelona EDITION
+    - Grand Hotel Central vs Kimpton Vividora
+    - Hotel Arts vs W Barcelona
+    These are 3 new comparison routes — only build them with unique side-by-side data tables (pool, location, vibe, best for, price). No thin pages.
 
-Hotel detail pages already show `pool_verified_at`; I'll surface `last_verified_date` + sources from the new column on hotel pages too.
+## Suggested order of execution
 
-## 7. Remove "Edit with Lovable" badge
+We can ship Phase 1 in one batch (migration + scoring rewrite + Grand Hotel Central fix), then iterate Phase 2 page by page so you can review each Barcelona guide as it lands. Phase 3 is one batch (legal + badge + schema). Phase 4 last because it depends on the new comparison content.
 
-Call `publish_settings--set_badge_visibility` with `hide_badge: true` (requires Pro plan; if it fails I'll tell you).
+## Out of scope until you say otherwise
 
-## 8. English-only
+- New cities (only Barcelona is being rebuilt here).
+- The 3 vs-comparison routes get built only after Phase 1–3 ship and we agree on the template.
+- Automated photo licensing — for now, photos without a `license_source` simply don't render.
 
-Audit visible strings across routes/components. `/integritetspolicy` is Swedish — I'll redirect it to `/privacy` (new English page) and keep the Swedish route as a redirect to avoid broken links. Other Swedish copy gets translated.
+## Ready to start?
 
-## 9. Unique SEO title + meta description per page
-
-Audit every route's `head()`. Each gets a unique title and description (≤60 / ≤160 chars).
-
-## 10. JSON-LD
-
-- `WebSite` — already in `__root.tsx`, keep.
-- `BreadcrumbList` — add on guides + hotel pages.
-- `ItemList` — add on each ranking guide (top 10).
-- `Review` — add on hotel pages where we have an editorial pool score (treat our pool score as the review rating).
-- `Hotel`/`LodgingBusiness` — already on hotel pages; verify and extend with `amenityFeature` for pool.
-
-## 11. Affiliate link `rel`
-
-Add a tiny `<AffiliateLink>` component that always renders `rel="sponsored nofollow noopener"` + `target="_blank"`. Replace `booking_url` link sites with it.
-
----
-
-## Out of scope confirmation
-
-- I will **not** fetch live data to populate the 20+ Barcelona hotels' new editorial fields automatically. I'll seed reasonable defaults for the ~15 hotels that appear in the four guides based on public knowledge (neighborhoods, rooftop yes/no, beachfront yes/no) and mark `last_verified_date = today`. You can refine in the admin afterwards. If you'd rather I leave most fields NULL and only fill what's strictly needed per guide, say so.
-- Pool Score and Meta Rating numbers stay as currently stored. I won't re-score hotels.
-- The "remove Lovable badge" requires a paid plan — if you're on free I'll surface the error.
-
-Reply "go" to proceed, or tell me what to change (especially around how much seed data to write for Barcelona hotels).
+If this matches your intent, I'll begin with **Phase 1** (DB migration + scoring + Grand Hotel Central). It's the highest-leverage fix — everything else reads from it. Confirm and I'll write the migration first.
