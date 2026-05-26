@@ -66,6 +66,23 @@ export const Route = createFileRoute("/hotels/$slug")({
       links: [{ rel: "canonical", href: url }],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(jsonLd) },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://bestpoolhotels.com/" },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: hotel.city,
+                item: `https://bestpoolhotels.com/${hotel.city_slug ?? hotel.city.toLowerCase()}`,
+              },
+              { "@type": "ListItem", position: 3, name: hotel.name, item: url },
+            ],
+          }),
+        },
       ],
     };
   },

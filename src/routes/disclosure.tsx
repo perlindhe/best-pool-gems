@@ -55,7 +55,7 @@ function Disclosure() {
           <h2 className="font-display text-3xl tracking-wide text-primary">Questions?</h2>
           <p>
             Email{" "}
-            <a href="mailto:hej@poollist.se" className="text-primary underline">hej@poollist.se</a>{" "}
+            <a href="mailto:hello@bestpoolhotels.com" className="text-primary underline">hello@bestpoolhotels.com</a>{" "}
             with any questions. Also see our{" "}
             <Link to="/integritetspolicy" className="text-primary underline">
               privacy policy

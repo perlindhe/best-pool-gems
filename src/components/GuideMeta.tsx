@@ -8,6 +8,8 @@ export type GuideMetaProps = {
   lastUpdated: string; // ISO yyyy-mm-dd
   sources?: Source[];
   verificationNote?: string;
+  hotelsChecked?: number;
+  hotelsIncluded?: number;
 };
 
 function formatDate(iso: string) {
@@ -34,6 +36,8 @@ export function GuideMeta({
   lastUpdated,
   sources = [],
   verificationNote,
+  hotelsChecked,
+  hotelsIncluded,
 }: GuideMetaProps) {
   return (
     <aside
@@ -62,11 +66,44 @@ export function GuideMeta({
         </div>
       </div>
 
+      {(hotelsChecked != null || hotelsIncluded != null) && (
+        <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-border/40 pt-4 text-xs">
+          {hotelsChecked != null && (
+            <p>
+              <span className="uppercase tracking-[0.18em] text-muted-foreground">Hotels checked</span>{" "}
+              <span className="text-foreground font-medium">{hotelsChecked}</span>
+            </p>
+          )}
+          {hotelsIncluded != null && (
+            <p>
+              <span className="uppercase tracking-[0.18em] text-muted-foreground">Included in guide</span>{" "}
+              <span className="text-foreground font-medium">{hotelsIncluded}</span>
+            </p>
+          )}
+        </div>
+      )}
+
       {verificationNote && (
         <p className="mt-5 border-t border-border/40 pt-4 text-xs leading-relaxed text-muted-foreground">
           <strong className="text-foreground">Verification:</strong> {verificationNote}
         </p>
       )}
+
+      <p className="mt-4 border-t border-border/40 pt-4 text-xs leading-relaxed text-muted-foreground">
+        <strong className="text-foreground">No paid placements.</strong> Hotels cannot pay to be
+        included or ranked higher. Rankings are decided by the editorial team before any booking
+        links are added.
+      </p>
+
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+        <strong className="text-foreground">Affiliate disclosure.</strong> Some booking links earn us
+        a small commission at no extra cost to you. See our{" "}
+        <a href="/disclosure" className="text-primary underline-offset-2 hover:underline">
+          disclosure
+        </a>
+        .
+      </p>
+
 
       {sources.length > 0 && (
         <div className="mt-4 border-t border-border/40 pt-4">
