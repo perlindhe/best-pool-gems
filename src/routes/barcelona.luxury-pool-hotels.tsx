@@ -20,13 +20,10 @@ const TOP_10: Hotel[] = [...barcelonaTop10]
   .sort((a, b) => b.score - a.score)
   .slice(0, 10);
 
+// Names in the Top 10 are filtered out from Also Considered so the same
+// hotel never appears in both lists (Cotton House used to show in both).
+const TOP_10_NAMES = new Set(TOP_10.map((h) => h.name));
 const ALSO_CONSIDERED = [
-  {
-    name: "Cotton House Hotel",
-    neighborhood: "Eixample",
-    reason:
-      "Charming plunge on a 19th-century palace, but the water is small enough to be a hot-tub on busy days.",
-  },
   {
     name: "Ohla Eixample",
     neighborhood: "Eixample",
@@ -45,7 +42,14 @@ const ALSO_CONSIDERED = [
     reason:
       "Best low-key neighbourhood pool in Barcelona — held out of this luxury list because the price tier is different.",
   },
-];
+  {
+    name: "Sir Victor Hotel",
+    neighborhood: "Eixample",
+    reason:
+      "Compact rooftop plunge with a sharp design crowd, but the deck fills fast and afternoon shade is limited.",
+  },
+].filter((h) => !TOP_10_NAMES.has(h.name));
+
 
 const SOURCES = [
   { label: "Hotel Arts Barcelona", url: "https://www.ritzcarlton.com/en/hotels/bcnrz-hotel-arts-barcelona/overview/" },
@@ -162,7 +166,7 @@ const NEIGHBORHOODS = [
 const FAQS = [
   {
     q: "What is Pool Score?",
-    a: "A weighted 0–10 score based on five criteria: vibe & setting, lounging space, service, uniqueness and overall pool-first feel. We re-score before each summer season.",
+    a: "A weighted 0–10 score built from five criteria — pool design & setting (25%), view & atmosphere (25%), size & lounging space (20%), access & seasonality (15%), and service & maintenance (15%). We re-score before each summer season.",
   },
   {
     q: "When are Barcelona's rooftop pools open?",
@@ -263,12 +267,14 @@ function LuxuryPoolHotels() {
             and just as many poolside cocktails.
           </p>
           <p>
-            Every hotel gets a Pool Score from 0–10 based on vibe & setting,
-            lounging space, service, uniqueness and overall pool-first feel. We
+            Every hotel gets a Pool Score from 0–10 built from five criteria —
+            pool design &amp; setting, view &amp; atmosphere, size &amp; lounging
+            space, access &amp; seasonality, and service &amp; maintenance. We
             don't accept payment for placement, and the ranking is set by the
             editorial team before any booking links are added. You can trust
             that a 7 here is a 7 no matter who advertises.
           </p>
+
           <p>
             Use the quick filters below if you're after a specific vibe — a
             quieter pool morning, a beachfront party resort or a spa with

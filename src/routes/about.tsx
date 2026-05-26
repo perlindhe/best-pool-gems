@@ -85,28 +85,29 @@ function AboutPage() {
                 <tr className="border-t border-border/40 align-top">
                   <td className="px-5 py-3 text-foreground">Pool design &amp; setting</td>
                   <td className="px-5 py-3 text-foreground/85">Architecture, materials, shape, integration with the building.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">30%</td>
+                  <td className="px-5 py-3 text-right tabular-nums">25%</td>
                 </tr>
                 <tr className="border-t border-border/40 align-top">
                   <td className="px-5 py-3 text-foreground">View &amp; atmosphere</td>
                   <td className="px-5 py-3 text-foreground/85">What you see from the water, the crowd, the music, the light.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">20%</td>
-                </tr>
-                <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">Access &amp; opening hours</td>
-                  <td className="px-5 py-3 text-foreground/85">Guest-only vs. day-pass, season length, daily hours, reservation friction.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">20%</td>
+                  <td className="px-5 py-3 text-right tabular-nums">25%</td>
                 </tr>
                 <tr className="border-t border-border/40 align-top">
                   <td className="px-5 py-3 text-foreground">Size &amp; lounging space</td>
                   <td className="px-5 py-3 text-foreground/85">Pool footprint, deck size, sunbeds, shade, room at peak hour.</td>
+                  <td className="px-5 py-3 text-right tabular-nums">20%</td>
+                </tr>
+                <tr className="border-t border-border/40 align-top">
+                  <td className="px-5 py-3 text-foreground">Access &amp; seasonality</td>
+                  <td className="px-5 py-3 text-foreground/85">Guest-only vs. day-pass, season length, daily hours, heated / year-round.</td>
                   <td className="px-5 py-3 text-right tabular-nums">15%</td>
                 </tr>
                 <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">Water quality &amp; maintenance</td>
-                  <td className="px-5 py-3 text-foreground/85">Cleanliness, temperature, towel and bar service, attentiveness.</td>
+                  <td className="px-5 py-3 text-foreground">Service &amp; maintenance</td>
+                  <td className="px-5 py-3 text-foreground/85">Cleanliness, water temperature, towel and bar service, attentiveness.</td>
                   <td className="px-5 py-3 text-right tabular-nums">15%</td>
                 </tr>
+
               </tbody>
             </table>
           </div>
@@ -125,12 +126,13 @@ function AboutPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Pool design &amp; setting</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">30%</td><td className="px-5 py-3 text-right tabular-nums">2.85</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">View &amp; atmosphere</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">20%</td><td className="px-5 py-3 text-right tabular-nums">1.90</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Access &amp; opening hours</td><td className="px-5 py-3 tabular-nums">9.0</td><td className="px-5 py-3 tabular-nums text-muted-foreground">20%</td><td className="px-5 py-3 text-right tabular-nums">1.80</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Size &amp; lounging space</td><td className="px-5 py-3 tabular-nums">7.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">15%</td><td className="px-5 py-3 text-right tabular-nums">1.13</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Water quality &amp; maintenance</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">15%</td><td className="px-5 py-3 text-right tabular-nums">1.43</td></tr>
+                <tr className="border-t border-border/40"><td className="px-5 py-3">Pool design &amp; setting</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">25%</td><td className="px-5 py-3 text-right tabular-nums">2.38</td></tr>
+                <tr className="border-t border-border/40"><td className="px-5 py-3">View &amp; atmosphere</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">25%</td><td className="px-5 py-3 text-right tabular-nums">2.38</td></tr>
+                <tr className="border-t border-border/40"><td className="px-5 py-3">Size &amp; lounging space</td><td className="px-5 py-3 tabular-nums">9.0</td><td className="px-5 py-3 tabular-nums text-muted-foreground">20%</td><td className="px-5 py-3 text-right tabular-nums">1.80</td></tr>
+                <tr className="border-t border-border/40"><td className="px-5 py-3">Access &amp; seasonality</td><td className="px-5 py-3 tabular-nums">8.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">15%</td><td className="px-5 py-3 text-right tabular-nums">1.28</td></tr>
+                <tr className="border-t border-border/40"><td className="px-5 py-3">Service &amp; maintenance</td><td className="px-5 py-3 tabular-nums">9.0</td><td className="px-5 py-3 tabular-nums text-muted-foreground">15%</td><td className="px-5 py-3 text-right tabular-nums">1.35</td></tr>
                 <tr className="border-t border-border/40 bg-primary/5"><td className="px-5 py-3 font-semibold text-foreground" colSpan={3}>Pool Score</td><td className="px-5 py-3 text-right font-display text-2xl text-primary">9.2</td></tr>
+
               </tbody>
             </table>
           </div>
