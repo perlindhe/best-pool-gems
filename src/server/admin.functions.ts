@@ -573,6 +573,17 @@ export const adminListPoolScores = createServerFn({ method: "GET" })
       rows: (hotels ?? []).map((h) => {
         const s = byId.get(h.id as string);
         const comps = (s?.components as Record<string, number> | null) ?? null;
+        // Map canonical (0–10) DB shape back to legacy (0–2) so the existing
+        // admin UI sliders keep working until the admin form is migrated.
+        const legacy = comps
+          ? {
+              vibe: (comps.view_atmosphere ?? 0) / 5,
+              lounging_space: (comps.size_lounging_space ?? 0) / 5,
+              service: (comps.service_maintenance ?? 0) / 5,
+              uniqueness: (comps.access_seasonality ?? 0) / 5,
+              pool_first_feel: (comps.pool_design_setting ?? 0) / 5,
+            }
+          : { vibe: null, lounging_space: null, service: null, uniqueness: null, pool_first_feel: null };
         return {
           hotel_id: h.id as string,
           name: h.name as string,
@@ -580,13 +591,8 @@ export const adminListPoolScores = createServerFn({ method: "GET" })
           slug: h.slug as string,
           rank_position: h.rank_position as number | null,
           pool_score_0_10: (s?.pool_score_0_10 as number | null) ?? null,
-          components: {
-            vibe: comps?.vibe ?? null,
-            lounging_space: comps?.lounging_space ?? null,
-            service: comps?.service ?? null,
-            uniqueness: comps?.uniqueness ?? null,
-            pool_first_feel: comps?.pool_first_feel ?? null,
-          },
+          components: legacy,
+
           updated_at: (s?.updated_at as string | null) ?? null,
         };
       }),
