@@ -20,6 +20,7 @@ import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
+import { Route as ComparePairRouteImport } from './routes/compare.$pair'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
@@ -87,6 +88,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const HotelsSlugRoute = HotelsSlugRouteImport.update({
   id: '/hotels/$slug',
   path: '/hotels/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComparePairRoute = ComparePairRouteImport.update({
+  id: '/compare/$pair',
+  path: '/compare/$pair',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BarcelonaLuxuryPoolHotelsRoute =
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/compare/$pair': typeof ComparePairRoute
   '/hotels/$slug': typeof HotelsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/compare/$pair': typeof ComparePairRoute
   '/hotels/$slug': typeof HotelsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
+  '/compare/$pair': typeof ComparePairRoute
   '/hotels/$slug': typeof HotelsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
+    | '/compare/$pair'
     | '/hotels/$slug'
     | '/admin/'
     | '/api/public/hotels'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
+    | '/compare/$pair'
     | '/hotels/$slug'
     | '/admin'
     | '/api/public/hotels'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
+    | '/compare/$pair'
     | '/hotels/$slug'
     | '/admin/'
     | '/api/public/hotels'
@@ -336,6 +348,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
+  ComparePairRoute: typeof ComparePairRoute
   HotelsSlugRoute: typeof HotelsSlugRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
@@ -426,6 +439,13 @@ declare module '@tanstack/react-router' {
       path: '/hotels/$slug'
       fullPath: '/hotels/$slug'
       preLoaderRoute: typeof HotelsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$pair': {
+      id: '/compare/$pair'
+      path: '/compare/$pair'
+      fullPath: '/compare/$pair'
+      preLoaderRoute: typeof ComparePairRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/barcelona/luxury-pool-hotels': {
@@ -558,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
+  ComparePairRoute: ComparePairRoute,
   HotelsSlugRoute: HotelsSlugRoute,
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,

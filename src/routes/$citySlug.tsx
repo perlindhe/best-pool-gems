@@ -361,7 +361,37 @@ function CityHub() {
         </div>
       </section>
 
+      {city.slug === "barcelona" && (
+        <section className="border-t border-border/40 bg-surface/30">
+          <div className="mx-auto max-w-6xl px-6 py-16">
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">Head to head</p>
+            <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
+              Side-by-side comparisons
+            </h2>
+            <ul className="mt-8 grid gap-4 md:grid-cols-3">
+              {[
+                { pair: "grand-hotel-central-vs-barcelona-edition", label: "Grand Hotel Central vs The Barcelona EDITION" },
+                { pair: "grand-hotel-central-vs-kimpton-vividora", label: "Grand Hotel Central vs Kimpton Vividora" },
+                { pair: "hotel-arts-vs-w-barcelona", label: "Hotel Arts vs W Barcelona" },
+              ].map((c) => (
+                <li key={c.pair}>
+                  <Link
+                    to="/compare/$pair"
+                    params={{ pair: c.pair }}
+                    className="block rounded-lg border border-border/60 bg-background/60 p-5 transition hover:border-primary/60"
+                  >
+                    <p className="font-display text-lg tracking-wide text-foreground">{c.label}</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.2em] text-primary">Compare →</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
       <SiteFooter />
     </div>
+
   );
 }
