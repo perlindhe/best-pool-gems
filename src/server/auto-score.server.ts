@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { computePoolScore } from "./scoring";
+import { computePoolScore, toCanonicalComponents } from "./scoring";
+
 
 // ============================================================================
 // EVIDENCE COLLECTION
@@ -637,13 +638,16 @@ export async function autoScoreHotelById(hotel_id: string) {
     cited_facts: Record<string, CitedBool | CitedNum | CitedStr>;
   };
 
-  const components = {
+  // Convert the AI's legacy 0–2 sub-scores into the canonical 5-criteria 0–10 shape
+  // used everywhere on the site (About page, guides, profiles).
+  const components = toCanonicalComponents({
     vibe: parsed.vibe,
     lounging_space: parsed.lounging_space,
     service: parsed.service,
     uniqueness: parsed.uniqueness,
     pool_first_feel: parsed.pool_first_feel,
-  };
+  });
+
 
   // ---- Apply confidence gate at the data layer ----
   const cf = parsed.cited_facts ?? {};

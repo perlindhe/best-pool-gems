@@ -499,15 +499,25 @@ export const adminAutoScoreHotel = createServerFn({ method: "POST" })
   });
 
 // ---------- POOL SCORE ----------
+// Accept either the new canonical 0–10 shape OR the legacy 0–2 admin shape
+// (the admin UI hasn't been migrated yet). We normalize at write time.
+const LegacyPoolComponentsSchema = z.object({
+  vibe: z.number().min(0).max(2),
+  lounging_space: z.number().min(0).max(2),
+  service: z.number().min(0).max(2),
+  uniqueness: z.number().min(0).max(2),
+  pool_first_feel: z.number().min(0).max(2),
+});
+const CanonicalPoolComponentsSchema = z.object({
+  pool_design_setting: z.number().min(0).max(10),
+  view_atmosphere: z.number().min(0).max(10),
+  size_lounging_space: z.number().min(0).max(10),
+  access_seasonality: z.number().min(0).max(10),
+  service_maintenance: z.number().min(0).max(10),
+});
 const PoolScoreSchema = z.object({
   hotel_id: z.string().uuid(),
-  components: z.object({
-    vibe: z.number().min(0).max(2),
-    lounging_space: z.number().min(0).max(2),
-    service: z.number().min(0).max(2),
-    uniqueness: z.number().min(0).max(2),
-    pool_first_feel: z.number().min(0).max(2),
-  }),
+  components: z.union([CanonicalPoolComponentsSchema, LegacyPoolComponentsSchema]),
   best_time: z.string().max(200).nullish().or(z.literal("")),
   pool_type: z.string().max(200).nullish().or(z.literal("")),
   editorial_notes: z.string().max(2000).nullish().or(z.literal("")),
@@ -519,14 +529,15 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => PoolScoreSchema.parse(input))
   .handler(async ({ context, data }) => {
     await ensureAdmin(context.userId);
-    const score = computePoolScore(data.components);
+    const canonical = toCanonicalComponents(data.components);
+    const score = computePoolScore(canonical);
     const { data: row, error } = await supabaseAdmin
       .from("pool_scores")
       .upsert(
         {
           hotel_id: data.hotel_id,
           pool_score_0_10: score,
-          components: data.components,
+          components: canonical,
           best_time: data.best_time || null,
           pool_type: data.pool_type || null,
           editorial_notes: data.editorial_notes || null,
@@ -539,6 +550,7 @@ export const adminUpsertPoolScore = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { pool: row };
   });
+
 
 export const adminListPoolScores = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
