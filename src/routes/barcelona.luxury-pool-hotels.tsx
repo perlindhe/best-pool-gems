@@ -20,13 +20,10 @@ const TOP_10: Hotel[] = [...barcelonaTop10]
   .sort((a, b) => b.score - a.score)
   .slice(0, 10);
 
+// Names in the Top 10 are filtered out from Also Considered so the same
+// hotel never appears in both lists (Cotton House used to show in both).
+const TOP_10_NAMES = new Set(TOP_10.map((h) => h.name));
 const ALSO_CONSIDERED = [
-  {
-    name: "Cotton House Hotel",
-    neighborhood: "Eixample",
-    reason:
-      "Charming plunge on a 19th-century palace, but the water is small enough to be a hot-tub on busy days.",
-  },
   {
     name: "Ohla Eixample",
     neighborhood: "Eixample",
@@ -45,7 +42,14 @@ const ALSO_CONSIDERED = [
     reason:
       "Best low-key neighbourhood pool in Barcelona — held out of this luxury list because the price tier is different.",
   },
-];
+  {
+    name: "Sir Victor Hotel",
+    neighborhood: "Eixample",
+    reason:
+      "Compact rooftop plunge with a sharp design crowd, but the deck fills fast and afternoon shade is limited.",
+  },
+].filter((h) => !TOP_10_NAMES.has(h.name));
+
 
 const SOURCES = [
   { label: "Hotel Arts Barcelona", url: "https://www.ritzcarlton.com/en/hotels/bcnrz-hotel-arts-barcelona/overview/" },
