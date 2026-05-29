@@ -21,7 +21,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/about", changefreq: "monthly", priority: "0.6" },
           { path: "/disclosure", changefreq: "yearly", priority: "0.3" },
           { path: "/cookies", changefreq: "yearly", priority: "0.3" },
-          { path: "/integritetspolicy", changefreq: "yearly", priority: "0.3" },
+          { path: "/privacy", changefreq: "yearly", priority: "0.3" },
         ];
 
         for (const c of cities) {
