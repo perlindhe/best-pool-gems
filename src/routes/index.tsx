@@ -67,6 +67,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const latestGuides = [...guides].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
+  const { top, total, cities: dbCities } = Route.useLoaderData();
 
   return (
     <div className="min-h-screen bg-background">
