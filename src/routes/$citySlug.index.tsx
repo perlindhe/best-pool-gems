@@ -2,6 +2,7 @@ import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/hotels";
+import { getCityCollections, type Collection } from "@/data/collections";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
@@ -20,12 +21,14 @@ export const Route = createFileRoute("/$citySlug/")({
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
+    const cityCollections = getCityCollections(city.slug);
     const [hotelInfo, summary] = await Promise.all([
       getCityHotelPhotos({ data: { citySlug: city.slug } }),
       getCityHubSummaryFn({ data: { citySlug: city.slug } }).catch(() => null),
     ]);
-    return { city, cityGuides, hotelInfo, summary };
+    return { city, cityGuides, cityCollections, hotelInfo, summary };
   },
+
 
   head: ({ params, loaderData }) => {
     const city = loaderData?.city;
