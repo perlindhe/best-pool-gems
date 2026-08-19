@@ -61,8 +61,22 @@ export const Route = createFileRoute("/$citySlug/$articleSlug")({
       </div>
     </div>
   ),
-  component: GuidePage,
+  component: ArticleRoute,
 });
+
+function ArticleRoute() {
+  const data = Route.useLoaderData();
+  if (data.kind === "collection") {
+    return (
+      <CollectionPage
+        collection={data.collection as Collection}
+        hotels={data.hotels}
+        total={data.total}
+      />
+    );
+  }
+  return <GuidePage />;
+}
 
 function renderInline(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -78,8 +92,11 @@ function renderInline(text: string) {
 }
 
 function GuidePage() {
-  const { guide, content } = Route.useLoaderData();
+  const data = Route.useLoaderData();
+  if (data.kind !== "guide") return null;
+  const { guide, content } = data;
   const related = getCityGuides(guide.citySlug)
+
     .filter((g) => g.slug !== guide.slug)
     .slice(0, 3);
 
