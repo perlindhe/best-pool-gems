@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { cities, guides } from "@/data/hotels";
+import { collections } from "@/data/collections";
+
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const BASE_URL = "https://bestpoolhotels.com";
