@@ -468,6 +468,13 @@ function HotelDetailPage() {
       <ComparedWith slug={hotel.slug} />
 
       <SiteFooter />
+
+      <StickyBookingBar
+        name={hotel.name}
+        score={hotel.pool_score_0_10}
+        url={hotel.affiliate_url ?? hotel.booking_url}
+      />
+      <div className="h-20 md:hidden" aria-hidden="true" />
     </div>
   );
 }
