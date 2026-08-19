@@ -16,9 +16,9 @@ import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolic
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as CitySlugRouteImport } from './routes/$citySlug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as CitySlugIndexRouteImport } from './routes/$citySlug.index'
 import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
 import { Route as ComparePairRouteImport } from './routes/compare.$pair'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
@@ -70,11 +70,6 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CitySlugRoute = CitySlugRouteImport.update({
-  id: '/$citySlug',
-  path: '/$citySlug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -83,6 +78,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CitySlugIndexRoute = CitySlugIndexRouteImport.update({
+  id: '/$citySlug/',
+  path: '/$citySlug/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelsSlugRoute = HotelsSlugRouteImport.update({
@@ -172,7 +172,6 @@ const ApiPublicHooksAutoScoreAllRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
@@ -185,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
   '/hotels/$slug': typeof HotelsSlugRoute
+  '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
@@ -199,7 +199,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
@@ -212,6 +211,7 @@ export interface FileRoutesByTo {
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
   '/hotels/$slug': typeof HotelsSlugRoute
+  '/$citySlug': typeof CitySlugIndexRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
@@ -227,7 +227,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$citySlug': typeof CitySlugRouteWithChildren
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
   '/disclosure': typeof DisclosureRoute
@@ -240,6 +239,7 @@ export interface FileRoutesById {
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
   '/hotels/$slug': typeof HotelsSlugRoute
+  '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
@@ -256,7 +256,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
@@ -269,6 +268,7 @@ export interface FileRouteTypes {
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
     | '/hotels/$slug'
+    | '/$citySlug/'
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
@@ -283,7 +283,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
@@ -296,6 +295,7 @@ export interface FileRouteTypes {
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
     | '/hotels/$slug'
+    | '/$citySlug'
     | '/admin'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
@@ -310,7 +310,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/$citySlug'
     | '/about'
     | '/cookies'
     | '/disclosure'
@@ -323,6 +322,7 @@ export interface FileRouteTypes {
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
     | '/hotels/$slug'
+    | '/$citySlug/'
     | '/admin/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
@@ -338,7 +338,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CitySlugRoute: typeof CitySlugRouteWithChildren
   AboutRoute: typeof AboutRoute
   CookiesRoute: typeof CookiesRoute
   DisclosureRoute: typeof DisclosureRoute
@@ -350,6 +349,7 @@ export interface RootRouteChildren {
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   ComparePairRoute: typeof ComparePairRoute
   HotelsSlugRoute: typeof HotelsSlugRoute
+  CitySlugIndexRoute: typeof CitySlugIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
@@ -413,13 +413,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$citySlug': {
-      id: '/$citySlug'
-      path: '/$citySlug'
-      fullPath: '/$citySlug'
-      preLoaderRoute: typeof CitySlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -432,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$citySlug/': {
+      id: '/$citySlug/'
+      path: '/$citySlug'
+      fullPath: '/$citySlug/'
+      preLoaderRoute: typeof CitySlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hotels/$slug': {
@@ -542,18 +542,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface CitySlugRouteChildren {
-  CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
-}
-
-const CitySlugRouteChildren: CitySlugRouteChildren = {
-  CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
-}
-
-const CitySlugRouteWithChildren = CitySlugRoute._addFileChildren(
-  CitySlugRouteChildren,
-)
-
 interface ApiPublicHotelsRouteChildren {
   ApiPublicHotelsSlugRoute: typeof ApiPublicHotelsSlugRoute
 }
@@ -568,7 +556,6 @@ const ApiPublicHotelsRouteWithChildren = ApiPublicHotelsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CitySlugRoute: CitySlugRouteWithChildren,
   AboutRoute: AboutRoute,
   CookiesRoute: CookiesRoute,
   DisclosureRoute: DisclosureRoute,
@@ -580,6 +567,7 @@ const rootRouteChildren: RootRouteChildren = {
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   ComparePairRoute: ComparePairRoute,
   HotelsSlugRoute: HotelsSlugRoute,
+  CitySlugIndexRoute: CitySlugIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
