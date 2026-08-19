@@ -119,7 +119,7 @@ export function PoolFactsTable({ facts }: { facts: PoolFacts | null | undefined 
               </dt>
               <dd className="text-foreground/90">
                 {r.value}
-                {!isCited(facts, r.keys) && (
+                {facts.sources && !isCited(facts, r.keys) && (
                   <span
                     title="No source citation recorded yet for this detail."
                     className="ml-2 align-middle text-[10px] uppercase tracking-[0.16em] text-muted-foreground"
@@ -134,7 +134,7 @@ export function PoolFactsTable({ facts }: { facts: PoolFacts | null | undefined 
       )}
 
       <p className="border-t border-border/40 bg-surface/40 px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-        Facts without a recorded citation are marked verification pending
+        Only facts confirmed by the hotel's own site or 2+ sources are shown as verified
       </p>
     </div>
   );
