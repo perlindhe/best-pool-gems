@@ -30,7 +30,8 @@ export type CanonicalHotel = {
   pool_components: Record<string, number> | null;
   best_time: string | null;
   pool_type: string | null;
-  pool_facts: Record<string, unknown> | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  pool_facts: Record<string, any> | null;
   editorial_notes: string | null;
   pool_score_updated_at: string | null;
   meta_rating_0_100: number | null;
@@ -43,8 +44,10 @@ export type CanonicalHotel = {
   previous_names: string[] | null;
   canonical_hotel_id: string | null;
   verification_status: VerificationState;
-  verification_sources: unknown;
-  fact_verification: Record<string, unknown> | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  verification_sources: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fact_verification: Record<string, any> | null;
   last_verified_date: string | null;
   pool_count: number | null;
   indoor: boolean | null;
