@@ -180,6 +180,25 @@ function RankingsPage() {
               </select>
             </label>
 
+            <label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Pool size
+              <select
+                value={search.poolSize ?? ""}
+                onChange={(e) =>
+                  setSearch({
+                    poolSize: (e.target.value || undefined) as Search["poolSize"],
+                  })
+                }
+                className="ml-2 rounded-sm border border-border/60 bg-background px-2 py-1.5 text-xs uppercase tracking-[0.15em] text-foreground"
+              >
+                <option value="">Any</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+                <option value="very_large">Very large</option>
+              </select>
+            </label>
+
             {activeCount > 0 && (
               <button
                 type="button"
