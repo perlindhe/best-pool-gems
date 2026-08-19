@@ -5,12 +5,13 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 async function ensureAdmin(userId: string) {
   const { data, error } = await supabaseAdmin
-    .from("profiles")
-    .select("is_admin")
+    .from("user_roles")
+    .select("role")
     .eq("user_id", userId)
+    .eq("role", "admin")
     .maybeSingle();
   if (error) throw new Error(error.message);
-  if (!data?.is_admin) throw new Error("Forbidden: admin only");
+  if (!data) throw new Error("Forbidden: admin only");
 }
 
 function getKey() {
