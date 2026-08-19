@@ -3,8 +3,49 @@ import heroImg from "@/assets/hero-pool.jpg";
 import { cities, guides } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { VerificationBadge } from "@/components/VerificationBadge";
+import { listRankedHotels, listRankingFacets } from "@/lib/rankings.functions";
+
+const DISCOVERY_FILTERS = [
+  { label: "Rooftop pools", search: { rooftop: true } },
+  { label: "Infinity edges", search: { infinity: true } },
+  { label: "Heated all year", search: { heated: true, yearRound: true } },
+  { label: "Adults-only", search: { adultsOnly: true } },
+  { label: "Family-friendly", search: { familyFriendly: true } },
+  { label: "Beachfront", search: { beachfront: true } },
+  { label: "Score 9+", search: { minScore: 9 } },
+] as const;
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const [top, facets] = await Promise.all([
+      listRankedHotels({ data: { limit: 6, verifiedOnly: true } }),
+      listRankingFacets(),
+    ]);
+    return { top: top.hotels, total: top.total, cities: facets.cities.slice(0, 8) };
+  },
+  errorComponent: ({ error }) => (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-6 py-32 text-center">
+        <h1 className="font-display text-5xl text-primary">Couldn't load the rankings</h1>
+        <p className="mt-4 text-muted-foreground">{error.message}</p>
+        <Link to="/rankings" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
+          Browse all pools →
+        </Link>
+      </div>
+      <SiteFooter />
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-6 py-32 text-center">
+        <h1 className="font-display text-5xl text-primary">Page not found</h1>
+      </div>
+      <SiteFooter />
+    </div>
+  ),
   head: () => ({
     meta: [
       { title: "Best hotel pools — Best Pool Hotels" },
@@ -26,6 +67,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const latestGuides = [...guides].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
+  const { top, total, cities: dbCities } = Route.useLoaderData();
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,6 +108,98 @@ function Home() {
               How we rank
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Discovery — live from the pool database */}
+      <section className="border-b border-border/50 bg-surface/30">
+        <div className="mx-auto max-w-7xl px-6 py-20">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">Start exploring</p>
+              <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
+                {total} verified pools
+              </h2>
+              <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+                Every pool is scored on the same five criteria and marked with its verification
+                state. Filter the full list, or jump straight into a destination.
+              </p>
+            </div>
+            <Link
+              to="/rankings"
+              className="rounded-full border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.2em] transition hover:border-primary hover:bg-primary/10"
+            >
+              All rankings
+            </Link>
+          </div>
+
+          <ul className="mt-8 flex flex-wrap gap-2">
+            {DISCOVERY_FILTERS.map((f) => (
+              <li key={f.label}>
+                <Link
+                  to="/rankings"
+                  search={f.search}
+                  className="inline-block rounded-full border border-border/70 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-foreground/85 transition hover:border-primary hover:text-primary"
+                >
+                  {f.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {top.length > 0 && (
+            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {top.map((h) => (
+                <Link
+                  key={h.id}
+                  to="/hotels/$slug"
+                  params={{ slug: h.slug }}
+                  className="group overflow-hidden rounded-xl border border-border/60 bg-surface/50 transition hover:border-primary/60"
+                >
+                  {(h.hero_photo_url || h.cover_image_url) && (
+                    <img
+                      src={(h.hero_photo_url || h.cover_image_url) as string}
+                      alt={`Pool at ${h.name}`}
+                      width={640}
+                      height={420}
+                      loading="lazy"
+                      className="h-48 w-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  )}
+                  <div className="p-5">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
+                      {h.city}
+                      {h.pool_score_0_10 != null ? ` · ${h.pool_score_0_10.toFixed(1)}/10` : ""}
+                    </p>
+                    <h3 className="mt-2 font-display text-2xl tracking-wide group-hover:text-primary">
+                      {h.name}
+                    </h3>
+                    <VerificationBadge
+                      className="mt-4"
+                      status={h.verification_status}
+                      date={h.last_verified_date}
+                    />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {dbCities.length > 0 && (
+            <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
+              {dbCities.map((c) => (
+                <li key={c.city_slug}>
+                  <Link
+                    to="/rankings"
+                    search={{ city: c.city_slug }}
+                    className="transition hover:text-primary"
+                  >
+                    {c.city} <span className="text-foreground/50">({c.count})</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
 

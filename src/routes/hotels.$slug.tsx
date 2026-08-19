@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
+import { VerificationBadge } from "@/components/VerificationBadge";
 import { getHotelBySlug } from "@/lib/hotel-detail.functions";
 import type { HotelPhoto } from "@/server/hotel-detail.server";
 
@@ -116,6 +117,24 @@ function HotelDetailPage() {
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
+  const keyFacts: string[] = [
+    hotel.rooftop ? "Rooftop" : null,
+    hotel.infinity ? "Infinity edge" : null,
+    hotel.heated_pool ? "Heated" : null,
+    hotel.year_round ? "Year-round" : null,
+    hotel.indoor && hotel.outdoor
+      ? "Indoor + outdoor"
+      : hotel.indoor
+        ? "Indoor"
+        : hotel.outdoor
+          ? "Outdoor"
+          : null,
+    hotel.saltwater ? "Saltwater" : null,
+    hotel.adults_only ? "Adults only" : hotel.family_friendly ? "Family friendly" : null,
+    hotel.beachfront ? "Beachfront" : null,
+    hotel.pool_view ? `${hotel.pool_view} view` : null,
+    hotel.pool_count && hotel.pool_count > 1 ? `${hotel.pool_count} pools` : null,
+  ].filter((f): f is string => Boolean(f));
   const gallery = photos.slice(1, 19);
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
@@ -154,6 +173,31 @@ function HotelDetailPage() {
               {hotel.pool_type}
               {hotel.best_time ? ` · best ${hotel.best_time}` : ""}
             </p>
+          )}
+
+          {/* Trust + key pool facts, above the fold */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <VerificationBadge
+              status={hotel.verification_status}
+              date={hotel.last_verified_date}
+            />
+            {hotel.pool_score_0_10 != null && (
+              <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/60 bg-primary/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
+                Pool score {hotel.pool_score_0_10.toFixed(1)}/10
+              </span>
+            )}
+          </div>
+          {keyFacts.length > 0 && (
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {keyFacts.map((f) => (
+                <li
+                  key={f}
+                  className="rounded-full border border-border/70 bg-background/40 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-foreground/85 backdrop-blur"
+                >
+                  {f}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </section>
