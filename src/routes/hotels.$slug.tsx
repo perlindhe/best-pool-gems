@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
+import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
 import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
