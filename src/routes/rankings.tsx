@@ -336,6 +336,11 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
           )}
         </div>
 
+        <VerificationBadge
+          status={hotel.verification_status}
+          date={hotel.last_verified_date ?? hotel.pool_score_updated_at}
+        />
+
         <PoolFactsTable facts={hotel.pool_facts} />
 
         <div className="mt-auto flex flex-wrap items-center gap-4 pt-2 text-xs uppercase tracking-[0.18em]">
