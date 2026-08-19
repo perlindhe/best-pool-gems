@@ -223,6 +223,14 @@ function CityHub() {
         </section>
       )}
 
+      {/* Off season pool hotels — heated outdoor pools */}
+      <OffSeasonPoolHotels
+        cityName={city.name}
+        citySlug={city.slug}
+        rankedHotels={city.hotels}
+        dbHotels={offSeason}
+      />
+
       {/* Guides + data-driven collections for this city */}
       {(cityGuides.length > 0 || cityCollections.length > 0) && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
