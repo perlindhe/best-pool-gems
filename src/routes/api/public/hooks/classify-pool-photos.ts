@@ -33,10 +33,13 @@ export const Route = createFileRoute("/api/public/hooks/classify-pool-photos")({
         const url = new URL(request.url);
         const force = url.searchParams.get("force") === "1";
 
-        const { data: hotels, error } = await supabaseAdmin
+        const citySlug = url.searchParams.get("city_slug");
+        let hotelsQuery = supabaseAdmin
           .from("hotels")
           .select("id, name")
           .eq("is_published", true);
+        if (citySlug) hotelsQuery = hotelsQuery.eq("city_slug", citySlug);
+        const { data: hotels, error } = await hotelsQuery;
         if (error) return json({ error: error.message }, 500);
 
         const results: Array<{

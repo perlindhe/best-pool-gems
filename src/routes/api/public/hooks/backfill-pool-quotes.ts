@@ -33,6 +33,8 @@ export const Route = createFileRoute("/api/public/hooks/backfill-pool-quotes")({
           .select("id, name")
           .eq("is_published", true);
         if (onlyHotelId) query = query.eq("id", onlyHotelId);
+        const citySlug = url.searchParams.get("city_slug");
+        if (citySlug) query = query.eq("city_slug", citySlug);
 
         const { data: hotels, error } = await query;
         if (error) return json({ error: error.message }, 500);
