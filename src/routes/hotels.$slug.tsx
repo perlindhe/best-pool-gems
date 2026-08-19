@@ -4,6 +4,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
+import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
 import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
 import type { HotelPhoto } from "@/server/hotel-detail.server";
 
@@ -191,6 +193,7 @@ function HotelDetailPage() {
               status={hotel.verification_status}
               date={hotel.last_verified_date}
             />
+            <VerificationMethodBadge method={hotel.verification_method} />
             {hotel.pool_score_0_10 != null && (
               <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/60 bg-primary/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
                 Pool score {hotel.pool_score_0_10.toFixed(1)}/10
@@ -281,28 +284,14 @@ function HotelDetailPage() {
               </p>
             </>
           )}
-          <div className="mt-8 flex flex-wrap gap-4 text-xs uppercase tracking-[0.2em]">
-            {hotel.website_url && (
-              <a
-                href={hotel.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-sm border border-primary/60 px-4 py-2 text-primary transition hover:bg-primary hover:text-primary-foreground"
-              >
-                Visit website ↗
-              </a>
-            )}
-            {hotel.booking_url && (
-              <a
-                href={hotel.booking_url}
-                target="_blank"
-                rel="sponsored noopener noreferrer"
-                className="rounded-sm border border-primary/60 px-4 py-2 text-primary transition hover:bg-primary hover:text-primary-foreground"
-              >
-                Book ↗
-              </a>
-            )}
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <CheckAvailability url={hotel.affiliate_url ?? hotel.booking_url} />
+            <OfficialSiteLink url={hotel.official_url ?? hotel.website_url} />
           </div>
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+            {verificationMethodDetail(hotel.verification_method)} Booking links may earn us a
+            commission; they never influence the Pool Score or the ranking order.
+          </p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Pool facts</p>
