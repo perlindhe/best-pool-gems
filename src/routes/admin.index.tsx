@@ -20,9 +20,9 @@ import {
   adminAutoScoreHotel,
   adminRefreshHotelPhotos,
   adminListPoolScores,
-} from "@/server/admin.functions";
-import { googleSearchPlace, googleFetchRating } from "@/server/google-places.functions";
-import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/server/tripadvisor.functions";
+} from "@/lib/admin.functions";
+import { googleSearchPlace, googleFetchRating } from "@/lib/google-places.functions";
+import { tripadvisorSearchLocation, tripadvisorFetchRating } from "@/lib/tripadvisor.functions";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Admin – Best Pool Hotels" }, { name: "robots", content: "noindex" }] }),

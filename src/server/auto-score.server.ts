@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { computePoolScore, toCanonicalComponents } from "./scoring";
+import { computePoolScore, toCanonicalComponents } from "@/lib/scoring";
 
 
 // ============================================================================

@@ -496,7 +496,7 @@ export const adminAutoScoreHotel = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ hotel_id: z.string().uuid() }).parse(input))
   .handler(async ({ context, data }) => {
     await ensureAdmin(context.userId);
-    const { autoScoreHotelById } = await import("./auto-score.server");
+    const { autoScoreHotelById } = await import("@/server/auto-score.server");
     return autoScoreHotelById(data.hotel_id);
   });
 
@@ -642,6 +642,6 @@ export const adminRefreshHotelPhotos = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ hotel_id: z.string().uuid() }).parse(input))
   .handler(async ({ context, data }) => {
     await ensureAdmin(context.userId);
-    const { refreshHotelPhotos } = await import("./hotel-photos.server");
+    const { refreshHotelPhotos } = await import("@/server/hotel-photos.server");
     return refreshHotelPhotos(data.hotel_id);
   });

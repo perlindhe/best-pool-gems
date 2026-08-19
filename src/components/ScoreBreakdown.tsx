@@ -1,4 +1,4 @@
-import { POOL_CRITERIA, POOL_WEIGHTS, toCanonicalComponents } from "@/server/scoring";
+import { POOL_CRITERIA, POOL_WEIGHTS, toCanonicalComponents } from "@/lib/scoring";
 
 type SourceRow = { source: string; normalized: number; rating_count: number };
 
