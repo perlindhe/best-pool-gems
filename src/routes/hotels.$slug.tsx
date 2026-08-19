@@ -117,6 +117,24 @@ function HotelDetailPage() {
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
+  const keyFacts: string[] = [
+    hotel.rooftop ? "Rooftop" : null,
+    hotel.infinity ? "Infinity edge" : null,
+    hotel.heated_pool ? "Heated" : null,
+    hotel.year_round ? "Year-round" : null,
+    hotel.indoor && hotel.outdoor
+      ? "Indoor + outdoor"
+      : hotel.indoor
+        ? "Indoor"
+        : hotel.outdoor
+          ? "Outdoor"
+          : null,
+    hotel.saltwater ? "Saltwater" : null,
+    hotel.adults_only ? "Adults only" : hotel.family_friendly ? "Family friendly" : null,
+    hotel.beachfront ? "Beachfront" : null,
+    hotel.pool_view ? `${hotel.pool_view} view` : null,
+    hotel.pool_count && hotel.pool_count > 1 ? `${hotel.pool_count} pools` : null,
+  ].filter((f): f is string => Boolean(f));
   const gallery = photos.slice(1, 19);
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
