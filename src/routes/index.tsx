@@ -3,8 +3,28 @@ import heroImg from "@/assets/hero-pool.jpg";
 import { cities, guides } from "@/data/hotels";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { VerificationBadge } from "@/components/VerificationBadge";
+import { listRankedHotels, listRankingFacets } from "@/lib/rankings.functions";
+
+const DISCOVERY_FILTERS = [
+  { label: "Rooftop pools", search: { rooftop: true } },
+  { label: "Infinity edges", search: { infinity: true } },
+  { label: "Heated all year", search: { heated: true, yearRound: true } },
+  { label: "Adults-only", search: { adultsOnly: true } },
+  { label: "Family-friendly", search: { familyFriendly: true } },
+  { label: "Beachfront", search: { beachfront: true } },
+  { label: "Score 9+", search: { minScore: 9 } },
+] as const;
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const [top, facets] = await Promise.all([
+      listRankedHotels({ data: { limit: 6, verifiedOnly: true } }),
+      listRankingFacets(),
+    ]);
+    return { top: top.hotels, total: top.total, cities: facets.cities.slice(0, 8) };
+  },
+  errorComponent: () => <Home />,
   head: () => ({
     meta: [
       { title: "Best hotel pools — Best Pool Hotels" },
