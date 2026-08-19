@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
  */
 
 export const CANONICAL_SELECT =
-  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_sources, fact_verification, last_verified_date, pool_count, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur";
+  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur";
 
 export type VerificationState = "verified" | "partially_verified" | "research_pending";
 
@@ -23,6 +23,7 @@ export type CanonicalHotel = {
   booking_url: string | null;
   official_url: string | null;
   affiliate_url: string | null;
+  verification_method: string | null;
   cover_image_url: string | null;
   hero_photo_url?: string | null;
   rank_position: number | null;
