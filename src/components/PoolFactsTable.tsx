@@ -19,7 +19,7 @@ const POOL_TYPE_LABEL: Record<PoolDescriptor["type"], string> = {
   jacuzzi: "Jacuzzi",
 };
 
-type Row = { label: string; value: string };
+type Row = { label: string; value: string; keys: string[] };
 
 function buildRows(f: PoolFacts): Row[] {
   const rows: Row[] = [];
@@ -27,12 +27,12 @@ function buildRows(f: PoolFacts): Row[] {
     v === true ? "Yes" : v === false ? "No" : null;
 
   if (f.pool_count != null)
-    rows.push({ label: "Pools", value: String(f.pool_count) });
+    rows.push({ label: "Pools", value: String(f.pool_count), keys: ["pool_count"] });
   if (f.size_estimate)
-    rows.push({ label: "Size", value: SIZE_LABEL[f.size_estimate] ?? f.size_estimate });
+    rows.push({ label: "Size", value: SIZE_LABEL[f.size_estimate] ?? f.size_estimate, keys: ["size_estimate"] });
   if (f.length_m != null)
-    rows.push({ label: "Length", value: `${f.length_m} m` });
-  if (f.view) rows.push({ label: "View", value: f.view });
+    rows.push({ label: "Length", value: `${f.length_m} m`, keys: ["length_m"] });
+  if (f.view) rows.push({ label: "View", value: f.view, keys: ["view"] });
 
   const setting: string[] = [];
   if (f.is_rooftop) setting.push("Rooftop");
@@ -40,13 +40,13 @@ function buildRows(f: PoolFacts): Row[] {
   if (f.has_indoor && f.has_outdoor) setting.push("Indoor + outdoor");
   else if (f.has_indoor) setting.push("Indoor");
   else if (f.has_outdoor) setting.push("Outdoor");
-  if (setting.length) rows.push({ label: "Setting", value: setting.join(" · ") });
+  if (setting.length) rows.push({ label: "Setting", value: setting.join(" · "), keys: ["is_rooftop", "is_infinity", "has_indoor", "has_outdoor"] });
 
-  if (yn(f.is_heated)) rows.push({ label: "Heated", value: yn(f.is_heated)! });
-  if (yn(f.is_saltwater)) rows.push({ label: "Saltwater", value: yn(f.is_saltwater)! });
+  if (yn(f.is_heated)) rows.push({ label: "Heated", value: yn(f.is_heated)!, keys: ["is_heated"] });
+  if (yn(f.is_saltwater)) rows.push({ label: "Saltwater", value: yn(f.is_saltwater)!, keys: ["is_saltwater"] });
   if (yn(f.year_round))
-    rows.push({ label: "Year-round", value: yn(f.year_round)! });
-  if (f.season) rows.push({ label: "Season", value: f.season });
+    rows.push({ label: "Year-round", value: yn(f.year_round)!, keys: ["year_round"] });
+  if (f.season) rows.push({ label: "Season", value: f.season, keys: ["season"] });
 
   const amenities: string[] = [];
   if (f.has_jacuzzi) amenities.push("Jacuzzi");
@@ -55,10 +55,10 @@ function buildRows(f: PoolFacts): Row[] {
   if (f.has_poolside_food) amenities.push("Poolside food");
   if (f.has_kids_pool) amenities.push("Kids' pool");
   if (amenities.length)
-    rows.push({ label: "Amenities", value: amenities.join(" · ") });
+    rows.push({ label: "Amenities", value: amenities.join(" · "), keys: ["has_jacuzzi", "has_swim_up_bar", "has_cabanas", "has_poolside_food", "has_kids_pool"] });
 
   if (yn(f.adults_only))
-    rows.push({ label: "Adults only", value: yn(f.adults_only)! });
+    rows.push({ label: "Adults only", value: yn(f.adults_only)!, keys: ["adults_only"] });
 
   return rows;
 }
@@ -72,6 +72,12 @@ function poolSubtitle(p: PoolDescriptor): string {
   if (p.adults_only === true) bits.push("Adults only");
   if (p.season) bits.push(p.season);
   return bits.join(" · ");
+}
+
+function isCited(f: PoolFacts, keys: string[]) {
+  const sources = f.sources;
+  if (!sources) return false;
+  return keys.some((k) => (sources[k]?.length ?? 0) > 0);
 }
 
 export function PoolFactsTable({ facts }: { facts: PoolFacts | null | undefined }) {
@@ -111,14 +117,24 @@ export function PoolFactsTable({ facts }: { facts: PoolFacts | null | undefined 
               <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                 {r.label}
               </dt>
-              <dd className="text-foreground/90">{r.value}</dd>
+              <dd className="text-foreground/90">
+                {r.value}
+                {facts.sources && !isCited(facts, r.keys) && (
+                  <span
+                    title="No source citation recorded yet for this detail."
+                    className="ml-2 align-middle text-[10px] uppercase tracking-[0.16em] text-muted-foreground"
+                  >
+                    · Verification pending
+                  </span>
+                )}
+              </dd>
             </div>
           ))}
         </dl>
       )}
 
       <p className="border-t border-border/40 bg-surface/40 px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-        Only facts confirmed by 2+ sources or the hotel's own site are shown
+        Only facts confirmed by the hotel's own site or 2+ sources are shown as verified
       </p>
     </div>
   );

@@ -30,6 +30,9 @@ export type HotelDetail = {
   why_included: string | null;
   why_not_higher: string | null;
   verification_status: "verified" | "partially_verified" | "research_pending" | null;
+  verification_method: "personally_visited" | "verified_with_hotel" | "multiple_sources" | "research_pending" | null;
+  affiliate_url: string | null;
+  official_url: string | null;
   pool_count: number | null;
   rooftop: boolean | null;
   infinity: boolean | null;

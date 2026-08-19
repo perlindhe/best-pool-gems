@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
+import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { listRankedHotels, listRankingFacets, type RankedHotel } from "@/lib/rankings.functions";
 
@@ -26,6 +27,7 @@ type ToggleKey = (typeof TOGGLES)[number]["key"];
 type Search = {
   city?: string;
   minScore?: number;
+  poolSize?: "small" | "medium" | "large" | "very_large";
   page?: number;
 } & Partial<Record<ToggleKey, boolean>>;
 
@@ -39,6 +41,11 @@ export const Route = createFileRoute("/rankings")({
     if (typeof search.city === "string" && search.city) out.city = search.city.slice(0, 60);
     const min = Number(search.minScore);
     if (Number.isFinite(min) && min > 0 && min <= 10) out.minScore = min;
+    if (
+      typeof search.poolSize === "string" &&
+      ["small", "medium", "large", "very_large"].includes(search.poolSize)
+    )
+      out.poolSize = search.poolSize as Search["poolSize"];
     const page = Number(search.page);
     if (Number.isFinite(page) && page > 1) out.page = Math.min(Math.floor(page), 200);
     for (const t of TOGGLES) {
@@ -50,10 +57,11 @@ export const Route = createFileRoute("/rankings")({
   loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {
     const page = deps.page ?? 1;
-    const { city, minScore, ...rest } = deps;
+    const { city, minScore, poolSize, ...rest } = deps;
     const filters: Record<string, unknown> = { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE };
     if (city) filters.city = city;
     if (minScore) filters.minScore = minScore;
+    if (poolSize) filters.poolSize = poolSize;
     for (const t of TOGGLES) if (rest[t.key]) filters[t.key] = true;
     const [result, facets] = await Promise.all([
       listRankedHotels({ data: filters }),
@@ -169,6 +177,25 @@ function RankingsPage() {
                     {v.toFixed(1)}+
                   </option>
                 ))}
+              </select>
+            </label>
+
+            <label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Pool size
+              <select
+                value={search.poolSize ?? ""}
+                onChange={(e) =>
+                  setSearch({
+                    poolSize: (e.target.value || undefined) as Search["poolSize"],
+                  })
+                }
+                className="ml-2 rounded-sm border border-border/60 bg-background px-2 py-1.5 text-xs uppercase tracking-[0.15em] text-foreground"
+              >
+                <option value="">Any</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+                <option value="very_large">Very large</option>
               </select>
             </label>
 
@@ -361,16 +388,11 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
               Website ↗
             </a>
           )}
-          {hotel.booking_url && (
-            <a
-              href={hotel.booking_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              Book ↗
-            </a>
-          )}
+          <CheckAvailability
+            url={hotel.affiliate_url ?? hotel.booking_url}
+            size="sm"
+            className="ml-auto"
+          />
         </div>
       </div>
     </article>

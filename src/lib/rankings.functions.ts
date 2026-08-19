@@ -66,6 +66,7 @@ export type RankedHotel = {
   pool_score_updated_at: string | null;
   meta_computed_at: string | null;
   verification_status?: "verified" | "partially_verified" | "research_pending";
+  verification_method?: "personally_visited" | "verified_with_hotel" | "multiple_sources" | "research_pending" | null;
   last_verified_date?: string | null;
   rooftop?: boolean | null;
   infinity?: boolean | null;

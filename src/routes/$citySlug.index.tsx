@@ -285,6 +285,7 @@ function CityHub() {
                 hotel={h}
                 slug={info?.slug ?? null}
                 photoUrl={info?.url ?? null}
+                bookingUrl={info?.bookingUrl ?? null}
               />
             );
           })}

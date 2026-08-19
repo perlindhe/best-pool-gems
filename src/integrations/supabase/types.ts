@@ -143,6 +143,7 @@ export type Database = {
           sources: Json | null
           tags: string[] | null
           updated_at: string
+          verification_method: string | null
           verification_sources: Json | null
           verification_status: Database["public"]["Enums"]["verification_status"]
           vibe: string | null
@@ -212,6 +213,7 @@ export type Database = {
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
+          verification_method?: string | null
           verification_sources?: Json | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
           vibe?: string | null
@@ -281,6 +283,7 @@ export type Database = {
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
+          verification_method?: string | null
           verification_sources?: Json | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
           vibe?: string | null
@@ -651,6 +654,7 @@ export type Database = {
           slug: string | null
           sources_used: Json | null
           tags: string[] | null
+          verification_method: string | null
           verification_sources: Json | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]

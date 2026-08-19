@@ -18,7 +18,7 @@ export async function getHotelDetail(slug: string) {
   const { data: hotel, error } = await supabaseAdmin
     .from("public_hotels_view")
     .select(
-      "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at, verification_status, pool_count, rooftop, infinity, heated_pool, indoor, outdoor, adults_only, family_friendly, beachfront, saltwater, year_round, pool_size, pool_view",
+      "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at, verification_status, verification_method, affiliate_url, official_url, pool_count, rooftop, infinity, heated_pool, indoor, outdoor, adults_only, family_friendly, beachfront, saltwater, year_round, pool_size, pool_view",
     )
     .eq("slug", slug)
     .maybeSingle();

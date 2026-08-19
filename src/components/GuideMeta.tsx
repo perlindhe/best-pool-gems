@@ -31,7 +31,7 @@ function formatDate(iso: string) {
 export function GuideMeta({
   author = "BestPoolHotels Editorial",
   authorRole = "Independent travel editors",
-  authorBio = "BestPoolHotels is an independent editorial team that reviews hotel pools on the ground each season and re-verifies every fact against the hotel's own website before publishing.",
+  authorBio = "BestPoolHotels is an independent editorial team. We verify every pool fact against the hotel's own website plus at least one independent source before publishing, and label separately the hotels an editor has visited in person.",
   publishedDate,
   lastUpdated,
   sources = [],
@@ -46,7 +46,12 @@ export function GuideMeta({
     >
       <div className="grid gap-5 md:grid-cols-[1fr_auto]">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary">By {author}</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
+            By{" "}
+            <a href="/editors" className="underline-offset-2 hover:underline">
+              {author}
+            </a>
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">{authorRole}</p>
           <p className="mt-3 max-w-2xl leading-relaxed text-foreground/85">{authorBio}</p>
         </div>
