@@ -111,6 +111,98 @@ function Home() {
         </div>
       </section>
 
+      {/* Discovery — live from the pool database */}
+      <section className="border-b border-border/50 bg-surface/30">
+        <div className="mx-auto max-w-7xl px-6 py-20">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">Start exploring</p>
+              <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
+                {total} pools, one database
+              </h2>
+              <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+                Every pool is scored on the same five criteria and marked with its verification
+                state. Filter the full list, or jump straight into a destination.
+              </p>
+            </div>
+            <Link
+              to="/rankings"
+              className="rounded-full border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.2em] transition hover:border-primary hover:bg-primary/10"
+            >
+              All rankings
+            </Link>
+          </div>
+
+          <ul className="mt-8 flex flex-wrap gap-2">
+            {DISCOVERY_FILTERS.map((f) => (
+              <li key={f.label}>
+                <Link
+                  to="/rankings"
+                  search={f.search}
+                  className="inline-block rounded-full border border-border/70 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-foreground/85 transition hover:border-primary hover:text-primary"
+                >
+                  {f.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {top.length > 0 && (
+            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {top.map((h) => (
+                <Link
+                  key={h.id}
+                  to="/hotels/$slug"
+                  params={{ slug: h.slug }}
+                  className="group overflow-hidden rounded-xl border border-border/60 bg-surface/50 transition hover:border-primary/60"
+                >
+                  {(h.hero_photo_url || h.cover_image_url) && (
+                    <img
+                      src={(h.hero_photo_url || h.cover_image_url) as string}
+                      alt={`Pool at ${h.name}`}
+                      width={640}
+                      height={420}
+                      loading="lazy"
+                      className="h-48 w-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  )}
+                  <div className="p-5">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
+                      {h.city}
+                      {h.pool_score_0_10 != null ? ` · ${h.pool_score_0_10.toFixed(1)}/10` : ""}
+                    </p>
+                    <h3 className="mt-2 font-display text-2xl tracking-wide group-hover:text-primary">
+                      {h.name}
+                    </h3>
+                    <VerificationBadge
+                      className="mt-4"
+                      status={h.verification_status}
+                      date={h.last_verified_date}
+                    />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {dbCities.length > 0 && (
+            <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
+              {dbCities.map((c) => (
+                <li key={c.city_slug}>
+                  <Link
+                    to="/rankings"
+                    search={{ city: c.city_slug }}
+                    className="transition hover:text-primary"
+                  >
+                    {c.city} <span className="text-foreground/50">({c.count})</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
       {/* Latest guides */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="flex items-end justify-between gap-6">
