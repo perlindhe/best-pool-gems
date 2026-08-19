@@ -8,6 +8,7 @@ import bangkokImg from "@/assets/bangkok.jpg";
 import malagaImg from "@/assets/malaga.jpg";
 import losAngelesImg from "@/assets/los-angeles.jpg";
 import sydneyImg from "@/assets/sydney.jpg";
+import creteImg from "@/assets/crete.jpg";
 
 export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
 
