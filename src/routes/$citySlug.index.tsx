@@ -8,8 +8,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
 import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 import { getCityHubSummaryFn } from "@/lib/city-hub.functions";
-import { listOffSeasonHotels } from "@/lib/off-season.functions";
-import { OffSeasonPoolHotels } from "@/components/OffSeasonPoolHotels";
 
 const PAGE_SIZE = 10;
 
@@ -24,12 +22,11 @@ export const Route = createFileRoute("/$citySlug/")({
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
     const cityCollections = getCityCollections(city.slug);
-    const [hotelInfo, summary, offSeason] = await Promise.all([
+    const [hotelInfo, summary] = await Promise.all([
       getCityHotelPhotos({ data: { citySlug: city.slug } }),
       getCityHubSummaryFn({ data: { citySlug: city.slug } }).catch(() => null),
-      listOffSeasonHotels({ data: { citySlug: city.slug } }).catch(() => []),
     ]);
-    return { city, cityGuides, cityCollections, hotelInfo, summary, offSeason };
+    return { city, cityGuides, cityCollections, hotelInfo, summary };
   },
 
 
@@ -115,7 +112,7 @@ export const Route = createFileRoute("/$citySlug/")({
 });
 
 function CityHub() {
-  const { city, cityGuides, cityCollections, hotelInfo, summary, offSeason } = Route.useLoaderData();
+  const { city, cityGuides, cityCollections, hotelInfo, summary } = Route.useLoaderData();
 
 
 
@@ -222,14 +219,6 @@ function CityHub() {
           </div>
         </section>
       )}
-
-      {/* Off season pool hotels — heated outdoor pools */}
-      <OffSeasonPoolHotels
-        cityName={city.name}
-        citySlug={city.slug}
-        rankedHotels={city.hotels}
-        dbHotels={offSeason}
-      />
 
       {/* Guides + data-driven collections for this city */}
       {(cityGuides.length > 0 || cityCollections.length > 0) && (
