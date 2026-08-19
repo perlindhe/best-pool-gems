@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
+import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { listRankedHotels, listRankingFacets, type RankedHotel } from "@/lib/rankings.functions";
 
@@ -361,16 +362,11 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
               Website ↗
             </a>
           )}
-          {hotel.booking_url && (
-            <a
-              href={hotel.booking_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              Book ↗
-            </a>
-          )}
+          <CheckAvailability
+            url={hotel.affiliate_url ?? hotel.booking_url}
+            size="sm"
+            className="ml-auto"
+          />
         </div>
       </div>
     </article>
