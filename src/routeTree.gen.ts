@@ -21,6 +21,7 @@ import { Route as EditorsIndexRouteImport } from './routes/editors.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as CitySlugIndexRouteImport } from './routes/$citySlug.index'
 import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
+import { Route as EditorsSlugRouteImport } from './routes/editors.$slug'
 import { Route as ComparePairRouteImport } from './routes/compare.$pair'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -94,6 +95,11 @@ const CitySlugIndexRoute = CitySlugIndexRouteImport.update({
 const HotelsSlugRoute = HotelsSlugRouteImport.update({
   id: '/hotels/$slug',
   path: '/hotels/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditorsSlugRoute = EditorsSlugRouteImport.update({
+  id: '/editors/$slug',
+  path: '/editors/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComparePairRoute = ComparePairRouteImport.update({
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
+  '/editors/$slug': typeof EditorsSlugRoute
   '/hotels/$slug': typeof HotelsSlugRoute
   '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
+  '/editors/$slug': typeof EditorsSlugRoute
   '/hotels/$slug': typeof HotelsSlugRoute
   '/$citySlug': typeof CitySlugIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
+  '/editors/$slug': typeof EditorsSlugRoute
   '/hotels/$slug': typeof HotelsSlugRoute
   '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
+    | '/editors/$slug'
     | '/hotels/$slug'
     | '/$citySlug/'
     | '/admin/'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
+    | '/editors/$slug'
     | '/hotels/$slug'
     | '/$citySlug'
     | '/admin'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
+    | '/editors/$slug'
     | '/hotels/$slug'
     | '/$citySlug/'
     | '/admin/'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   ComparePairRoute: typeof ComparePairRoute
+  EditorsSlugRoute: typeof EditorsSlugRoute
   HotelsSlugRoute: typeof HotelsSlugRoute
   CitySlugIndexRoute: typeof CitySlugIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -460,6 +473,13 @@ declare module '@tanstack/react-router' {
       path: '/hotels/$slug'
       fullPath: '/hotels/$slug'
       preLoaderRoute: typeof HotelsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editors/$slug': {
+      id: '/editors/$slug'
+      path: '/editors/$slug'
+      fullPath: '/editors/$slug'
+      preLoaderRoute: typeof EditorsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare/$pair': {
@@ -588,6 +608,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   ComparePairRoute: ComparePairRoute,
+  EditorsSlugRoute: EditorsSlugRoute,
   HotelsSlugRoute: HotelsSlugRoute,
   CitySlugIndexRoute: CitySlugIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
