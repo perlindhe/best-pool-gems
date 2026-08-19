@@ -17,6 +17,7 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2 text-sm">
             <li><Link to="/" className="hover:text-primary">Best hotel pools</Link></li>
             <li><Link to="/about" className="hover:text-primary">About Best Pool Hotels</Link></li>
+            <li><Link to="/editors" className="hover:text-primary">Our editors</Link></li>
             <li><Link to="/disclosure" className="hover:text-primary">Affiliate links & disclosure</Link></li>
           </ul>
         </div>
