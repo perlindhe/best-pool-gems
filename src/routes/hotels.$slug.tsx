@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
+import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
 import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
@@ -250,7 +251,24 @@ function HotelDetailPage() {
         </div>
       </section>
 
+      {/* Heated pool spotlight */}
+      <HeatedPoolPanel
+        hotelName={hotel.name}
+        heated={hotel.heated_pool}
+        indoor={hotel.indoor}
+        outdoor={hotel.outdoor}
+        yearRound={hotel.year_round}
+        poolCount={hotel.pool_count}
+        facts={hotel.pool_facts}
+        quotes={quotes}
+        verificationStatus={hotel.verification_status}
+        verificationMethod={hotel.verification_method}
+        lastVerifiedDate={hotel.last_verified_date}
+        officialUrl={hotel.official_url ?? hotel.website_url}
+      />
+
       {/* Score breakdown — explain how we got there */}
+
       <section className="mx-auto max-w-6xl px-6 pb-4">
         <p className="text-xs uppercase tracking-[0.3em] text-primary">Behind the numbers</p>
         <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
