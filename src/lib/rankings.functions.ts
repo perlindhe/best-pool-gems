@@ -50,6 +50,8 @@ export type RankedHotel = {
   neighborhood: string | null;
   website_url: string | null;
   booking_url: string | null;
+  official_url?: string | null;
+  affiliate_url?: string | null;
   cover_image_url: string | null;
   hero_photo_url: string | null;
   rank_position: number | null;
@@ -63,51 +65,45 @@ export type RankedHotel = {
   sources_used: Array<{ source: string; normalized: number; rating_count: number }> | null;
   pool_score_updated_at: string | null;
   meta_computed_at: string | null;
+  verification_status?: "verified" | "partially_verified" | "research_pending";
+  last_verified_date?: string | null;
+  rooftop?: boolean | null;
+  infinity?: boolean | null;
+  heated_pool?: boolean | null;
+  indoor?: boolean | null;
+  outdoor?: boolean | null;
+  adults_only?: boolean | null;
+  family_friendly?: boolean | null;
+  beachfront?: boolean | null;
+  saltwater?: boolean | null;
+  year_round?: boolean | null;
+  pool_size?: string | null;
+  pool_view?: string | null;
 };
 
+export const rankingFiltersSchema = z.object({
+  city: z.string().max(120).optional(),
+  minScore: z.number().min(0).max(10).optional(),
+  rooftop: z.boolean().optional(),
+  infinity: z.boolean().optional(),
+  heated: z.boolean().optional(),
+  yearRound: z.boolean().optional(),
+  indoor: z.boolean().optional(),
+  outdoor: z.boolean().optional(),
+  adultsOnly: z.boolean().optional(),
+  familyFriendly: z.boolean().optional(),
+  beachfront: z.boolean().optional(),
+  saltwater: z.boolean().optional(),
+  verifiedOnly: z.boolean().optional(),
+  poolSize: z.string().max(40).optional(),
+  limit: z.number().min(1).max(100).optional(),
+  offset: z.number().min(0).optional(),
+});
+
 export const listRankedHotels = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    z.object({ city: z.string().max(120).optional() }).parse(input ?? {}),
-  )
+  .inputValidator((input: unknown) => rankingFiltersSchema.parse(input ?? {}))
   .handler(async ({ data }) => {
-    let q = supabaseAdmin
-      .from("public_hotels_view")
-      .select(
-        "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at",
-      );
-    if (data.city) q = q.eq("city_slug", data.city);
-    const { data: rows, error } = await q;
-    if (error) throw new Error(error.message);
-
-    const ids = (rows ?? []).map((r) => r.id as string);
-    const heroByHotel = new Map<string, string>();
-    if (ids.length > 0) {
-      const { data: photos } = await supabaseAdmin
-        .from("hotel_photos")
-        .select("hotel_id, url, position")
-        .in("hotel_id", ids)
-        .order("position", { ascending: true });
-      for (const p of photos ?? []) {
-        const hid = p.hotel_id as string;
-        if (!heroByHotel.has(hid)) heroByHotel.set(hid, p.url as string);
-      }
-    }
-
-    const enriched = (rows ?? []).map((r) => ({
-      ...r,
-      hero_photo_url: heroByHotel.get(r.id as string) ?? r.cover_image_url ?? null,
-    }));
-
-    // Sort: pool_score desc (nulls last), then meta_rating desc (nulls last), then name asc
-    const sorted = enriched.sort((a, b) => {
-      const ap = a.pool_score_0_10 ?? -1;
-      const bp = b.pool_score_0_10 ?? -1;
-      if (bp !== ap) return bp - ap;
-      const am = a.meta_rating_0_100 ?? -1;
-      const bm = b.meta_rating_0_100 ?? -1;
-      if (bm !== am) return bm - am;
-      return (a.name ?? "").localeCompare(b.name ?? "");
-    });
-
-    return { hotels: sorted as RankedHotel[] };
+    const { listCanonicalHotels } = await import("@/server/canonical-hotels.server");
+    const { hotels, total } = await listCanonicalHotels(data);
+    return { hotels: hotels as unknown as RankedHotel[], total };
   });
