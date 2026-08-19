@@ -21,7 +21,7 @@ const seen = new Map();
 
 for (const url of urls) {
   const res = await fetch(BASE + url);
-  const html = await res.text();
+  const html = (await res.text()).replace(/\0/g, "");
   const title = pick(html, /<title[^>]*>([\s\S]*?)<\/title>/i);
   const h1 = pick(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i);
   const problems = [];
