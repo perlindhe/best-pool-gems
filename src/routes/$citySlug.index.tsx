@@ -112,7 +112,16 @@ export const Route = createFileRoute("/$citySlug/")({
 });
 
 function CityHub() {
-  const { city, cityGuides, hotelInfo, summary } = Route.useLoaderData();
+  const { city, cityGuides, cityCollections, hotelInfo, summary } = Route.useLoaderData() as {
+    city: ReturnType<typeof getCity> & object;
+    cityGuides: Guide[];
+    cityCollections: Collection[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hotelInfo: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    summary: any;
+  };
+
 
   const { page } = Route.useSearch();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
