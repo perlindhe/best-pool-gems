@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export type CityHotelInfo = { url: string | null; slug: string };
+export type CityHotelInfo = { url: string | null; slug: string; bookingUrl: string | null };
 export type CityHotelInfoMap = Record<string, CityHotelInfo>;
 
 export const getCityHotelPhotos = createServerFn({ method: "GET" })
@@ -12,7 +12,7 @@ export const getCityHotelPhotos = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<CityHotelInfoMap> => {
     const { data: hotels, error } = await supabaseAdmin
       .from("hotels")
-      .select("id, name, slug, cover_image_url")
+      .select("id, name, slug, cover_image_url, affiliate_url, booking_url")
       .eq("city_slug", data.citySlug)
       .eq("is_published", true);
     if (error || !hotels) return {};
@@ -37,6 +37,7 @@ export const getCityHotelPhotos = createServerFn({ method: "GET" })
       map[h.name.toLowerCase()] = {
         url: firstByHotel.get(h.id) ?? h.cover_image_url ?? null,
         slug: h.slug,
+        bookingUrl: h.affiliate_url ?? h.booking_url ?? null,
       };
     }
     return map;
