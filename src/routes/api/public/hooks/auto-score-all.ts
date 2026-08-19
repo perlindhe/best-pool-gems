@@ -36,15 +36,20 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
           0,
         );
 
-        const { count: total } = await supabaseAdmin
+        const citySlug = url.searchParams.get("city_slug");
+
+        let countQuery = supabaseAdmin
           .from("hotels")
           .select("id", { count: "exact", head: true });
+        if (citySlug) countQuery = countQuery.eq("city_slug", citySlug);
+        const { count: total } = await countQuery;
 
-        const { data: hotels, error } = await supabaseAdmin
+        let listQuery = supabaseAdmin
           .from("hotels")
           .select("id, name")
-          .order("name", { ascending: true })
-          .range(offset, offset + limit - 1);
+          .order("name", { ascending: true });
+        if (citySlug) listQuery = listQuery.eq("city_slug", citySlug);
+        const { data: hotels, error } = await listQuery.range(offset, offset + limit - 1);
         if (error) return json({ error: error.message }, 500);
 
         const results: Array<{

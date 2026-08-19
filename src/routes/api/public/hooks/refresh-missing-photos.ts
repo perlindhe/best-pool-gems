@@ -29,10 +29,13 @@ export const Route = createFileRoute("/api/public/hooks/refresh-missing-photos")
         }
 
         // Find published hotels with 0 photos
-        const { data: hotels, error } = await supabaseAdmin
+        const citySlug = new URL(request.url).searchParams.get("city_slug");
+        let hotelsQuery = supabaseAdmin
           .from("hotels")
           .select("id, name, hotel_photos(id)")
           .eq("is_published", true);
+        if (citySlug) hotelsQuery = hotelsQuery.eq("city_slug", citySlug);
+        const { data: hotels, error } = await hotelsQuery;
         if (error) return json({ error: error.message }, 500);
 
         const missing = (hotels ?? []).filter(
