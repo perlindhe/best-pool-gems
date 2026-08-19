@@ -86,11 +86,14 @@ export type Database = {
       hotels: {
         Row: {
           address: string | null
+          adults_only: boolean | null
           affiliate_url: string | null
           amenities: Json | null
           beachfront: boolean | null
           best_time_to_visit: string | null
           booking_url: string | null
+          canonical_hotel_id: string | null
+          children_allowed: boolean | null
           city: string
           city_slug: string
           country: string
@@ -99,11 +102,15 @@ export type Database = {
           day_pass_available: boolean | null
           distance_to_beach_m: number | null
           editorial_notes: string | null
+          fact_verification: Json | null
           family_friendly: boolean | null
           guest_only: boolean | null
           has_pool: boolean | null
           heated_pool: boolean | null
+          hotel_status: Database["public"]["Enums"]["hotel_status"]
           id: string
+          indoor: boolean | null
+          infinity: boolean | null
           is_published: boolean
           last_verified_date: string | null
           latitude: number | null
@@ -112,7 +119,9 @@ export type Database = {
           name: string
           neighborhood: string | null
           official_url: string | null
+          outdoor: boolean | null
           party_level: number | null
+          pool_count: number | null
           pool_floor: number | null
           pool_opening_hours: string | null
           pool_setting: string | null
@@ -120,10 +129,13 @@ export type Database = {
           pool_type: string | null
           pool_verification_notes: string | null
           pool_verified_at: string | null
+          pool_view: string | null
+          previous_names: string[] | null
           price_from_eur: number | null
           quiet_party_level: number | null
           rank_position: number | null
           rooftop: boolean | null
+          saltwater: boolean | null
           score_last_updated: string | null
           scrape_website: boolean
           season: string | null
@@ -131,6 +143,8 @@ export type Database = {
           sources: Json | null
           tags: string[] | null
           updated_at: string
+          verification_sources: Json | null
+          verification_status: Database["public"]["Enums"]["verification_status"]
           vibe: string | null
           view_description: string | null
           view_type: string | null
@@ -141,11 +155,14 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          adults_only?: boolean | null
           affiliate_url?: string | null
           amenities?: Json | null
           beachfront?: boolean | null
           best_time_to_visit?: string | null
           booking_url?: string | null
+          canonical_hotel_id?: string | null
+          children_allowed?: boolean | null
           city: string
           city_slug: string
           country: string
@@ -154,11 +171,15 @@ export type Database = {
           day_pass_available?: boolean | null
           distance_to_beach_m?: number | null
           editorial_notes?: string | null
+          fact_verification?: Json | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
           has_pool?: boolean | null
           heated_pool?: boolean | null
+          hotel_status?: Database["public"]["Enums"]["hotel_status"]
           id?: string
+          indoor?: boolean | null
+          infinity?: boolean | null
           is_published?: boolean
           last_verified_date?: string | null
           latitude?: number | null
@@ -167,7 +188,9 @@ export type Database = {
           name: string
           neighborhood?: string | null
           official_url?: string | null
+          outdoor?: boolean | null
           party_level?: number | null
+          pool_count?: number | null
           pool_floor?: number | null
           pool_opening_hours?: string | null
           pool_setting?: string | null
@@ -175,10 +198,13 @@ export type Database = {
           pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
+          pool_view?: string | null
+          previous_names?: string[] | null
           price_from_eur?: number | null
           quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
+          saltwater?: boolean | null
           score_last_updated?: string | null
           scrape_website?: boolean
           season?: string | null
@@ -186,6 +212,8 @@ export type Database = {
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
+          verification_sources?: Json | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
           vibe?: string | null
           view_description?: string | null
           view_type?: string | null
@@ -196,11 +224,14 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          adults_only?: boolean | null
           affiliate_url?: string | null
           amenities?: Json | null
           beachfront?: boolean | null
           best_time_to_visit?: string | null
           booking_url?: string | null
+          canonical_hotel_id?: string | null
+          children_allowed?: boolean | null
           city?: string
           city_slug?: string
           country?: string
@@ -209,11 +240,15 @@ export type Database = {
           day_pass_available?: boolean | null
           distance_to_beach_m?: number | null
           editorial_notes?: string | null
+          fact_verification?: Json | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
           has_pool?: boolean | null
           heated_pool?: boolean | null
+          hotel_status?: Database["public"]["Enums"]["hotel_status"]
           id?: string
+          indoor?: boolean | null
+          infinity?: boolean | null
           is_published?: boolean
           last_verified_date?: string | null
           latitude?: number | null
@@ -222,7 +257,9 @@ export type Database = {
           name?: string
           neighborhood?: string | null
           official_url?: string | null
+          outdoor?: boolean | null
           party_level?: number | null
+          pool_count?: number | null
           pool_floor?: number | null
           pool_opening_hours?: string | null
           pool_setting?: string | null
@@ -230,10 +267,13 @@ export type Database = {
           pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
+          pool_view?: string | null
+          previous_names?: string[] | null
           price_from_eur?: number | null
           quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
+          saltwater?: boolean | null
           score_last_updated?: string | null
           scrape_website?: boolean
           season?: string | null
@@ -241,6 +281,8 @@ export type Database = {
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
+          verification_sources?: Json | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
           vibe?: string | null
           view_description?: string | null
           view_type?: string | null
@@ -249,7 +291,22 @@ export type Database = {
           why_not_higher?: string | null
           year_round?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hotels_canonical_hotel_id_fkey"
+            columns: ["canonical_hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hotels_canonical_hotel_id_fkey"
+            columns: ["canonical_hotel_id"]
+            isOneToOne: false
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meta_scores: {
         Row: {
@@ -525,40 +582,99 @@ export type Database = {
     Views: {
       public_hotels_view: {
         Row: {
+          adults_only: boolean | null
+          affiliate_url: string | null
+          beachfront: boolean | null
           best_time: string | null
           booking_url: string | null
+          canonical_hotel_id: string | null
+          children_allowed: boolean | null
           city: string | null
           city_slug: string | null
           confidence_0_100: number | null
           country: string | null
           cover_image_url: string | null
+          distance_to_beach_m: number | null
           editorial_notes: string | null
+          fact_verification: Json | null
+          family_friendly: boolean | null
           has_pool: boolean | null
+          heated_pool: boolean | null
+          hotel_status: Database["public"]["Enums"]["hotel_status"] | null
           id: string | null
+          indoor: boolean | null
+          infinity: boolean | null
+          last_verified_date: string | null
           meta_computed_at: string | null
           meta_rating_0_100: number | null
           name: string | null
           neighborhood: string | null
+          official_url: string | null
+          outdoor: boolean | null
           pool_components: Json | null
+          pool_count: number | null
           pool_facts: Json | null
           pool_score_0_10: number | null
           pool_score_updated_at: string | null
+          pool_setting: string | null
+          pool_size: string | null
           pool_type: string | null
           pool_verified_at: string | null
+          pool_view: string | null
+          previous_names: string[] | null
+          price_from_eur: number | null
           rank_position: number | null
+          rooftop: boolean | null
+          saltwater: boolean | null
+          season: string | null
           slug: string | null
           sources_used: Json | null
+          tags: string[] | null
+          verification_sources: Json | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          view_type: string | null
           website_url: string | null
+          why_included: string | null
+          why_not_higher: string | null
+          year_round: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hotels_canonical_hotel_id_fkey"
+            columns: ["canonical_hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hotels_canonical_hotel_id_fkey"
+            columns: ["canonical_hotel_id"]
+            isOneToOne: false
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      hotel_status:
+        | "active"
+        | "renamed"
+        | "temporarily_closed"
+        | "permanently_closed"
+        | "opening_soon"
+        | "unverified"
       rating_source: "google" | "tripadvisor" | "booking" | "hotels_com"
       snapshot_status: "ok" | "failed" | "missing_id"
+      verification_status:
+        | "verified"
+        | "partially_verified"
+        | "research_pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -686,8 +802,21 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      hotel_status: [
+        "active",
+        "renamed",
+        "temporarily_closed",
+        "permanently_closed",
+        "opening_soon",
+        "unverified",
+      ],
       rating_source: ["google", "tripadvisor", "booking", "hotels_com"],
       snapshot_status: ["ok", "failed", "missing_id"],
+      verification_status: [
+        "verified",
+        "partially_verified",
+        "research_pending",
+      ],
     },
   },
 } as const
