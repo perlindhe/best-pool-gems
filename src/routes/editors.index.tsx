@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { editors } from "@/data/editors";
 
-export const Route = createFileRoute("/editors")({
+export const Route = createFileRoute("/editors/")({
   head: () => ({
     meta: [
       { title: "Our editors — Best Pool Hotels" },

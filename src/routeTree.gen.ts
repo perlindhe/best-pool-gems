@@ -17,6 +17,7 @@ import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EditorsIndexRouteImport } from './routes/editors.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as CitySlugIndexRouteImport } from './routes/$citySlug.index'
 import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
@@ -73,6 +74,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditorsIndexRoute = EditorsIndexRouteImport.update({
+  id: '/editors/',
+  path: '/editors/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/hotels/$slug': typeof HotelsSlugRoute
   '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/editors/': typeof EditorsIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -213,6 +220,7 @@ export interface FileRoutesByTo {
   '/hotels/$slug': typeof HotelsSlugRoute
   '/$citySlug': typeof CitySlugIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/editors': typeof EditorsIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/hotels/$slug': typeof HotelsSlugRoute
   '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/editors/': typeof EditorsIndexRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/hotels/$slug'
     | '/$citySlug/'
     | '/admin/'
+    | '/editors/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-pool-quotes'
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/hotels/$slug'
     | '/$citySlug'
     | '/admin'
+    | '/editors'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-pool-quotes'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/hotels/$slug'
     | '/$citySlug/'
     | '/admin/'
+    | '/editors/'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-pool-quotes'
@@ -352,6 +364,7 @@ export interface RootRouteChildren {
   HotelsSlugRoute: typeof HotelsSlugRoute
   CitySlugIndexRoute: typeof CitySlugIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  EditorsIndexRoute: typeof EditorsIndexRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
   ApiPublicHooksBackfillPoolQuotesRoute: typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editors/': {
+      id: '/editors/'
+      path: '/editors'
+      fullPath: '/editors/'
+      preLoaderRoute: typeof EditorsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -571,6 +591,7 @@ const rootRouteChildren: RootRouteChildren = {
   HotelsSlugRoute: HotelsSlugRoute,
   CitySlugIndexRoute: CitySlugIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
+  EditorsIndexRoute: EditorsIndexRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
   ApiPublicHooksBackfillPoolQuotesRoute: ApiPublicHooksBackfillPoolQuotesRoute,
