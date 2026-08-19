@@ -9,13 +9,14 @@ export const adminRunIntegrityChecks = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profile, error } = await supabaseAdmin
-      .from("profiles")
-      .select("is_admin")
+    const { data: adminRole, error } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
       .eq("user_id", context.userId)
+      .eq("role", "admin")
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!profile?.is_admin) throw new Error("Forbidden: admin only");
+    if (!adminRole) throw new Error("Forbidden: admin only");
 
     const { runIntegrityChecks } = await import("@/server/integrity.server");
     return runIntegrityChecks({ checkLinks: data.checkLinks ?? false });
