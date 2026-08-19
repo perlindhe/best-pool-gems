@@ -1,19 +1,45 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getCityGuides, getGuideByParts } from "@/data/hotels";
 import { guideContent, buildGuideMeta, type GuideContent, type GuideTableRow } from "@/data/guideContent";
+import { getCollection, type Collection } from "@/data/collections";
+import { buildCollectionMeta } from "@/data/collectionMeta";
+import { listCollectionHotels } from "@/lib/collections.functions";
+import { CollectionPage, type CollectionHotel } from "@/components/CollectionPage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GuideMeta } from "@/components/GuideMeta";
 import { AlsoConsidered } from "@/components/AlsoConsidered";
 
 export const Route = createFileRoute("/$citySlug/$articleSlug")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const guide = getGuideByParts(params.citySlug, params.articleSlug);
     const content = guide ? guideContent[guide.slug] : undefined;
-    if (!guide || !content) throw notFound();
-    return { guide, content };
+    if (guide && content) return { kind: "guide" as const, guide, content };
+
+    const collection = getCollection(params.citySlug, params.articleSlug);
+    if (collection) {
+      const { hotels, total } = await listCollectionHotels({
+        data: { citySlug: params.citySlug, articleSlug: params.articleSlug },
+      });
+      // Thin pages never ship.
+      if (hotels.length >= collection.minHotels) {
+        return {
+          kind: "collection" as const,
+          collection,
+          hotels: hotels as unknown as CollectionHotel[],
+          total,
+        };
+      }
+    }
+    throw notFound();
   },
-  head: ({ loaderData }) => (loaderData?.guide ? buildGuideMeta(loaderData.guide) : {}),
+  head: ({ loaderData }) => {
+    if (loaderData?.kind === "guide") return buildGuideMeta(loaderData.guide);
+    if (loaderData?.kind === "collection")
+      return buildCollectionMeta(loaderData.collection, loaderData.hotels);
+    return { meta: [{ title: "Guide not found" }, { name: "robots", content: "noindex" }] };
+  },
+
   notFoundComponent: () => (
     <div className="min-h-screen bg-background">
       <SiteHeader />
