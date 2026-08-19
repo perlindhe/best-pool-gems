@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
+import { VerificationBadge } from "@/components/VerificationBadge";
 import { getHotelBySlug } from "@/lib/hotel-detail.functions";
 import type { HotelPhoto } from "@/server/hotel-detail.server";
 
