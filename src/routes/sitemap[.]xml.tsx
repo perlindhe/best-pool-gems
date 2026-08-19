@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { cities, guides } from "@/data/hotels";
+import { collections } from "@/data/collections";
+
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const BASE_URL = "https://bestpoolhotels.com";
@@ -35,6 +37,15 @@ export const Route = createFileRoute("/sitemap.xml")({
             priority: "0.7",
           });
         }
+        for (const c of collections) {
+          entries.push({
+            path: `/${c.citySlug}/${c.articleSlug}`,
+            lastmod: c.lastUpdated,
+            changefreq: "monthly",
+            priority: "0.7",
+          });
+        }
+
         entries.push({
           path: "/barcelona/luxury-pool-hotels",
           changefreq: "monthly",
