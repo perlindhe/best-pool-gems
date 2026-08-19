@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { listRankedHotels, listRankingFacets } from "@/lib/rankings.functions";
+import { HotelImage } from "@/components/HotelImage";
 
 const DISCOVERY_FILTERS = [
   { label: "Rooftop pools", search: { rooftop: true } },
@@ -13,6 +14,10 @@ const DISCOVERY_FILTERS = [
   { label: "Adults-only", search: { adultsOnly: true } },
   { label: "Family-friendly", search: { familyFriendly: true } },
   { label: "Beachfront", search: { beachfront: true } },
+  { label: "Indoor pools", search: { indoor: true } },
+  { label: "Year-round swimming", search: { yearRound: true } },
+  { label: "Large pools", search: { poolSize: "large" } },
+  { label: "Saltwater", search: { saltwater: true } },
   { label: "Score 9+", search: { minScore: 9 } },
 ] as const;
 
@@ -157,12 +162,12 @@ function Home() {
                   className="group overflow-hidden rounded-xl border border-border/60 bg-surface/50 transition hover:border-primary/60"
                 >
                   {(h.hero_photo_url || h.cover_image_url) && (
-                    <img
+                    <HotelImage
                       src={(h.hero_photo_url || h.cover_image_url) as string}
                       alt={`Pool at ${h.name}`}
                       width={640}
                       height={420}
-                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="h-48 w-full object-cover transition duration-700 group-hover:scale-105"
                     />
                   )}
@@ -186,7 +191,12 @@ function Home() {
           )}
 
           {dbCities.length > 0 && (
-            <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
+            <p className="mt-10 text-[10px] uppercase tracking-[0.3em] text-primary">
+              Or pick a destination
+            </p>
+          )}
+          {dbCities.length > 0 && (
+            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
               {dbCities.map((c) => (
                 <li key={c.city_slug}>
                   <Link
