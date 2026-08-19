@@ -27,6 +27,7 @@ type ToggleKey = (typeof TOGGLES)[number]["key"];
 type Search = {
   city?: string;
   minScore?: number;
+  poolSize?: "small" | "medium" | "large" | "very_large";
   page?: number;
 } & Partial<Record<ToggleKey, boolean>>;
 
@@ -40,6 +41,11 @@ export const Route = createFileRoute("/rankings")({
     if (typeof search.city === "string" && search.city) out.city = search.city.slice(0, 60);
     const min = Number(search.minScore);
     if (Number.isFinite(min) && min > 0 && min <= 10) out.minScore = min;
+    if (
+      typeof search.poolSize === "string" &&
+      ["small", "medium", "large", "very_large"].includes(search.poolSize)
+    )
+      out.poolSize = search.poolSize as Search["poolSize"];
     const page = Number(search.page);
     if (Number.isFinite(page) && page > 1) out.page = Math.min(Math.floor(page), 200);
     for (const t of TOGGLES) {
@@ -51,10 +57,11 @@ export const Route = createFileRoute("/rankings")({
   loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {
     const page = deps.page ?? 1;
-    const { city, minScore, ...rest } = deps;
+    const { city, minScore, poolSize, ...rest } = deps;
     const filters: Record<string, unknown> = { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE };
     if (city) filters.city = city;
     if (minScore) filters.minScore = minScore;
+    if (poolSize) filters.poolSize = poolSize;
     for (const t of TOGGLES) if (rest[t.key]) filters[t.key] = true;
     const [result, facets] = await Promise.all([
       listRankedHotels({ data: filters }),
