@@ -107,9 +107,9 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
-  id: '/$articleSlug',
-  path: '/$articleSlug',
-  getParentRoute: () => CitySlugRoute,
+  id: '/$citySlug/$articleSlug',
+  path: '/$citySlug/$articleSlug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHotelsRoute = ApiPublicHotelsRouteImport.update({
   id: '/api/public/hotels',
@@ -345,6 +345,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RankingsRoute: typeof RankingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   ComparePairRoute: typeof ComparePairRoute
@@ -464,10 +465,10 @@ declare module '@tanstack/react-router' {
     }
     '/$citySlug/$articleSlug': {
       id: '/$citySlug/$articleSlug'
-      path: '/$articleSlug'
+      path: '/$citySlug/$articleSlug'
       fullPath: '/$citySlug/$articleSlug'
       preLoaderRoute: typeof CitySlugArticleSlugRouteImport
-      parentRoute: typeof CitySlugRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/hotels': {
       id: '/api/public/hotels'
@@ -563,6 +564,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RankingsRoute: RankingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   ComparePairRoute: ComparePairRoute,
