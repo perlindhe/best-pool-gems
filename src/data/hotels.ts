@@ -679,6 +679,16 @@ export const cities: City[] = [
     image: sydneyImg,
     hotels: sydneyTop20,
   },
+  {
+    slug: "crete",
+    name: "Crete",
+    country: "Greece",
+    tagline: "Private seawater pools above the Cretan Sea",
+    intro:
+      "Crete does pools at two extremes: sprawling lagoon resorts on the north coast and tiny private plunge pools cut into the cliffs around Elounda. We rank the island's best, from Chania rooftops to Mirabello Bay infinity edges.",
+    image: creteImg,
+    hotels: creteTop15,
+  },
 ];
 
 export const getCity = (slug: string) => cities.find((c) => c.slug === slug);
