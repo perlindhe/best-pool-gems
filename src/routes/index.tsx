@@ -24,7 +24,28 @@ export const Route = createFileRoute("/")({
     ]);
     return { top: top.hotels, total: top.total, cities: facets.cities.slice(0, 8) };
   },
-  errorComponent: () => <Home />,
+  errorComponent: ({ error }) => (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-6 py-32 text-center">
+        <h1 className="font-display text-5xl text-primary">Couldn't load the rankings</h1>
+        <p className="mt-4 text-muted-foreground">{error.message}</p>
+        <Link to="/rankings" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
+          Browse all pools →
+        </Link>
+      </div>
+      <SiteFooter />
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-3xl px-6 py-32 text-center">
+        <h1 className="font-display text-5xl text-primary">Page not found</h1>
+      </div>
+      <SiteFooter />
+    </div>
+  ),
   head: () => ({
     meta: [
       { title: "Best hotel pools — Best Pool Hotels" },
