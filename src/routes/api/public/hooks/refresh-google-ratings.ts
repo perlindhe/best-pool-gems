@@ -5,7 +5,7 @@ import {
   DEFAULT_WEIGHTS,
   type SourceKey,
   type Weights,
-} from "@/server/scoring";
+} from "@/lib/scoring";
 
 const corsHeaders = {
   "Content-Type": "application/json",

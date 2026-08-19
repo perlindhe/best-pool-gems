@@ -89,7 +89,7 @@ export const Route = createFileRoute("/compare/$pair")({
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
         <h1 className="font-display text-5xl text-primary">Comparison not found</h1>
-        <Link to="/barcelona" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
+        <Link to="/$citySlug" params={{ citySlug: "barcelona" }} className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
           ← Back to Barcelona
         </Link>
       </div>
@@ -122,7 +122,8 @@ function ComparePage() {
 
       <section className="mx-auto max-w-6xl px-6 pt-24 pb-12">
         <Link
-          to="/barcelona"
+          to="/$citySlug"
+          params={{ citySlug: "barcelona" }}
           className="text-xs uppercase tracking-[0.3em] text-primary hover:underline"
         >
           ← Barcelona

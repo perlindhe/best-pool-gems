@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { autoScoreHotelById } from "@/server/auto-score.server";
-import { computePoolScore } from "@/server/scoring";
+import { computePoolScore } from "@/lib/scoring";
 
 const corsHeaders = {
   "Content-Type": "application/json",
