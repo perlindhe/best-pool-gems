@@ -29,6 +29,20 @@ export type HotelDetail = {
   editorial_sources: HotelSource[];
   why_included: string | null;
   why_not_higher: string | null;
+  verification_status: "verified" | "partially_verified" | "research_pending" | null;
+  pool_count: number | null;
+  rooftop: boolean | null;
+  infinity: boolean | null;
+  heated_pool: boolean | null;
+  indoor: boolean | null;
+  outdoor: boolean | null;
+  adults_only: boolean | null;
+  family_friendly: boolean | null;
+  beachfront: boolean | null;
+  saltwater: boolean | null;
+  year_round: boolean | null;
+  pool_size: string | null;
+  pool_view: string | null;
 };
 
 
