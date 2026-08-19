@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
 import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
+import { getCityHubSummaryFn } from "@/lib/city-hub.functions";
 
 const PAGE_SIZE = 10;
 
@@ -13,15 +14,19 @@ const citySearchSchema = z.object({
   page: fallback(z.number().int().min(1).max(20), 1).default(1),
 });
 
-export const Route = createFileRoute("/$citySlug")({
+export const Route = createFileRoute("/$citySlug/")({
   validateSearch: zodValidator(citySearchSchema),
   loader: async ({ params }) => {
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
-    const hotelInfo = await getCityHotelPhotos({ data: { citySlug: city.slug } });
-    return { city, cityGuides, hotelInfo };
+    const [hotelInfo, summary] = await Promise.all([
+      getCityHotelPhotos({ data: { citySlug: city.slug } }),
+      getCityHubSummaryFn({ data: { citySlug: city.slug } }).catch(() => null),
+    ]);
+    return { city, cityGuides, hotelInfo, summary };
   },
+
   head: ({ params, loaderData }) => {
     const city = loaderData?.city;
     if (!city) return {};
@@ -104,7 +109,8 @@ export const Route = createFileRoute("/$citySlug")({
 });
 
 function CityHub() {
-  const { city, cityGuides, hotelInfo } = Route.useLoaderData();
+  const { city, cityGuides, hotelInfo, summary } = Route.useLoaderData();
+
   const { page } = Route.useSearch();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
   const totalPages = Math.max(1, Math.ceil(city.hotels.length / PAGE_SIZE));
@@ -141,6 +147,75 @@ function CityHub() {
           {city.intro}
         </p>
       </section>
+
+      {/* Database-derived destination summary */}
+      {summary && summary.total > 0 && (
+        <section className="border-y border-border/40 bg-surface/30">
+          <div className="mx-auto max-w-7xl px-6 py-16">
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">At a glance</p>
+            <h2 className="mt-3 font-display text-5xl tracking-wide">
+              {city.name} pools in our database
+            </h2>
+            <dl className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { label: "Hotels tracked", value: String(summary.total) },
+                { label: "Verified pool data", value: `${summary.verified}/${summary.total}` },
+                {
+                  label: "Average Pool Score",
+                  value: summary.avgScore != null ? summary.avgScore.toFixed(1) : "—",
+                },
+                {
+                  label: "Highest score",
+                  value: summary.topScore != null ? summary.topScore.toFixed(1) : "—",
+                },
+              ].map((s) => (
+                <div key={s.label} className="rounded-lg border border-border/60 bg-background/60 p-5">
+                  <dt className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                    {s.label}
+                  </dt>
+                  <dd className="mt-2 font-display text-4xl tracking-wide text-primary">{s.value}</dd>
+                </div>
+              ))}
+            </dl>
+            {summary.lastVerified && (
+              <p className="mt-4 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                Last verified {summary.lastVerified}
+                {summary.researchPending > 0
+                  ? ` · ${summary.researchPending} still marked research pending`
+                  : ""}
+              </p>
+            )}
+
+            {summary.features.length > 0 && (
+              <>
+                <h3 className="mt-12 font-display text-3xl tracking-wide">Browse by pool feature</h3>
+                <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                  Each shortlist is generated live from verified pool data for {city.name}.
+                </p>
+                <ul className="mt-6 flex flex-wrap gap-3">
+                  {summary.features
+                    .filter((f) => f.count >= 2)
+                    .sort((a, b) => b.count - a.count)
+                    .map((f) => (
+                      <li key={f.key}>
+                        <Link
+                          to="/rankings"
+                          search={{ city: city.slug, [f.key]: true }}
+                          className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 px-4 py-2 text-xs uppercase tracking-[0.2em] text-foreground/85 transition hover:border-primary/60 hover:text-primary"
+                        >
+                          {f.label}
+                          <span className="font-mono text-primary">{f.count}</span>
+                        </Link>
+                      </li>
+                    ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </section>
+      )}
+
+
 
       {/* Guides for this city */}
       {cityGuides.length > 0 && (

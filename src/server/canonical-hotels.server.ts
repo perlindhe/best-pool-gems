@@ -227,3 +227,66 @@ export async function listCanonicalCities() {
   }
   return { cities: Array.from(map.values()).sort((a, b) => b.count - a.count) };
 }
+
+export type CityFeatureCount = { key: string; label: string; count: number };
+
+export type CityHubSummary = {
+  citySlug: string;
+  total: number;
+  verified: number;
+  researchPending: number;
+  avgScore: number | null;
+  topScore: number | null;
+  lastVerified: string | null;
+  features: CityFeatureCount[];
+};
+
+const FEATURE_DEFS: Array<{ key: string; label: string; column: keyof CanonicalHotel }> = [
+  { key: "rooftop", label: "Rooftop pools", column: "rooftop" },
+  { key: "infinity", label: "Infinity pools", column: "infinity" },
+  { key: "heated", label: "Heated pools", column: "heated_pool" },
+  { key: "yearRound", label: "Open year-round", column: "year_round" },
+  { key: "indoor", label: "Indoor pools", column: "indoor" },
+  { key: "outdoor", label: "Outdoor pools", column: "outdoor" },
+  { key: "beachfront", label: "Beachfront", column: "beachfront" },
+  { key: "adultsOnly", label: "Adults only", column: "adults_only" },
+  { key: "familyFriendly", label: "Family friendly", column: "family_friendly" },
+  { key: "saltwater", label: "Saltwater", column: "saltwater" },
+];
+
+/** Aggregated, database-derived summary for one destination hub. */
+export async function getCityHubSummary(citySlug: string): Promise<CityHubSummary> {
+  const { data, error } = await supabaseAdmin
+    .from("public_hotels_view")
+    .select(
+      "pool_score_0_10, verification_status, last_verified_date, rooftop, infinity, heated_pool, year_round, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
+    )
+    .eq("city_slug", citySlug);
+  if (error) throw new Error(error.message);
+
+  const rows = (data ?? []) as unknown as CanonicalHotel[];
+  const scores = rows
+    .map((r) => r.pool_score_0_10)
+    .filter((s): s is number => typeof s === "number");
+  const dates = rows
+    .map((r) => r.last_verified_date)
+    .filter((d): d is string => Boolean(d))
+    .sort();
+
+  return {
+    citySlug,
+    total: rows.length,
+    verified: rows.filter(
+      (r) => r.verification_status === "verified" || r.verification_status === "partially_verified",
+    ).length,
+    researchPending: rows.filter((r) => r.verification_status === "research_pending").length,
+    avgScore: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : null,
+    topScore: scores.length ? Math.max(...scores) : null,
+    lastVerified: dates.length ? dates[dates.length - 1] : null,
+    features: FEATURE_DEFS.map((f) => ({
+      key: f.key,
+      label: f.label,
+      count: rows.filter((r) => r[f.column] === true).length,
+    })).filter((f) => f.count > 0),
+  };
+}
