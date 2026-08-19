@@ -1,16 +1,26 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
-import { getHotelBySlug } from "@/lib/hotel-detail.functions";
+import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
 import type { HotelPhoto } from "@/server/hotel-detail.server";
 
 export const Route = createFileRoute("/hotels/$slug")({
   loader: async ({ params }) => {
     const result = await getHotelBySlug({ data: { slug: params.slug } });
-    if (!result) throw notFound();
+    if (!result) {
+      const canonicalSlug = await getCanonicalHotelSlug({ data: { slug: params.slug } });
+      if (canonicalSlug) {
+        throw redirect({
+          to: "/hotels/$slug",
+          params: { slug: canonicalSlug },
+          statusCode: 301,
+        });
+      }
+      throw notFound();
+    }
     return result;
   },
   head: ({ params, loaderData }) => {

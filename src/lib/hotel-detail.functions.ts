@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getHotelDetail, type HotelPhoto, type PoolQuote, type HotelSource } from "@/server/hotel-detail.server";
+import { getHotelDetail, resolveCanonicalSlug, type HotelPhoto, type PoolQuote, type HotelSource } from "@/server/hotel-detail.server";
 import type { PoolFacts } from "@/lib/rankings.functions";
 
 export type HotelDetail = {
@@ -59,4 +59,12 @@ export const getHotelBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const result = await getHotelDetail(data.slug);
     return result as HotelDetailResult;
+  });
+
+export const getCanonicalHotelSlug = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ slug: z.string().min(1).max(200) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    return await resolveCanonicalSlug(data.slug);
   });
