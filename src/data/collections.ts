@@ -271,6 +271,42 @@ export const collections: Collection[] = [
     minHotels: 6,
     lastUpdated: "2026-08-19",
   },
+  {
+    citySlug: "crete",
+    articleSlug: "off-season-pool-hotels",
+    city: "Crete",
+    category: "Off season",
+    title: "Off season pool hotels in Crete",
+    metaTitle: "Off season pool hotels in Crete — heated outdoor pools 2026",
+    excerpt:
+      "Crete hotels with heated outdoor pools, so the water is swimmable in spring and autumn rather than only in high summer. Ranked by our Pool Score.",
+    hero: "Crete's air stays mild long after the beach crowds leave. These hotels heat their outdoor pools, which is what actually makes an April or October pool day work.",
+    intro: [
+      "Between November and March the sea around Crete sits at 16–18°C and an unheated pool is colder still. Even in April and October, an unheated outdoor pool rarely climbs past 20°C — warm enough to look at, not to swim in.",
+      "Every hotel on this list runs at least one heated outdoor pool. That is the single feature that stretches the Cretan pool season from roughly ten weeks to six months, and in a couple of cases to the full year.",
+      "Heating and opening dates are two different things: a hotel can heat its pool and still close the property for winter. Check the season note on each hotel page, and confirm heating dates directly with the hotel before booking a shoulder-season trip.",
+    ],
+    faqs: [
+      {
+        question: "When is the off season in Crete?",
+        answer:
+          "Roughly November to March is low season, with April, May and October counting as shoulder season. Most resorts open in April and close in late October.",
+      },
+      {
+        question: "How warm is a heated hotel pool in Crete?",
+        answer:
+          "Typically 26–29°C. Private villa pools that are heated on request usually land at the upper end; large open-air resort pools lose heat to wind and sit lower.",
+      },
+      {
+        question: "Can I swim outdoors in Crete in winter?",
+        answer:
+          "Only at the few hotels that keep a heated outdoor pool running year-round, mostly in Heraklion and the Elounda area. Everywhere else the outdoor pools are drained or unheated.",
+      },
+    ],
+    filter: { heated: true, outdoor: true },
+    minHotels: 5,
+    lastUpdated: "2026-08-19",
+  },
 ];
 
 export const getCollection = (citySlug: string, articleSlug: string) =>
