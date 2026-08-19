@@ -115,7 +115,7 @@ export const Route = createFileRoute("/$citySlug/")({
 });
 
 function CityHub() {
-  const { city, cityGuides, cityCollections, hotelInfo, summary } = Route.useLoaderData();
+  const { city, cityGuides, cityCollections, hotelInfo, summary, offSeason } = Route.useLoaderData();
 
 
 
