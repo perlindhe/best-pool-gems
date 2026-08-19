@@ -107,3 +107,8 @@ export const listRankedHotels = createServerFn({ method: "GET" })
     const { hotels, total } = await listCanonicalHotels(data);
     return { hotels: hotels as unknown as RankedHotel[], total };
   });
+
+export const listRankingFacets = createServerFn({ method: "GET" }).handler(async () => {
+  const { listCanonicalCities } = await import("@/server/canonical-hotels.server");
+  return await listCanonicalCities();
+});
