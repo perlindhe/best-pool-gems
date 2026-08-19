@@ -1,77 +1,71 @@
-# BestPoolHotels — Site Audit & Rebuild Plan
+# BestPoolHotels — Canonical Data, Discovery & Trust
 
-The site already has a real backend (Supabase `hotels` + `pool_scores` + `meta_scores` + `pool_quotes`) but it competes with a parallel hardcoded list in `src/data/hotels.ts`. That split is the root cause of the inconsistencies you flagged (Grand Hotel Central at 6.0 in one place, 9.2 in another). Several Barcelona guide pages also read from the hardcoded file instead of Supabase. The plan below fixes all 15 priorities in a sequence that minimizes rework.
+Goal: one hotel → one canonical record → one Pool Score → used everywhere. No visual redesign; the current premium editorial look stays.
 
-## Phase 1 — Single source of truth (Priorities 1, 2, 3, 4, 9)
+The backend already holds most of the model (`hotels`, `pool_scores`, `meta_scores`, `hotel_photos`, `pool_quotes`) and `public_hotels_view` is the read surface. The gaps are: missing canonical fields (status, previous names, verification state, adults-only, infinity/saltwater/indoor flags), `/rankings` having no filters and rendering every hotel at once, no duplicate/QA checks, and a homepage with no discovery layer.
 
-**Make Supabase the only hotel data source. Retire `src/data/hotels.ts` for Barcelona.**
+## Phase 1 — Canonical record (priorities 1, 3, 9)
 
-1. Extend the `hotels` table with the fields from your spec that aren't there yet: `pool_setting`, `view_type`, `year_round`, `season`, `amenities` (jsonb), `vibe` (text — already exists), `official_url`, `affiliate_url`, `score_last_updated`, `image_credit`, `license_source`. Keep existing field names that already match (`pool_type`, `neighborhood`, `slug`, `heated_pool`, `guest_only`, `day_pass_available`, `price_from_eur`, `last_verified_date`, `sources`, `why_included`, `why_not_higher`, `tags`).
+Migration on `public.hotels`:
+- `previous_names text[]`, `hotel_status` enum (`active`, `renamed`, `temporarily_closed`, `permanently_closed`, `opening_soon`, `unverified`), `canonical_hotel_id uuid` (self-reference for renames)
+- `verification_status` enum (`verified`, `partially_verified`, `research_pending`), `verification_sources jsonb`, `fact_verification jsonb` (per-fact state)
+- Pool flags promoted out of the jsonb blob to real columns so they can be filtered in SQL: `pool_count int`, `indoor bool`, `outdoor bool`, `infinity bool`, `saltwater bool`, `adults_only bool`, `children_allowed bool`, `pool_view text`
+- Backfill new columns from existing `pool_scores.facts` and `tags` so nothing is lost
+- Rebuild `public_hotels_view` to expose all of the above and to exclude `permanently_closed` / non-canonical (renamed) rows
 
-2. Update `src/server/scoring.ts` to the canonical 5-weight method:
+A single accessor module (`src/server/canonical-hotels.server.ts`) becomes the only place that reads hotel + score data. `rankings.functions.ts`, `hotel-detail.server.ts`, `compare.functions.ts`, city hub and guide loaders all call it. Any remaining hard-coded Pool Score in `src/data/hotels.ts` / `guideContent.ts` is deleted and replaced with a DB lookup by slug.
 
-   ```text
-   pool_design_setting:       25%   (renamed from pool_first_feel)
-   view_atmosphere:           25%   (merged from view + vibe)
-   size_lounging_space:       20%   (renamed from lounging_space)
-   access_seasonality:        15%   (new — replaces uniqueness)
-   service_maintenance:       15%   (renamed from service)
-   ```
-   Each component is rated 0–10 (not 0–2), weighted, summed to 0–10. Update `PoolComponents` type, `computePoolScore()`, `ScoreBreakdown.tsx` labels + hints + weight column, and re-score every published hotel in `pool_scores` so DB and UI agree.
+Renames: old slug rows keep `hotel_status = 'renamed'` + `canonical_hotel_id`, and `/hotels/$slug` issues a 301 redirect to the canonical slug.
 
-3. Lock Grand Hotel Central to 9.2 by writing real component values that sum to 9.2 — not by hardcoding. The hotel profile, the luxury guide ranking, the Also-Considered card, and `/about` will then all read the same number from `pool_scores` automatically.
+## Phase 2 — Rankings with filters (priorities 2, 11)
 
-4. Fix the duplicate problem: add a guard in `getBarcelonaGuideData()` that filters Also-Considered to exclude anything already in the Top 10. Remove Cotton House Hotel from the hardcoded also-considered list.
+Rewrite `/rankings`:
+- Server-side query with filters read from and written to the URL search params (shareable): destination, min pool score, rooftop, infinity, heated, year-round, indoor, outdoor, adults-only, family-friendly, pool size, beachfront, view
+- Server-side pagination (24 per page) instead of rendering 200+ cards
+- Filters compose (`?city=gran-canaria&heated=1&outdoor=1`)
+- Non-trivial filter combinations get `robots: noindex, follow`; the unfiltered page stays indexable
+- Cards get reserved image dimensions, `loading="lazy"`, and a "Check availability" CTA
 
-## Phase 2 — Rebuild Barcelona pages from the database (Priorities 5, 6, 7, 8)
+## Phase 3 — Discovery + hotel page (priorities 6, 7, 8)
 
-5. **`/barcelona` becomes a true city hub** (replaces current pagination):
-   - 6 themed mini-rankings (top 3 each): Best Overall, Best Rooftop, Best Beach + Pool, Best Heated / Year-Round, Best Quiet, Best Family
-   - Neighborhood guide block (Eixample, Born, Gothic, Barceloneta, Diagonal Mar)
-   - Comparison table: top 10 with Pool Score, Type, Setting, Best Time, Price From
-   - Internal links to every Barcelona guide
-   - Schema: `CollectionPage` + `BreadcrumbList`
+Homepage: a discovery block directly under the hero — "Find the hotel with the pool you actually want" — with eight pool-type entry points (heated, rooftop, infinity, year-round, adults-only, beachfront, indoor, large) plus a destination + requirement selector that deep-links into the filtered `/rankings` URL.
 
-6. **`/barcelona/rooftop-pool-hotels`** — query `tags @> ['rooftop']` only. New per-hotel block: floor/height, view, sunset quality, access, opening season, pool size, vibe, best time, quiet/party level. The cards already render most of this — we just wire it to the new DB fields.
+Hotel page (`/hotels/$slug`) reordered:
+- Above the fold: name, destination, Pool Score, Meta Rating, verification badge with date, hero pool image, 3–5 key facts, "Check availability" (primary) and "Official hotel website" (secondary)
+- Below: why we like this pool, score breakdown, pool facts, best for, best time, pool season, guest quotes, gallery, verification sources, similar pools, comparisons
+- Sticky booking bar on mobile: "Grand Hotel Central · Pool Score 9.2 — Check prices"
+- Affiliate links stay visually separated from scores, always `rel="sponsored nofollow"`
 
-7. **`/barcelona/pool-hotels-near-beach`** — query `tags @> ['beach']` or distance threshold. New fields: walking distance to beach, beach area, pool quality vs beach quality, family suitability, wind/sun exposure.
+Verification UI: a shared badge component rendering `✓ Pool details verified 12 Aug 2026` / `Partially verified` / `Research pending`, used on hotel pages, cards and guides. Nothing unverified is described as confirmed.
 
-8. **`/barcelona/pool-season`** — rebuild as a practical seasonal guide, not a ranking. Month-by-month advice (Jan–Dec), heated-pool table, year-round table, April / May / October recommendations, pool-season-by-hotel table (sourced from DB `season` + `heated_pool` + `year_round`).
+## Phase 4 — Routing, city hubs, programmatic SEO (priorities 4, 5, 10, 12)
 
-## Phase 3 — Trust, legal, schema (Priorities 10, 11, 12, 13, 14)
+- Audit every guide route so each renders its own SSR HTML, H1, intro, ranking, FAQ, canonical and OG tags — never the city hub fallback. Add a routing test that asserts each guide URL returns its own `<h1>` and title.
+- City hubs become destination-specific: category blocks are generated from actual hotel counts per destination (a category renders only when enough hotels qualify), so Barcelona shows rooftop/beachfront/heated/quiet/family while Paris shows indoor/spa/lap/rooftop.
+- A small set of high-value programmatic pages driven by one template with per-page editorial intro + FAQs: `/barcelona/heated-pool-hotels`, `/gran-canaria/heated-pools-winter`, `/mallorca/adults-only-pool-hotels`, `/london/indoor-pool-hotels`, `/paris/lap-pool-hotels`. Only pages with real editorial text and enough verified hotels ship; the rest stay unpublished.
+- Structured data audit: Organization, BreadcrumbList, Article, Hotel, Review, AggregateRating — emitted only from visible, verified data.
 
-10. Search and remove every "Edit with lovable.dev" footer link. Call `publish_settings--set_badge_visibility(hide_badge: true)` to hide the published badge.
+## Phase 5 — QA integrity checks (priorities 13, 14)
 
-11. Replace `hej@poollist.se` with `hello@bestpoolhotels.com` everywhere (disclosure, about, footer, contact).
+An admin "Data integrity" panel plus a server function that flags:
+- same hotel with different Pool Scores across sources
+- duplicate hotels (fuzzy match on name, official URL, address, previous names)
+- closed hotels still shown as active
+- missing official URL or verification status
+- contradictory facts (year-round = yes but seasonal-only season)
+- guide ranking order inconsistent with canonical scores
+- broken affiliate URLs (HEAD check)
+- guide URLs rendering a hub instead of the guide
 
-12. The existing `GuideMeta` component already handles trust blocks — extend it with: hotels checked count, hotels included count, verification method paragraph, affiliate disclosure line, "no paid placements" line. Wire into all guide pages.
+Editorial credibility: claims of personal visits are removed unless a visit record exists; the verification vocabulary is limited to the four states above. Editor profile pages are deferred until real contributors exist.
 
-13. **Structured data** (JSON-LD via `head().scripts`):
-    - `/` — `WebSite` + `Organization`
-    - `/barcelona` — `CollectionPage` + `BreadcrumbList`
-    - guide pages — `Article` + `ItemList` (hotels) + `BreadcrumbList`; `FAQPage` only when the page renders a visible FAQ
-    - `/hotels/$slug` — `Article` + `Hotel`/`LodgingBusiness` + `BreadcrumbList` + `ImageObject`
+## Technical notes
 
-14. Image SEO: rename `cover_image_url` semantics to require descriptive alt text. Add `image_credit` + `license_source` columns to `hotel_photos`. Render credit under photos. Skip any photo without a license source.
+- Filters live in TanStack Router `validateSearch` so state is in the URL and SSR-rendered.
+- Pagination and filtering happen in Postgres, not client-side.
+- New columns get GRANTs and the view keeps its existing anon read policy.
+- No visual identity changes; new UI reuses existing tokens and components.
 
-## Phase 4 — Internal linking (Priority 15)
+## Sequence
 
-15. On every hotel profile, render a "Featured in" block listing every guide the hotel appears in. On every guide, every hotel name links to its profile (already true). Add a "Compared with" block on profiles linking to:
-    - Grand Hotel Central vs The Barcelona EDITION
-    - Grand Hotel Central vs Kimpton Vividora
-    - Hotel Arts vs W Barcelona
-    These are 3 new comparison routes — only build them with unique side-by-side data tables (pool, location, vibe, best for, price). No thin pages.
-
-## Suggested order of execution
-
-We can ship Phase 1 in one batch (migration + scoring rewrite + Grand Hotel Central fix), then iterate Phase 2 page by page so you can review each Barcelona guide as it lands. Phase 3 is one batch (legal + badge + schema). Phase 4 last because it depends on the new comparison content.
-
-## Out of scope until you say otherwise
-
-- New cities (only Barcelona is being rebuilt here).
-- The 3 vs-comparison routes get built only after Phase 1–3 ship and we agree on the template.
-- Automated photo licensing — for now, photos without a `license_source` simply don't render.
-
-## Ready to start?
-
-If this matches your intent, I'll begin with **Phase 1** (DB migration + scoring + Grand Hotel Central). It's the highest-leverage fix — everything else reads from it. Confirm and I'll write the migration first.
+Phases run in order — 1 unblocks everything else, and 5 verifies the result. I'll report after each phase.
