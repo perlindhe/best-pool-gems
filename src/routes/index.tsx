@@ -118,7 +118,7 @@ function Home() {
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Start exploring</p>
               <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
-                {total} pools, one database
+                {total} verified pools
               </h2>
               <p className="mt-4 max-w-xl text-sm text-muted-foreground">
                 Every pool is scored on the same five criteria and marked with its verification
