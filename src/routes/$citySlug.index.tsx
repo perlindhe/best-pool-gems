@@ -215,10 +215,8 @@ function CityHub() {
         </section>
       )}
 
-
-
-      {/* Guides for this city */}
-      {cityGuides.length > 0 && (
+      {/* Guides + data-driven collections for this city */}
+      {(cityGuides.length > 0 || cityCollections.length > 0) && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Guides</p>
           <h2 className="mt-3 font-display text-5xl tracking-wide">All {city.name} guides</h2>
@@ -239,9 +237,24 @@ function CityHub() {
                 <p className="mt-2 text-sm text-muted-foreground">{g.excerpt}</p>
               </Link>
             ))}
+            {cityCollections.map((c) => (
+              <Link
+                key={`${c.citySlug}/${c.articleSlug}`}
+                to="/$citySlug/$articleSlug"
+                params={{ citySlug: c.citySlug, articleSlug: c.articleSlug }}
+                className="group rounded-xl border border-border/60 bg-surface/60 p-6 transition hover:border-primary/60"
+              >
+                <p className="text-[10px] uppercase tracking-[0.3em] text-primary">{c.category}</p>
+                <h3 className="mt-3 font-display text-3xl leading-tight tracking-wide group-hover:text-primary">
+                  {c.title}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">{c.excerpt}</p>
+              </Link>
+            ))}
           </div>
         </section>
       )}
+
 
       {/* Top hotels list (if any) */}
       {city.hotels.length > 0 && (
