@@ -96,3 +96,24 @@ export type PoolQuote = {
   source_url: string | null;
 };
 
+
+/**
+ * Resolve a legacy slug for a hotel that was renamed/merged into another record.
+ * Returns the canonical slug, or null if the slug has no canonical successor.
+ */
+export async function resolveCanonicalSlug(slug: string): Promise<string | null> {
+  const { data: row } = await supabaseAdmin
+    .from("hotels")
+    .select("hotel_status, canonical_hotel_id")
+    .eq("slug", slug)
+    .maybeSingle();
+  const canonicalId = (row?.canonical_hotel_id as string | null) ?? null;
+  if (!row || !canonicalId) return null;
+  const { data: target } = await supabaseAdmin
+    .from("hotels")
+    .select("slug")
+    .eq("id", canonicalId)
+    .maybeSingle();
+  const targetSlug = (target?.slug as string | null) ?? null;
+  return targetSlug && targetSlug !== slug ? targetSlug : null;
+}
