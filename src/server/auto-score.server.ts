@@ -258,81 +258,50 @@ const PoolDescriptorSchema = {
   additionalProperties: false,
 };
 
-const FactCitationSchema = {
-  type: "object",
-  properties: {
-    source: { type: "string", enum: [...SOURCE_TAGS] },
-    quote: { type: "string", description: "Short verbatim phrase (≤ 240 chars) from that source" },
-  },
-  required: ["source", "quote"],
-  additionalProperties: false,
-};
-
-// Each cited fact has a value + a list of citations. Empty array means
-// "no evidence" and the value MUST be null.
+// Flat citation shape: which sources confirmed the fact + one verbatim quote.
+// (Kept deliberately small — deeply nested citation arrays blow past the
+// structured-output constraint limit of the model.)
 const CITED_BOOL_KEYS = [
   "is_rooftop", "is_infinity", "is_heated", "has_indoor", "has_outdoor",
   "is_saltwater", "has_kids_pool", "has_jacuzzi", "has_swim_up_bar",
   "has_cabanas", "has_poolside_food", "adults_only", "year_round",
 ] as const;
 
-const CitedBoolSchema = {
-  type: "object",
-  properties: {
-    value: { type: ["boolean", "null"] },
-    citations: { type: "array", items: FactCitationSchema, maxItems: 5 },
-  },
-  required: ["value", "citations"],
-  additionalProperties: false,
+const citedSourceProp = {
+  type: ["string", "null"],
+  enum: [...SOURCE_TAGS, null],
+  description: "The single strongest source that explicitly supports this value, or null if none.",
+};
+const citedQuoteProp = {
+  type: ["string", "null"],
+  description: "One short verbatim phrase (≤ 200 chars) from that source. Null if no evidence.",
 };
 
+const citedFact = (valueSchema: Record<string, unknown>) => ({
+  type: "object",
+  properties: {
+    value: valueSchema,
+    cited_source: citedSourceProp,
+    quote: citedQuoteProp,
+  },
+  required: ["value", "cited_source", "quote"],
+  additionalProperties: false,
+});
+
+
 const CitedFactsProperties: Record<string, unknown> = {};
-for (const k of CITED_BOOL_KEYS) CitedFactsProperties[k] = CitedBoolSchema;
-CitedFactsProperties.pool_count = {
-  type: "object",
-  properties: {
-    value: { type: ["integer", "null"], minimum: 1, maximum: 30 },
-    citations: { type: "array", items: FactCitationSchema, maxItems: 5 },
-  },
-  required: ["value", "citations"],
-  additionalProperties: false,
-};
-CitedFactsProperties.size_estimate = {
-  type: "object",
-  properties: {
-    value: { type: ["string", "null"], enum: ["small", "medium", "large", "very_large", null] },
-    citations: { type: "array", items: FactCitationSchema, maxItems: 3 },
-  },
-  required: ["value", "citations"],
-  additionalProperties: false,
-};
-CitedFactsProperties.length_m = {
-  type: "object",
-  properties: {
-    value: { type: ["number", "null"], minimum: 3, maximum: 200 },
-    citations: { type: "array", items: FactCitationSchema, maxItems: 3 },
-  },
-  required: ["value", "citations"],
-  additionalProperties: false,
-};
-CitedFactsProperties.view = {
-  type: "object",
-  properties: {
-    value: { type: ["string", "null"] },
-    citations: { type: "array", items: FactCitationSchema, maxItems: 3 },
-  },
-  required: ["value", "citations"],
-  additionalProperties: false,
-};
-CitedFactsProperties.season = {
-  type: "object",
-  properties: {
-    value: { type: ["string", "null"] },
-    citations: { type: "array", items: FactCitationSchema, maxItems: 3 },
-  },
-  required: ["value", "citations"],
-  additionalProperties: false,
-};
+for (const k of CITED_BOOL_KEYS) {
+  CitedFactsProperties[k] = citedFact({ type: ["boolean", "null"] });
+}
+CitedFactsProperties.pool_count = citedFact({ type: ["integer", "null"], minimum: 1, maximum: 30 });
+CitedFactsProperties.size_estimate = citedFact({
+  type: ["string", "null"],
+  enum: ["small", "medium", "large", "very_large", null],
+});
+CitedFactsProperties.length_m = citedFact({ type: ["number", "null"], minimum: 3, maximum: 200 });
+CitedFactsProperties.view = citedFact({ type: ["string", "null"] });
+CitedFactsProperties.season = citedFact({ type: ["string", "null"] });
+
 
 const CitedFactsRequired = [
   ...CITED_BOOL_KEYS,
@@ -360,9 +329,10 @@ PART B — EXTRACT structured pool FACTS, with strict rules:
   • Hotels often have MULTIPLE pools (main + spa + kids + jacuzzi). Return one
     entry per distinct pool in the "pools" array, each with its own source quote.
   • For each top-level fact (heated, indoor, jacuzzi, etc.) return an object
-    { value, citations: [{ source, quote }, ...] }.
-  • If you have no direct quote supporting a fact, set value = null and
-    citations = []. Do NOT guess. Better null than wrong.
+    { value, cited_source, quote } where cited_source is the single strongest
+    source that explicitly supports the value.
+  • If you have no direct quote supporting a fact, set value = null,
+    cited_source = null and quote = null. Do NOT guess. Better null than wrong.
   • Citations must be VERBATIM short phrases from the labelled evidence above.
     Do not paraphrase. Do not invent text. Do not cite a source that did not
     appear in the input.
@@ -400,7 +370,7 @@ const AiToolSchema = {
           type: "array",
           items: PoolDescriptorSchema,
           minItems: 0,
-          maxItems: 8,
+          maxItems: 6,
           description: "One entry per distinct pool you can confirm with a source quote.",
         },
         cited_facts: {
@@ -635,7 +605,10 @@ export async function autoScoreHotelById(hotel_id: string) {
     confidence: string;
     reasoning: string;
     pools: PoolDescriptor[];
-    cited_facts: Record<string, CitedBool | CitedNum | CitedStr>;
+    cited_facts: Record<
+      string,
+      { value: unknown; cited_source?: string | null; quote?: string | null }
+    >;
   };
 
   // Convert the AI's legacy 0–2 sub-scores into the canonical 5-criteria 0–10 shape
@@ -649,13 +622,30 @@ export async function autoScoreHotelById(hotel_id: string) {
   });
 
 
+  // ---- Normalise flat citation shape -> { value, citations[] } ----
+  const rawFacts = parsed.cited_facts ?? {};
+  const cf: Record<string, { value: unknown; citations: Citation[] }> = {};
+  for (const [key, f] of Object.entries(rawFacts)) {
+    const tag = f?.cited_source ?? null;
+    const valid = (SOURCE_TAGS as readonly string[]).includes(tag ?? "");
+    const quote = (f?.quote ?? "").toString().slice(0, 240);
+    cf[key] = {
+      value: f?.value ?? null,
+      citations:
+        valid && tag
+          ? [{ source: tag as Citation["source"], quote: quote || `Confirmed by ${tag}` }]
+          : [],
+    };
+  }
+
+
   // ---- Apply confidence gate at the data layer ----
-  const cf = parsed.cited_facts ?? {};
   const sources: Record<string, Citation[]> = {};
   const collect = <T,>(key: string, gated: { value: T | null; citations: Citation[] }) => {
     if (gated.citations.length) sources[key] = gated.citations;
     return gated.value;
   };
+
 
   const facts: PoolFacts = {
     pool_count: collect("pool_count", gateScalar(cf.pool_count as CitedNum)),
