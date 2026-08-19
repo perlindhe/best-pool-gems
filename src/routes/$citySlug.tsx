@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
 import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
+import { getCityHubSummaryFn } from "@/lib/city-hub.functions";
 
 const PAGE_SIZE = 10;
 
@@ -19,9 +20,13 @@ export const Route = createFileRoute("/$citySlug")({
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
-    const hotelInfo = await getCityHotelPhotos({ data: { citySlug: city.slug } });
-    return { city, cityGuides, hotelInfo };
+    const [hotelInfo, summary] = await Promise.all([
+      getCityHotelPhotos({ data: { citySlug: city.slug } }),
+      getCityHubSummaryFn({ data: { citySlug: city.slug } }).catch(() => null),
+    ]);
+    return { city, cityGuides, hotelInfo, summary };
   },
+
   head: ({ params, loaderData }) => {
     const city = loaderData?.city;
     if (!city) return {};
