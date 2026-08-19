@@ -38,7 +38,7 @@ export function buildOffSeasonList(
       name: h.name,
       neighborhood: h.neighborhood,
       poolType: h.poolType,
-      heatedMonths: h.bestTime,
+      heatedMonths: h.bestTime ?? "Shoulder season",
       heatedPools: "Heated outdoor pool",
       note: h.highlight,
       score: h.score,
