@@ -14,7 +14,7 @@ const citySearchSchema = z.object({
   page: fallback(z.number().int().min(1).max(20), 1).default(1),
 });
 
-export const Route = createFileRoute("/$citySlug")({
+export const Route = createFileRoute("/$citySlug/")({
   validateSearch: zodValidator(citySearchSchema),
   loader: async ({ params }) => {
     const city = getCity(params.citySlug);
