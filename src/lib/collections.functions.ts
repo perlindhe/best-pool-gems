@@ -17,7 +17,7 @@ export const listCollectionHotels = createServerFn({ method: "GET" })
     const { hotels, total } = await listCanonicalHotels({
       city: collection.citySlug,
       ...collection.filter,
-      limit: 24,
+      limit: 50,
     });
     return { hotels, total };
   });
