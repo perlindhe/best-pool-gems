@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
+import { IntegrityPanel } from "@/components/admin/IntegrityPanel";
 import { SiteHeader } from "@/components/SiteHeader";
 
 installServerFnAuth();
@@ -36,7 +37,7 @@ type AnyRec = Record<string, any>;
 function AdminPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
-  const [tab, setTab] = useState<"hotels" | "scores" | "settings">("hotels");
+  const [tab, setTab] = useState<"hotels" | "scores" | "integrity" | "settings">("hotels");
   const [hotels, setHotels] = useState<AnyRec[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<AnyRec | null>(null);
@@ -279,6 +280,12 @@ function AdminPage() {
               Pool scores
             </button>
             <button
+              onClick={() => setTab("integrity")}
+              className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${tab === "integrity" ? "bg-primary text-primary-foreground" : "border border-border"}`}
+            >
+              Integrity
+            </button>
+            <button
               onClick={() => setTab("settings")}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${tab === "settings" ? "bg-primary text-primary-foreground" : "border border-border"}`}
             >
@@ -442,6 +449,8 @@ function AdminPage() {
           <SettingsPanel onSaved={() => setMsg("Settings saved")} />
         ) : tab === "scores" ? (
           <PoolScoresTable onMsg={setMsg} />
+        ) : tab === "integrity" ? (
+          <IntegrityPanel />
         ) : (
           <div className="mt-8 grid gap-6 lg:grid-cols-[360px_1fr]">
             <aside className="rounded-lg border border-border/60 bg-surface/40 p-4">
