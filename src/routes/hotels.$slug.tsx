@@ -275,7 +275,7 @@ function HotelDetailPage() {
 
       {/* Facts + text on the left, gallery on the right */}
       <section className="mx-auto max-w-7xl px-6 pb-16">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_380px]">
           {/* Left column */}
           <div>
             {/* Pool facts */}
