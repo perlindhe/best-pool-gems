@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
-import { PoolScoreBreakdown, MetaRatingBreakdown } from "@/components/ScoreBreakdown";
+import { MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
@@ -328,7 +328,7 @@ function HotelDetailPage() {
             In their own words
           </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {quotes.slice(0, 3).map((q, i) => (
+            {quotes.slice(0, 6).map((q, i) => (
               <figure
                 key={i}
                 className="relative flex flex-col rounded-2xl border border-border/60 bg-surface/50 p-7 shadow-elegant"
@@ -488,7 +488,6 @@ function HotelDetailPage() {
 
       <StickyBookingBar
         name={hotel.name}
-        score={hotel.pool_score_0_10}
         url={hotel.affiliate_url ?? hotel.booking_url}
       />
       <div className="h-20 md:hidden" aria-hidden="true" />
