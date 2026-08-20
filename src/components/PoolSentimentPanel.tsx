@@ -1,3 +1,5 @@
+import { MessagesSquare } from "lucide-react";
+import { SectionIcon } from "@/components/SectionHeading";
 import type { PoolQuote } from "@/server/hotel-detail.server";
 
 const NEGATIVE = [
