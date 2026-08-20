@@ -331,12 +331,11 @@ function HotelDetailPage() {
       {/* Pool quotes from guests */}
       {quotes.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">
-            What guests say about the pool
-          </p>
-          <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
-            In their own words
-          </h2>
+          <SectionHeading
+            icon={Quote}
+            eyebrow="What guests say about the pool"
+            title="In their own words"
+          />
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {quotes.slice(0, 6).map((q, i) => (
               <figure
