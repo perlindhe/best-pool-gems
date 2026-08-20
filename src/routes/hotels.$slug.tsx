@@ -308,8 +308,11 @@ function HotelDetailPage() {
         <div className="max-w-3xl">
           {hotel.editorial_notes && (
             <>
-              <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
-              <p className="mt-4 font-display text-2xl leading-snug tracking-wide text-foreground/95 md:text-3xl">
+              <div className="flex items-center gap-4">
+                <SectionIcon icon={PenLine} />
+                <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
+              </div>
+              <p className="mt-5 font-display text-2xl leading-snug tracking-wide text-foreground/95 md:text-3xl">
                 {hotel.editorial_notes}
               </p>
             </>
