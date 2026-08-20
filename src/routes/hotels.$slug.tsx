@@ -9,6 +9,16 @@ import { VerificationMethodBadge, verificationMethodDetail } from "@/components/
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
 import { PoolSentimentPanel } from "@/components/PoolSentimentPanel";
 import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
+import { SectionHeading, SectionIcon } from "@/components/SectionHeading";
+import {
+  Waves,
+  BarChart3,
+  PenLine,
+  Quote,
+  Images,
+  ShieldCheck,
+  GitCompareArrows,
+} from "lucide-react";
 import type { HotelPhoto } from "@/server/hotel-detail.server";
 
 export const Route = createFileRoute("/hotels/$slug")({
@@ -265,14 +275,12 @@ function HotelDetailPage() {
 
       {/* Pool facts — front and centre */}
       <section className="mx-auto max-w-6xl px-6 pb-12">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">Pool facts</p>
-        <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
-          What we know about the pool
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Every fact below comes from the hotel's own website, Google, TripAdvisor or guest
-          reviews — with the source noted where we have one.
-        </p>
+        <SectionHeading
+          icon={Waves}
+          eyebrow="Pool facts"
+          title="What we know about the pool"
+          description="Every fact below comes from the hotel's own website, Google, TripAdvisor or guest reviews — with the source noted where we have one."
+        />
         <div className="mt-6 rounded-lg border border-border/60 bg-surface/50 p-6 md:p-8">
           <PoolFactsTable facts={hotel.pool_facts} />
         </div>
@@ -280,14 +288,12 @@ function HotelDetailPage() {
 
       {/* Meta rating breakdown */}
       <section className="mx-auto max-w-6xl px-6 pb-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">Behind the numbers</p>
-        <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
-          How the meta rating is built
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          The <strong className="text-foreground">meta rating</strong> is a weighted blend of
-          every guest-rating source we track, weighted by review volume and recency.
-        </p>
+        <SectionHeading
+          icon={BarChart3}
+          eyebrow="Behind the numbers"
+          title="How the meta rating is built"
+          description="The meta rating is a weighted blend of every guest-rating source we track, weighted by review volume and recency."
+        />
         <div className="mt-6">
           <MetaRatingBreakdown
             metaRating={hotel.meta_rating_0_100}
@@ -302,8 +308,11 @@ function HotelDetailPage() {
         <div className="max-w-3xl">
           {hotel.editorial_notes && (
             <>
-              <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
-              <p className="mt-4 font-display text-2xl leading-snug tracking-wide text-foreground/95 md:text-3xl">
+              <div className="flex items-center gap-4">
+                <SectionIcon icon={PenLine} />
+                <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
+              </div>
+              <p className="mt-5 font-display text-2xl leading-snug tracking-wide text-foreground/95 md:text-3xl">
                 {hotel.editorial_notes}
               </p>
             </>
@@ -322,12 +331,11 @@ function HotelDetailPage() {
       {/* Pool quotes from guests */}
       {quotes.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">
-            What guests say about the pool
-          </p>
-          <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
-            In their own words
-          </h2>
+          <SectionHeading
+            icon={Quote}
+            eyebrow="What guests say about the pool"
+            title="In their own words"
+          />
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {quotes.slice(0, 6).map((q, i) => (
               <figure
@@ -370,10 +378,7 @@ function HotelDetailPage() {
       {/* Gallery */}
       {gallery.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Gallery</p>
-          <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
-            More from the property
-          </h2>
+          <SectionHeading icon={Images} eyebrow="Gallery" title="More from the property" />
           <div className="mt-8 columns-1 gap-4 sm:columns-2 md:columns-3 [&>figure]:mb-4 [&>figure]:break-inside-avoid">
             {gallery.map((p: HotelPhoto, i: number) => (
               <figure
@@ -403,12 +408,17 @@ function HotelDetailPage() {
       {/* Sources & verification */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">
-            Sources &amp; verification
-          </p>
-          <h2 className="mt-3 font-display text-2xl tracking-wide md:text-3xl">
-            How we verified this pool
-          </h2>
+          <div className="flex items-start gap-4">
+            <SectionIcon icon={ShieldCheck} />
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">
+                Sources &amp; verification
+              </p>
+              <h2 className="mt-2 font-display text-2xl tracking-wide md:text-3xl">
+                How we verified this pool
+              </h2>
+            </div>
+          </div>
           <div className="mt-5 grid gap-6 md:grid-cols-2">
             <div>
               <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
@@ -524,10 +534,15 @@ function ComparedWith({ slug }: { slug: string }) {
   return (
     <section className="mx-auto max-w-6xl px-6 pb-20">
       <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">Compared with</p>
-        <h2 className="mt-3 font-display text-2xl tracking-wide md:text-3xl">
-          Side-by-side comparisons
-        </h2>
+        <div className="flex items-start gap-4">
+          <SectionIcon icon={GitCompareArrows} />
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">Compared with</p>
+            <h2 className="mt-2 font-display text-2xl tracking-wide md:text-3xl">
+              Side-by-side comparisons
+            </h2>
+          </div>
+        </div>
         <ul className="mt-5 space-y-2 text-sm">
           {items.map((c) => (
             <li key={c.pair}>

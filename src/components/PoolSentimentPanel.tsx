@@ -1,3 +1,5 @@
+import { MessagesSquare } from "lucide-react";
+import { SectionIcon } from "@/components/SectionHeading";
 import type { PoolQuote } from "@/server/hotel-detail.server";
 
 const NEGATIVE = [
@@ -81,12 +83,15 @@ export function PoolSentimentPanel({
   return (
     <section className="mx-auto max-w-6xl px-6 pb-12">
       <div className="rounded-lg border border-border/60 bg-surface/50 p-6 md:p-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">
-          Full transparency
-        </p>
-        <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
-          Every pool comment we found
-        </h2>
+        <div className="flex items-start gap-4">
+          <SectionIcon icon={MessagesSquare} />
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">Full transparency</p>
+            <h2 className="mt-2 font-display text-3xl tracking-wide md:text-4xl">
+              Every pool comment we found
+            </h2>
+          </div>
+        </div>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           All {quotes.length} guest comments we collected about the pool at {hotelName} —
           praise and criticism alike, unedited and linked to their source.
