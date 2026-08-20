@@ -534,10 +534,15 @@ function ComparedWith({ slug }: { slug: string }) {
   return (
     <section className="mx-auto max-w-6xl px-6 pb-20">
       <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">Compared with</p>
-        <h2 className="mt-3 font-display text-2xl tracking-wide md:text-3xl">
-          Side-by-side comparisons
-        </h2>
+        <div className="flex items-start gap-4">
+          <SectionIcon icon={GitCompareArrows} />
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">Compared with</p>
+            <h2 className="mt-2 font-display text-2xl tracking-wide md:text-3xl">
+              Side-by-side comparisons
+            </h2>
+          </div>
+        </div>
         <ul className="mt-5 space-y-2 text-sm">
           {items.map((c) => (
             <li key={c.pair}>
