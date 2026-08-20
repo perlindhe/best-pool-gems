@@ -7,6 +7,7 @@ import { MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
+import { PoolSentimentPanel } from "@/components/PoolSentimentPanel";
 import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
 import type { HotelPhoto } from "@/server/hotel-detail.server";
 
@@ -362,6 +363,9 @@ function HotelDetailPage() {
           </div>
         </section>
       )}
+
+      {/* All pool comments, positive and negative */}
+      <PoolSentimentPanel hotelName={hotel.name} quotes={quotes} />
 
       {/* Gallery */}
       {gallery.length > 0 && (
