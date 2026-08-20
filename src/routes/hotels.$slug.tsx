@@ -265,14 +265,12 @@ function HotelDetailPage() {
 
       {/* Pool facts — front and centre */}
       <section className="mx-auto max-w-6xl px-6 pb-12">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">Pool facts</p>
-        <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
-          What we know about the pool
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Every fact below comes from the hotel's own website, Google, TripAdvisor or guest
-          reviews — with the source noted where we have one.
-        </p>
+        <SectionHeading
+          icon={Waves}
+          eyebrow="Pool facts"
+          title="What we know about the pool"
+          description="Every fact below comes from the hotel's own website, Google, TripAdvisor or guest reviews — with the source noted where we have one."
+        />
         <div className="mt-6 rounded-lg border border-border/60 bg-surface/50 p-6 md:p-8">
           <PoolFactsTable facts={hotel.pool_facts} />
         </div>
@@ -280,14 +278,12 @@ function HotelDetailPage() {
 
       {/* Meta rating breakdown */}
       <section className="mx-auto max-w-6xl px-6 pb-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">Behind the numbers</p>
-        <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
-          How the meta rating is built
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          The <strong className="text-foreground">meta rating</strong> is a weighted blend of
-          every guest-rating source we track, weighted by review volume and recency.
-        </p>
+        <SectionHeading
+          icon={BarChart3}
+          eyebrow="Behind the numbers"
+          title="How the meta rating is built"
+          description="The meta rating is a weighted blend of every guest-rating source we track, weighted by review volume and recency."
+        />
         <div className="mt-6">
           <MetaRatingBreakdown
             metaRating={hotel.meta_rating_0_100}
