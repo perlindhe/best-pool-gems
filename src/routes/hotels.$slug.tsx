@@ -197,9 +197,9 @@ function HotelDetailPage() {
             {hotel.verification_method && hotel.verification_method !== "research_pending" && (
               <VerificationMethodBadge method={hotel.verification_method} />
             )}
-            {hotel.pool_score_0_10 != null && (
+            {hotel.meta_rating_0_100 != null && (
               <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/60 bg-primary/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
-                Pool score {hotel.pool_score_0_10.toFixed(1)}/10
+                Meta rating {Math.round(hotel.meta_rating_0_100)}/100
               </span>
             )}
           </div>
