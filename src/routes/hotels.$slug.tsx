@@ -273,60 +273,105 @@ function HotelDetailPage() {
         officialUrl={hotel.official_url ?? hotel.website_url}
       />
 
-      {/* Pool facts — front and centre */}
-      <section className="mx-auto max-w-6xl px-6 pb-12">
-        <SectionHeading
-          icon={Waves}
-          eyebrow="Pool facts"
-          title="What we know about the pool"
-          description="Every fact below comes from the hotel's own website, Google, TripAdvisor or guest reviews — with the source noted where we have one."
-        />
-        <div className="mt-6 rounded-lg border border-border/60 bg-surface/50 p-6 md:p-8">
-          <PoolFactsTable facts={hotel.pool_facts} />
-        </div>
-      </section>
-
-      {/* Meta rating breakdown */}
-      <section className="mx-auto max-w-6xl px-6 pb-4">
-        <SectionHeading
-          icon={BarChart3}
-          eyebrow="Behind the numbers"
-          title="How the meta rating is built"
-          description="The meta rating is a weighted blend of every guest-rating source we track, weighted by review volume and recency."
-        />
-        <div className="mt-6">
-          <MetaRatingBreakdown
-            metaRating={hotel.meta_rating_0_100}
-            confidence={hotel.confidence_0_100}
-            sources={sources}
-          />
-        </div>
-      </section>
-
-      {/* Editorial */}
-      <section className="mx-auto max-w-6xl px-6 pb-12">
-        <div className="max-w-3xl">
-          {hotel.editorial_notes && (
-            <>
-              <div className="flex items-center gap-4">
-                <SectionIcon icon={PenLine} />
-                <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
+      {/* Facts + text on the left, gallery on the right */}
+      <section className="mx-auto max-w-7xl px-6 pb-16">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+          {/* Left column */}
+          <div>
+            {/* Pool facts */}
+            <SectionHeading
+              icon={Waves}
+              eyebrow="Pool facts"
+              title="What we know about the pool"
+              description="Every fact below comes from the hotel's own website, Google, TripAdvisor or guest reviews — with the source noted where we have one."
+            />
+            <div className="mt-6 overflow-hidden rounded-lg border border-border/60 bg-surface/50">
+              {photos[1]?.url && (
+                <img
+                  src={photos[1].url}
+                  alt={`Pool detail at ${hotel.name}`}
+                  loading="lazy"
+                  className="h-40 w-full object-cover md:h-52"
+                />
+              )}
+              <div className="p-6 md:p-8">
+                <PoolFactsTable facts={hotel.pool_facts} />
               </div>
-              <p className="mt-5 font-display text-2xl leading-snug tracking-wide text-foreground/95 md:text-3xl">
-                {hotel.editorial_notes}
+            </div>
+
+            {/* Meta rating breakdown */}
+            <div className="mt-14">
+              <SectionHeading
+                icon={BarChart3}
+                eyebrow="Behind the numbers"
+                title="How the meta rating is built"
+                description="The meta rating is a weighted blend of every guest-rating source we track, weighted by review volume and recency."
+              />
+              <div className="mt-6">
+                <MetaRatingBreakdown
+                  metaRating={hotel.meta_rating_0_100}
+                  confidence={hotel.confidence_0_100}
+                  sources={sources}
+                />
+              </div>
+            </div>
+
+            {/* Editorial */}
+            <div className="mt-14 max-w-3xl">
+              {hotel.editorial_notes && (
+                <>
+                  <div className="flex items-center gap-4">
+                    <SectionIcon icon={PenLine} />
+                    <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
+                  </div>
+                  <p className="mt-5 font-display text-2xl leading-snug tracking-wide text-foreground/95 md:text-3xl">
+                    {hotel.editorial_notes}
+                  </p>
+                </>
+              )}
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <CheckAvailability url={hotel.affiliate_url ?? hotel.booking_url} />
+                <OfficialSiteLink url={hotel.official_url ?? hotel.website_url} />
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                {verificationMethodDetail(hotel.verification_method)} Booking links may earn us a
+                commission; they never influence the ranking order.
               </p>
-            </>
-          )}
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <CheckAvailability url={hotel.affiliate_url ?? hotel.booking_url} />
-            <OfficialSiteLink url={hotel.official_url ?? hotel.website_url} />
+            </div>
           </div>
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            {verificationMethodDetail(hotel.verification_method)} Booking links may earn us a
-            commission; they never influence the ranking order.
-          </p>
+
+          {/* Right column — gallery */}
+          {gallery.length > 0 && (
+            <aside className="lg:sticky lg:top-24 lg:self-start">
+              <SectionHeading icon={Images} eyebrow="Gallery" title="More from the property" />
+              <div className="mt-6 grid grid-cols-2 gap-3 lg:max-h-[70vh] lg:overflow-y-auto lg:pr-1">
+                {gallery.map((p: HotelPhoto, i: number) => (
+                  <figure
+                    key={i}
+                    className="group overflow-hidden rounded-lg border border-border/50 bg-surface/40"
+                  >
+                    <img
+                      src={p.url}
+                      alt={`${hotel.name} — photo ${i + 2}`}
+                      loading="lazy"
+                      className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                    />
+                    {p.attribution && (
+                      <figcaption className="px-2 py-1.5 text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+                        © {p.attribution}
+                      </figcaption>
+                    )}
+                  </figure>
+                ))}
+              </div>
+              <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Photos via Google, TripAdvisor and the hotel's own website
+              </p>
+            </aside>
+          )}
         </div>
       </section>
+
 
       {/* Pool quotes from guests */}
       {quotes.length > 0 && (
