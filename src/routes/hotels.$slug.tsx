@@ -420,35 +420,8 @@ function HotelDetailPage() {
       {/* All pool comments, positive and negative */}
       <PoolSentimentPanel hotelName={hotel.name} quotes={quotes} />
 
-      {/* Gallery */}
-      {gallery.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pb-20">
-          <SectionHeading icon={Images} eyebrow="Gallery" title="More from the property" />
-          <div className="mt-8 columns-1 gap-4 sm:columns-2 md:columns-3 [&>figure]:mb-4 [&>figure]:break-inside-avoid">
-            {gallery.map((p: HotelPhoto, i: number) => (
-              <figure
-                key={i}
-                className="group overflow-hidden rounded-lg border border-border/50 bg-surface/40"
-              >
-                <img
-                  src={p.url}
-                  alt={`${hotel.name} — photo ${i + 2}`}
-                  loading="lazy"
-                  className="w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                />
-                {p.attribution && (
-                  <figcaption className="px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                    © {p.attribution}
-                  </figcaption>
-                )}
-              </figure>
-            ))}
-          </div>
-          <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            Photos via Google, TripAdvisor and the hotel's own website
-          </p>
-        </section>
-      )}
+
+
 
       {/* Sources & verification */}
       <section className="mx-auto max-w-6xl px-6 pb-20">
