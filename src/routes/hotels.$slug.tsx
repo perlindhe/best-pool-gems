@@ -378,10 +378,7 @@ function HotelDetailPage() {
       {/* Gallery */}
       {gallery.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Gallery</p>
-          <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
-            More from the property
-          </h2>
+          <SectionHeading icon={Images} eyebrow="Gallery" title="More from the property" />
           <div className="mt-8 columns-1 gap-4 sm:columns-2 md:columns-3 [&>figure]:mb-4 [&>figure]:break-inside-avoid">
             {gallery.map((p: HotelPhoto, i: number) => (
               <figure
