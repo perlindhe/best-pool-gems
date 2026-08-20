@@ -117,10 +117,13 @@ export function HeatedPoolPanel({
   return (
     <section className="mx-auto max-w-6xl px-6 pb-4">
       <div className="rounded-lg border border-primary/40 bg-primary/[0.06] p-6 shadow-elegant md:p-8">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-primary">Heated pool check</p>
-            <h2 className="mt-2 font-display text-3xl tracking-wide md:text-4xl">{headline}</h2>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex items-start gap-4">
+            <SectionIcon icon={Thermometer} />
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">Heated pool check</p>
+              <h2 className="mt-2 font-display text-3xl tracking-wide md:text-4xl">{headline}</h2>
+            </div>
           </div>
           <span
             className={`rounded-sm border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${
