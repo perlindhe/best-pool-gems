@@ -1,3 +1,5 @@
+import { Thermometer } from "lucide-react";
+import { SectionIcon } from "@/components/SectionHeading";
 import type { PoolFacts, PoolCitation } from "@/lib/rankings.functions";
 import type { PoolQuote } from "@/server/hotel-detail.server";
 
