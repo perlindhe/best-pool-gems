@@ -364,6 +364,9 @@ function HotelDetailPage() {
         </section>
       )}
 
+      {/* All pool comments, positive and negative */}
+      <PoolSentimentPanel hotelName={hotel.name} quotes={quotes} />
+
       {/* Gallery */}
       {gallery.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-20">
