@@ -9,7 +9,7 @@ import { VerificationMethodBadge, verificationMethodDetail } from "@/components/
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
 import { PoolSentimentPanel } from "@/components/PoolSentimentPanel";
 import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
-import { SectionHeading } from "@/components/SectionHeading";
+import { SectionHeading, SectionIcon } from "@/components/SectionHeading";
 import {
   Waves,
   BarChart3,
