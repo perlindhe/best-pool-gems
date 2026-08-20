@@ -262,24 +262,32 @@ function HotelDetailPage() {
         officialUrl={hotel.official_url ?? hotel.website_url}
       />
 
-      {/* Score breakdown — explain how we got there */}
+      {/* Pool facts — front and centre */}
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <p className="text-xs uppercase tracking-[0.3em] text-primary">Pool facts</p>
+        <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
+          What we know about the pool
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          Every fact below comes from the hotel's own website, Google, TripAdvisor or guest
+          reviews — with the source noted where we have one.
+        </p>
+        <div className="mt-6 rounded-lg border border-border/60 bg-surface/50 p-6 md:p-8">
+          <PoolFactsTable facts={hotel.pool_facts} />
+        </div>
+      </section>
 
+      {/* Meta rating breakdown */}
       <section className="mx-auto max-w-6xl px-6 pb-4">
         <p className="text-xs uppercase tracking-[0.3em] text-primary">Behind the numbers</p>
         <h2 className="mt-3 font-display text-3xl tracking-wide md:text-4xl">
-          How we scored this hotel
+          How the meta rating is built
         </h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Two scores, two methods. The <strong className="text-foreground">pool score</strong>{" "}
-          is our editorial judgement of the pool itself. The{" "}
-          <strong className="text-foreground">meta rating</strong> is a weighted blend of every
-          guest-rating source we track.
+          The <strong className="text-foreground">meta rating</strong> is a weighted blend of
+          every guest-rating source we track, weighted by review volume and recency.
         </p>
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <PoolScoreBreakdown
-            total={hotel.pool_score_0_10}
-            components={hotel.pool_components}
-          />
+        <div className="mt-6">
           <MetaRatingBreakdown
             metaRating={hotel.meta_rating_0_100}
             confidence={hotel.confidence_0_100}
@@ -288,9 +296,9 @@ function HotelDetailPage() {
         </div>
       </section>
 
-      {/* Editorial + Facts */}
-      <section className="mx-auto grid max-w-6xl gap-10 px-6 pb-12 md:grid-cols-[1.4fr_1fr]">
-        <div>
+      {/* Editorial */}
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="max-w-3xl">
           {hotel.editorial_notes && (
             <>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Editor's note</p>
@@ -305,14 +313,8 @@ function HotelDetailPage() {
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
             {verificationMethodDetail(hotel.verification_method)} Booking links may earn us a
-            commission; they never influence the Pool Score or the ranking order.
+            commission; they never influence the ranking order.
           </p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Pool facts</p>
-          <div className="mt-4">
-            <PoolFactsTable facts={hotel.pool_facts} />
-          </div>
         </div>
       </section>
 
