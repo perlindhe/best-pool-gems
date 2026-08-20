@@ -220,21 +220,16 @@ function HotelDetailPage() {
 
       {/* Scores at-a-glance */}
       <section className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid gap-4 rounded-lg border border-border/60 bg-surface/50 p-6 md:grid-cols-3 md:p-8">
+        <div className="grid gap-4 rounded-lg border border-border/60 bg-surface/50 p-6 md:grid-cols-2 md:p-8">
           <ScoreBlock
-            label="Pool score"
-            value={hotel.pool_score_0_10 != null ? hotel.pool_score_0_10.toFixed(1) : "—"}
-            suffix="/10"
-            big
-          />
-          <ScoreBlock
-            label="Meta rating"
+            label="Meta rating — blended guest ratings"
             value={
               hotel.meta_rating_0_100 != null
                 ? Math.round(hotel.meta_rating_0_100).toString()
                 : "—"
             }
             suffix="/100"
+            big
           />
           <div className="flex flex-col justify-center gap-2 text-xs uppercase tracking-[0.18em]">
             {google && (
