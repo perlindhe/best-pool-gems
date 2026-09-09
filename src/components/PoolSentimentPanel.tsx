@@ -17,6 +17,24 @@ const POSITIVE = [
   "enjoy", "love", "recommend",
 ];
 
+// A quote is only published when it names something concrete about the pool.
+const CONCRETE = [
+  "heated", "heating", "temperature", "degrees", "warm", "cold", "lukewarm",
+  "metre", "meter", "metres", "meters", "length", "laps", "lane", "深",
+  "depth", "shallow", "deep", "rooftop", "roof", "indoor", "outdoor", "infinity",
+  "lounger", "sunbed", "chair", "towel", "shade", "sun", "morning", "afternoon",
+  "season", "open", "closed", "hours", "children", "kids", "adults", "crowded",
+  "quiet", "view", "salt", "chlorine", "clean", "dirty", "renovation", "day pass",
+  "spa", "jacuzzi", "bar", "size", "small", "large", "busy", "月", "januar",
+];
+
+function isSubstantive(q: PoolQuote) {
+  const text = (q.quote ?? "").trim();
+  if (text.length < 60) return false;
+  const t = text.toLowerCase();
+  return CONCRETE.some((w) => t.includes(w));
+}
+
 type Sentiment = "positive" | "negative" | "neutral";
 
 function classify(text: string): Sentiment {
@@ -68,12 +86,17 @@ export function PoolSentimentPanel({
   hotelName: string;
   quotes: PoolQuote[];
 }) {
-  if (!quotes.length) return null;
+  // Editorial quality bar: a published quote has to say something concrete about
+  // the pool. Very short or generic praise ("the pool is nice") is counted but
+  // not quoted, so the panel stays useful instead of padded.
+  const usable = quotes.filter(isSubstantive);
+  const generic = quotes.length - usable.length;
+  if (!usable.length && !generic) return null;
 
   const positive: PoolQuote[] = [];
   const negative: PoolQuote[] = [];
   const neutral: PoolQuote[] = [];
-  for (const q of quotes) {
+  for (const q of usable) {
     const s = classify(q.quote);
     if (s === "positive") positive.push(q);
     else if (s === "negative") negative.push(q);
@@ -93,7 +116,7 @@ export function PoolSentimentPanel({
           </div>
         </div>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          All {quotes.length} guest comments we collected about the pool at {hotelName} —
+          All {usable.length} substantive guest comments about the pool at {hotelName} —
           praise and criticism alike, unedited and linked to their source.
         </p>
 
@@ -148,6 +171,9 @@ export function PoolSentimentPanel({
         <p className="mt-6 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
           Comments are grouped automatically by tone and shown verbatim. We never remove
           negative feedback.
+          {generic > 0
+            ? ` ${generic} further comment${generic === 1 ? " was" : "s were"} too short or too generic to quote and are not shown.`
+            : ""}
         </p>
       </div>
     </section>

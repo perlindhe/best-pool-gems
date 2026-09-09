@@ -29,6 +29,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/disclosure", changefreq: "yearly", priority: "0.3" },
           { path: "/cookies", changefreq: "yearly", priority: "0.3" },
           { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+          { path: "/heated-pool-hotels", changefreq: "weekly", priority: "0.8" },
+          { path: "/rooftop-pool-hotels", changefreq: "weekly", priority: "0.8" },
+          { path: "/family-pool-hotels", changefreq: "weekly", priority: "0.8" },
+          { path: "/indoor-pool-hotels", changefreq: "weekly", priority: "0.8" },
         ];
 
         for (const c of cities) {
