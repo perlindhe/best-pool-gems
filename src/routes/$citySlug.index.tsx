@@ -1,13 +1,13 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { getCity, cities, getCityGuides, type Hotel, type Guide } from "@/data/hotels";
+import { getCity, cities, getCityGuides, type Guide } from "@/data/hotels";
 import { getCityCollections, type Collection } from "@/data/collections";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
-import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
-import { getCityHubSummaryFn } from "@/lib/city-hub.functions";
+import { getCityHubSummaryFn, listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
+import { hasCompletePoolScore } from "@/lib/scoring";
 
 const PAGE_SIZE = 10;
 
@@ -23,17 +23,18 @@ export const Route = createFileRoute("/$citySlug/")({
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
     const cityCollections = getCityCollections(city.slug);
-    const [hotelInfo, summary] = await Promise.all([
-      getCityHotelPhotos({ data: { citySlug: city.slug } }),
+    const [hotelList, summary] = await Promise.all([
+      listCityHotelsFn({ data: { citySlug: city.slug } }),
       getCityHubSummaryFn({ data: { citySlug: city.slug } }).catch(() => null),
     ]);
-    return { city, cityGuides, cityCollections, hotelInfo, summary };
+    return { city, cityGuides, cityCollections, hotels: hotelList.hotels, summary };
   },
 
 
   head: ({ params, loaderData, match }) => {
     const city = loaderData?.city;
     if (!city) return {};
+    const hotels = loaderData?.hotels ?? [];
     // Paginated variants add no separate search value — keep page 1 only.
     const pageNo = Number((match?.search as { page?: number } | undefined)?.page ?? 1);
     const title = `Best Pool Hotels in ${city.name} — Ranked & Reviewed`;
@@ -57,15 +58,16 @@ export const Route = createFileRoute("/$citySlug/")({
             { "@type": "ListItem", position: 2, name: city.name, item: url },
           ],
         },
-        ...(city.hotels.length
+        ...(hotels.length
           ? [
               {
                 "@type": "ItemList",
-                name: `Top ${city.hotels.length} pool hotels in ${city.name}`,
-                itemListElement: city.hotels.slice(0, 10).map((h, i) => ({
+                name: `Top ${hotels.length} pool hotels in ${city.name}`,
+                itemListElement: hotels.slice(0, 10).map((h, i) => ({
                   "@type": "ListItem",
                   position: i + 1,
                   name: h.name,
+                  url: `https://bestpoolhotels.com/hotels/${h.slug}`,
                 })),
               },
             ]
@@ -116,16 +118,16 @@ export const Route = createFileRoute("/$citySlug/")({
 });
 
 function CityHub() {
-  const { city, cityGuides, cityCollections, hotelInfo, summary } = Route.useLoaderData();
+  const { city, cityGuides, cityCollections, hotels, summary } = Route.useLoaderData();
 
 
 
   const { page = 1 } = Route.useSearch();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
-  const totalPages = Math.max(1, Math.ceil(city.hotels.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(hotels.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pagedHotels = city.hotels.slice(startIdx, startIdx + PAGE_SIZE);
+  const pagedHotels = hotels.slice(startIdx, startIdx + PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-background">
@@ -170,7 +172,7 @@ function CityHub() {
             <dl className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 { label: "Hotels tracked", value: String(summary.total) },
-                { label: "Verified pool data", value: `${summary.verified}/${summary.total}` },
+                { label: "Verified profiles", value: `${summary.verified}/${summary.total}` },
                 {
                   label: "Average Pool Score",
                   value: summary.avgScore != null ? summary.avgScore.toFixed(1) : "—",
@@ -268,13 +270,13 @@ function CityHub() {
 
 
       {/* Top hotels list (if any) */}
-      {city.hotels.length > 0 && (
+      {hotels.length > 0 && (
         <section className="mx-auto max-w-5xl space-y-6 px-6 pb-24">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Ranking</p>
               <h2 className="mt-2 font-display text-5xl tracking-wide">
-                Top {city.hotels.length}
+                Top {hotels.length}
               </h2>
             </div>
             {totalPages > 1 && (
@@ -283,18 +285,9 @@ function CityHub() {
               </p>
             )}
           </div>
-          {pagedHotels.map((h: Hotel) => {
-            const info = hotelInfo[h.name.toLowerCase()];
-            return (
-              <HotelCard
-                key={h.rank}
-                hotel={h}
-                slug={info?.slug ?? null}
-                photoUrl={info?.url ?? null}
-                bookingUrl={info?.bookingUrl ?? null}
-              />
-            );
-          })}
+          {pagedHotels.map((h: CityHotel, i: number) => (
+            <HotelCard key={h.id} hotel={h} rank={startIdx + i + 1} />
+          ))}
           {totalPages > 1 && (
             <nav className="mt-10 flex items-center justify-between border-t border-border/40 pt-8">
               {currentPage > 1 ? (
@@ -344,15 +337,15 @@ function CityHub() {
       )}
 
       {/* Themed mini-rankings */}
-      {city.hotels.length > 0 && (() => {
-        const themes: { key: string; label: string; intro: string; pick: (h: Hotel) => boolean }[] = [
-          { key: "rooftop", label: "Best rooftop pools", intro: "Skyline views, sunset DJs, plunge pools above the city.", pick: (h) => !!h.tags?.includes("rooftop") },
-          { key: "resort", label: "Resort & beachfront", intro: "Big-water, full-cabana hotels — closest thing to a beach resort in town.", pick: (h) => !!h.tags?.includes("resort") },
-          { key: "quiet", label: "Quiet & grown-up", intro: "Low-key crowd, no party soundtrack, real swimming space.", pick: (h) => !!h.tags?.includes("quiet") },
-          { key: "spa", label: "Pool + serious spa", intro: "Where the pool comes with a proper wellness floor.", pick: (h) => !!h.tags?.includes("spa") },
+      {hotels.length > 0 && (() => {
+        const themes: { key: string; label: string; intro: string; pick: (h: CityHotel) => boolean }[] = [
+          { key: "rooftop", label: "Best rooftop pools", intro: "Skyline views, sunset DJs, plunge pools above the city.", pick: (h) => h.rooftop === true },
+          { key: "resort", label: "Resort & beachfront", intro: "Big-water, full-cabana hotels — closest thing to a beach resort in town.", pick: (h) => h.beachfront === true },
+          { key: "quiet", label: "Adults only", intro: "Low-key crowd, no party soundtrack, real swimming space.", pick: (h) => h.adults_only === true },
+          { key: "spa", label: "Heated & indoor", intro: "Where the pool works outside high summer.", pick: (h) => h.heated_pool === true || h.indoor === true },
         ];
         const slices = themes
-          .map((t) => ({ ...t, items: city.hotels.filter(t.pick).slice(0, 3) }))
+          .map((t) => ({ ...t, items: hotels.filter(t.pick).slice(0, 3) }))
           .filter((t) => t.items.length > 0);
         if (slices.length === 0) return null;
         return (
@@ -369,13 +362,15 @@ function CityHub() {
                     <h3 className="font-display text-2xl tracking-wide text-primary">{s.label}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">{s.intro}</p>
                     <ol className="mt-5 space-y-3">
-                      {s.items.map((h: Hotel) => (
-                        <li key={h.rank} className="flex items-baseline justify-between gap-4 border-t border-border/30 pt-3 first:border-none first:pt-0">
+                      {s.items.map((h: CityHotel) => (
+                        <li key={h.id} className="flex items-baseline justify-between gap-4 border-t border-border/30 pt-3 first:border-none first:pt-0">
                           <div>
-                            <p className="font-display text-lg tracking-wide text-foreground">{h.name}</p>
-                            <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{h.neighborhood} · {h.poolType}</p>
+                            <Link to="/hotels/$slug" params={{ slug: h.slug }} className="font-display text-lg tracking-wide text-foreground hover:text-primary">{h.name}</Link>
+                            <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{[h.neighborhood, h.pool_type].filter(Boolean).join(" · ")}</p>
                           </div>
-                          <span className="font-mono text-sm text-primary">{h.score.toFixed(1)}</span>
+                          <span className="font-mono text-sm text-primary">
+                            {hasCompletePoolScore(h.pool_components, h.pool_score_0_10) ? h.pool_score_0_10!.toFixed(1) : "—"}
+                          </span>
                         </li>
                       ))}
                     </ol>
@@ -388,9 +383,10 @@ function CityHub() {
       })()}
 
       {/* Neighborhood snapshot */}
-      {city.hotels.length > 0 && (() => {
-        const byHood = new Map<string, Hotel[]>();
-        for (const h of city.hotels) {
+      {hotels.length > 0 && (() => {
+        const byHood = new Map<string, CityHotel[]>();
+        for (const h of hotels) {
+          if (!h.neighborhood) continue;
           const list = byHood.get(h.neighborhood) ?? [];
           list.push(h);
           byHood.set(h.neighborhood, list);
@@ -415,9 +411,11 @@ function CityHub() {
                   </p>
                   <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
                     {list.slice(0, 3).map((h) => (
-                      <li key={h.rank} className="flex justify-between gap-2">
+                      <li key={h.id} className="flex justify-between gap-2">
                         <span className="truncate text-foreground/80">{h.name}</span>
-                        <span className="font-mono text-xs text-primary">{h.score.toFixed(1)}</span>
+                        <span className="font-mono text-xs text-primary">
+                          {hasCompletePoolScore(h.pool_components, h.pool_score_0_10) ? h.pool_score_0_10!.toFixed(1) : "—"}
+                        </span>
                       </li>
                     ))}
                   </ul>

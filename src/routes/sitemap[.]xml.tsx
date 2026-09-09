@@ -70,6 +70,7 @@ export const Route = createFileRoute("/sitemap.xml")({
               .eq("editorial_status", "published")
               .eq("verification_status", "verified")
               .eq("hotel_status", "active")
+              .eq("qa_blocked", false)
               .is("canonical_hotel_id", null)
               .order("slug")
               .range(offset, offset + pageSize - 1);
