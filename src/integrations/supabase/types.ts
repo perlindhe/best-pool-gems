@@ -102,6 +102,7 @@ export type Database = {
           day_pass_available: boolean | null
           distance_to_beach_m: number | null
           editorial_notes: string | null
+          editorial_status: Database["public"]["Enums"]["editorial_status"]
           fact_verification: Json | null
           family_friendly: boolean | null
           guest_only: boolean | null
@@ -132,6 +133,7 @@ export type Database = {
           pool_view: string | null
           previous_names: string[] | null
           price_from_eur: number | null
+          primary_source_url: string | null
           quiet_party_level: number | null
           rank_position: number | null
           rooftop: boolean | null
@@ -139,13 +141,16 @@ export type Database = {
           score_last_updated: string | null
           scrape_website: boolean
           season: string | null
+          secondary_source_url: string | null
           slug: string
           sources: Json | null
           tags: string[] | null
           updated_at: string
           verification_method: string | null
+          verification_notes: string | null
           verification_sources: Json | null
           verification_status: Database["public"]["Enums"]["verification_status"]
+          verified_by: string | null
           vibe: string | null
           view_description: string | null
           view_type: string | null
@@ -172,6 +177,7 @@ export type Database = {
           day_pass_available?: boolean | null
           distance_to_beach_m?: number | null
           editorial_notes?: string | null
+          editorial_status?: Database["public"]["Enums"]["editorial_status"]
           fact_verification?: Json | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
@@ -202,6 +208,7 @@ export type Database = {
           pool_view?: string | null
           previous_names?: string[] | null
           price_from_eur?: number | null
+          primary_source_url?: string | null
           quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
@@ -209,13 +216,16 @@ export type Database = {
           score_last_updated?: string | null
           scrape_website?: boolean
           season?: string | null
+          secondary_source_url?: string | null
           slug: string
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
           verification_method?: string | null
+          verification_notes?: string | null
           verification_sources?: Json | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_by?: string | null
           vibe?: string | null
           view_description?: string | null
           view_type?: string | null
@@ -242,6 +252,7 @@ export type Database = {
           day_pass_available?: boolean | null
           distance_to_beach_m?: number | null
           editorial_notes?: string | null
+          editorial_status?: Database["public"]["Enums"]["editorial_status"]
           fact_verification?: Json | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
@@ -272,6 +283,7 @@ export type Database = {
           pool_view?: string | null
           previous_names?: string[] | null
           price_from_eur?: number | null
+          primary_source_url?: string | null
           quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
@@ -279,13 +291,16 @@ export type Database = {
           score_last_updated?: string | null
           scrape_website?: boolean
           season?: string | null
+          secondary_source_url?: string | null
           slug?: string
           sources?: Json | null
           tags?: string[] | null
           updated_at?: string
           verification_method?: string | null
+          verification_notes?: string | null
           verification_sources?: Json | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_by?: string | null
           vibe?: string | null
           view_description?: string | null
           view_type?: string | null
@@ -695,6 +710,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      editorial_status: "draft" | "review" | "published"
       hotel_status:
         | "active"
         | "renamed"
@@ -836,6 +852,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      editorial_status: ["draft", "review", "published"],
       hotel_status: [
         "active",
         "renamed",
