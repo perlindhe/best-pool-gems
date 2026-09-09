@@ -68,12 +68,17 @@ export function PoolSentimentPanel({
   hotelName: string;
   quotes: PoolQuote[];
 }) {
-  if (!quotes.length) return null;
+  // Editorial quality bar: a published quote has to say something concrete about
+  // the pool. Very short or generic praise ("the pool is nice") is counted but
+  // not quoted, so the panel stays useful instead of padded.
+  const usable = quotes.filter(isSubstantive);
+  const generic = quotes.length - usable.length;
+  if (!usable.length && !generic) return null;
 
   const positive: PoolQuote[] = [];
   const negative: PoolQuote[] = [];
   const neutral: PoolQuote[] = [];
-  for (const q of quotes) {
+  for (const q of usable) {
     const s = classify(q.quote);
     if (s === "positive") positive.push(q);
     else if (s === "negative") negative.push(q);
