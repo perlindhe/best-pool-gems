@@ -123,11 +123,10 @@ function Home() {
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Start exploring</p>
               <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
-                {total} verified pools
+                {total} verified hotel profiles
               </h2>
               <p className="mt-4 max-w-xl text-sm text-muted-foreground">
-                Every pool is scored on the same five criteria and marked with its verification
-                state. Filter the full list, or jump straight into a destination.
+                A profile counts as verified when its pool facts are confirmed against an official source, an independent source, and all five scoring criteria. Filter the full list, or jump straight into a destination.
               </p>
             </div>
             <Link

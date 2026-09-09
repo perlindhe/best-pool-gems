@@ -134,6 +134,9 @@ export type Database = {
           previous_names: string[] | null
           price_from_eur: number | null
           primary_source_url: string | null
+          qa_blocked: boolean
+          qa_blocked_reasons: Json
+          qa_checked_at: string | null
           quiet_party_level: number | null
           rank_position: number | null
           rooftop: boolean | null
@@ -209,6 +212,9 @@ export type Database = {
           previous_names?: string[] | null
           price_from_eur?: number | null
           primary_source_url?: string | null
+          qa_blocked?: boolean
+          qa_blocked_reasons?: Json
+          qa_checked_at?: string | null
           quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
@@ -284,6 +290,9 @@ export type Database = {
           previous_names?: string[] | null
           price_from_eur?: number | null
           primary_source_url?: string | null
+          qa_blocked?: boolean
+          qa_blocked_reasons?: Json
+          qa_checked_at?: string | null
           quiet_party_level?: number | null
           rank_position?: number | null
           rooftop?: boolean | null
@@ -625,6 +634,7 @@ export type Database = {
           affiliate_url: string | null
           beachfront: boolean | null
           best_time: string | null
+          best_time_to_visit: string | null
           booking_url: string | null
           canonical_hotel_id: string | null
           children_allowed: boolean | null
@@ -633,10 +643,15 @@ export type Database = {
           confidence_0_100: number | null
           country: string | null
           cover_image_url: string | null
+          day_pass_available: boolean | null
           distance_to_beach_m: number | null
           editorial_notes: string | null
+          editorial_status:
+            | Database["public"]["Enums"]["editorial_status"]
+            | null
           fact_verification: Json | null
           family_friendly: boolean | null
+          guest_only: boolean | null
           has_pool: boolean | null
           heated_pool: boolean | null
           hotel_status: Database["public"]["Enums"]["hotel_status"] | null
@@ -644,6 +659,7 @@ export type Database = {
           indoor: boolean | null
           infinity: boolean | null
           last_verified_date: string | null
+          lounging_space: string | null
           meta_computed_at: string | null
           meta_rating_0_100: number | null
           name: string | null
@@ -653,6 +669,7 @@ export type Database = {
           pool_components: Json | null
           pool_count: number | null
           pool_facts: Json | null
+          pool_opening_hours: string | null
           pool_score_0_10: number | null
           pool_score_updated_at: string | null
           pool_setting: string | null
@@ -662,18 +679,27 @@ export type Database = {
           pool_view: string | null
           previous_names: string[] | null
           price_from_eur: number | null
+          primary_source_url: string | null
+          qa_blocked: boolean | null
+          qa_blocked_reasons: Json | null
+          qa_checked_at: string | null
           rank_position: number | null
           rooftop: boolean | null
           saltwater: boolean | null
           season: string | null
+          secondary_source_url: string | null
           slug: string | null
           sources_used: Json | null
           tags: string[] | null
           verification_method: string | null
+          verification_notes: string | null
           verification_sources: Json | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]
             | null
+          verified_by: string | null
+          vibe: string | null
+          view_description: string | null
           view_type: string | null
           website_url: string | null
           why_included: string | null

@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, redirect } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 
@@ -25,6 +25,27 @@ function NotFoundComponent() {
 }
 
 export const Route = createRootRoute({
+  // Consolidate every host variant on the apex domain with a permanent redirect.
+  beforeLoad: async () => {
+    if (typeof window !== "undefined") return;
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const request = getRequest();
+    if (!request) return;
+    let url: URL;
+    try {
+      url = new URL(request.url);
+    } catch {
+      return;
+    }
+    const host = (request.headers.get("x-forwarded-host") ?? url.host).toLowerCase();
+    const proto = (request.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "")).toLowerCase();
+    if (host !== "www.bestpoolhotels.com" && host !== "bestpoolhotels.com") return;
+    if (host === "bestpoolhotels.com" && proto === "https") return;
+    throw redirect({
+      href: `https://bestpoolhotels.com${url.pathname}${url.search}`,
+      statusCode: 301,
+    });
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

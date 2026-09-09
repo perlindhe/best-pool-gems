@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { barcelonaTop10, type Hotel, type HotelTag } from "@/data/hotels";
+import { listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
+import { hasCompletePoolScore, toCanonicalComponents, POOL_CRITERIA } from "@/lib/scoring";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GuideMeta } from "@/components/GuideMeta";
 import { AlsoConsidered } from "@/components/AlsoConsidered";
 import barcelonaImg from "@/assets/barcelona.jpg";
-import { getCityHotelPhotos } from "@/lib/city-hotel-photos.functions";
 
 const TITLE = "Top 10 pool hotels in Barcelona — Pool Score 2026";
 const DESCRIPTION =
@@ -15,14 +15,6 @@ const PAGE_URL = "https://bestpoolhotels.com/barcelona/luxury-pool-hotels";
 const PUBLISHED_DATE = "2024-05-18";
 const LAST_UPDATED = "2026-05-22";
 
-// Top 10 = highest pool scores, including Grand Hotel Central (9.2).
-const TOP_10: Hotel[] = [...barcelonaTop10]
-  .sort((a, b) => b.score - a.score)
-  .slice(0, 10);
-
-// Names in the Top 10 are filtered out from Also Considered so the same
-// hotel never appears in both lists (Cotton House used to show in both).
-const TOP_10_NAMES = new Set(TOP_10.map((h) => h.name));
 const ALSO_CONSIDERED = [
   {
     name: "Ohla Eixample",
@@ -48,7 +40,7 @@ const ALSO_CONSIDERED = [
     reason:
       "Compact rooftop plunge with a sharp design crowd, but the deck fills fast and afternoon shade is limited.",
   },
-].filter((h) => !TOP_10_NAMES.has(h.name));
+];
 
 
 const SOURCES = [
@@ -59,7 +51,7 @@ const SOURCES = [
   { label: "Hotel SOFIA Barcelona", url: "https://www.hotelsofiabarcelona.com/" },
 ];
 
-const buildJsonLd = () => ({
+const buildJsonLd = (hotels: CityHotel[]) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -85,20 +77,23 @@ const buildJsonLd = () => ({
       "@type": "ItemList",
       name: TITLE,
       itemListOrder: "https://schema.org/ItemListOrderDescending",
-      numberOfItems: TOP_10.length,
-      itemListElement: TOP_10.map((h, i) => ({
+      numberOfItems: hotels.length,
+      itemListElement: hotels.map((h, i) => ({
         "@type": "ListItem",
         position: i + 1,
         name: h.name,
+        url: `https://bestpoolhotels.com/hotels/${h.slug}`,
         item: {
           "@type": "Hotel",
           name: h.name,
-          address: { "@type": "PostalAddress", addressLocality: "Barcelona", addressRegion: h.neighborhood, addressCountry: "ES" },
+          url: `https://bestpoolhotels.com/hotels/${h.slug}`,
+          address: { "@type": "PostalAddress", addressLocality: "Barcelona", addressRegion: h.neighborhood ?? undefined, addressCountry: "ES" },
           review: {
             "@type": "Review",
-            reviewRating: { "@type": "Rating", ratingValue: h.score, bestRating: 10, worstRating: 0 },
+            name: "Editorial Pool Score",
+            reviewRating: { "@type": "Rating", ratingValue: h.pool_score_0_10, bestRating: 10, worstRating: 0 },
             author: { "@type": "Organization", name: "BestPoolHotels Editorial" },
-            reviewBody: h.description,
+            reviewBody: h.why_included ?? h.editorial_notes ?? "",
           },
         },
       })),
@@ -107,10 +102,21 @@ const buildJsonLd = () => ({
 });
 
 export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
-  loader: async () => ({
-    photos: await getCityHotelPhotos({ data: { citySlug: "barcelona" } }),
-  }),
-  head: () => ({
+  loader: async () => {
+    const { hotels } = await listCityHotelsFn({ data: { citySlug: "barcelona" } });
+    // Only finished, fully scored profiles may carry a ranking position.
+    const ranked = hotels
+      .filter(
+        (h) =>
+          h.verification_status === "verified" &&
+          (h.editorial_status ?? "published") === "published" &&
+          h.qa_blocked !== true &&
+          hasCompletePoolScore(h.pool_components, h.pool_score_0_10),
+      )
+      .slice(0, 10);
+    return { ranked };
+  },
+  head: ({ loaderData }) => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
@@ -126,18 +132,20 @@ export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
     ],
     links: [{ rel: "canonical", href: PAGE_URL }],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify(buildJsonLd()) },
+      { type: "application/ld+json", children: JSON.stringify(buildJsonLd(loaderData?.ranked ?? [])) },
     ],
   }),
   component: LuxuryPoolHotels,
 });
 
-const FILTERS: { key: HotelTag | "all"; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "rooftop", label: "Rooftop" },
-  { key: "resort", label: "Resort" },
-  { key: "quiet", label: "Quiet" },
-  { key: "spa", label: "Spa" },
+type FilterKey = "all" | "rooftop" | "beachfront" | "adults" | "heated";
+
+const FILTERS: { key: FilterKey; label: string; pick: (h: CityHotel) => boolean }[] = [
+  { key: "all", label: "All", pick: () => true },
+  { key: "rooftop", label: "Rooftop", pick: (h) => h.rooftop === true },
+  { key: "beachfront", label: "Beachfront", pick: (h) => h.beachfront === true },
+  { key: "adults", label: "Adults only", pick: (h) => h.adults_only === true },
+  { key: "heated", label: "Heated", pick: (h) => h.heated_pool === true },
 ];
 
 const NEIGHBORHOODS = [
@@ -198,24 +206,14 @@ const FAQS = [
   },
 ];
 
-const TAG_LABEL: Record<HotelTag, string> = {
-  rooftop: "Rooftop",
-  resort: "Resort",
-  quiet: "Quiet",
-  spa: "Spa",
-};
-
 function LuxuryPoolHotels() {
-  const [filter, setFilter] = useState<HotelTag | "all">("all");
-  const { photos } = Route.useLoaderData();
+  const [filter, setFilter] = useState<FilterKey>("all");
+  const { ranked } = Route.useLoaderData();
 
-  const visible = useMemo(
-    () =>
-      filter === "all"
-        ? TOP_10
-        : TOP_10.filter((h) => h.tags?.includes(filter)),
-    [filter],
-  );
+  const visible = useMemo(() => {
+    const def = FILTERS.find((f) => f.key === filter) ?? FILTERS[0]!;
+    return ranked.filter(def.pick);
+  }, [filter, ranked]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -332,12 +330,18 @@ function LuxuryPoolHotels() {
             No hotel matches that filter. Try a different vibe.
           </p>
         )}
-        {visible.map((h: Hotel, idx: number) => {
-          const info = photos[h.name.toLowerCase()];
-          const photo = info?.url ?? null;
-          const slug = info?.slug ?? null;
+        {visible.map((h: CityHotel, idx: number) => {
+          const photo = h.hero_photo_url ?? h.cover_image_url ?? null;
           const position = idx + 1;
-          const CardInner = (
+          const badges = [
+            h.rooftop === true ? "Rooftop" : null,
+            h.beachfront === true ? "Beachfront" : null,
+            h.heated_pool === true ? "Heated" : null,
+            h.adults_only === true ? "Adults only" : null,
+            h.family_friendly === true ? "Family friendly" : null,
+          ].filter(Boolean) as string[];
+          return (
+          <Link key={h.id} to="/hotels/$slug" params={{ slug: h.slug }} className="block">
           <article
             className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 shadow-card transition hover:border-primary/60"
           >
@@ -368,60 +372,56 @@ function LuxuryPoolHotels() {
                     {h.name}
                   </h2>
                   <span className="font-display text-2xl text-primary">
-                    {h.score.toFixed(1)}
+                    {h.pool_score_0_10!.toFixed(1)}
                     <span className="ml-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       Pool Score
                     </span>
                   </span>
                 </div>
                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  {h.neighborhood} · {h.poolType}
+                  {[h.neighborhood, h.pool_type].filter(Boolean).join(" · ")}
                 </p>
-                <p className="mt-4 text-base leading-relaxed text-foreground/90">{h.description}</p>
+                {(h.why_included || h.editorial_notes) && (
+                  <p className="mt-4 text-base leading-relaxed text-foreground/90">
+                    {h.why_included ?? h.editorial_notes}
+                  </p>
+                )}
 
                 <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
                   <div>
-                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Vibe</dt>
-                    <dd className="mt-1 text-foreground/90">{h.vibe}</dd>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Season</dt>
+                    <dd className="mt-1 text-foreground/90">{h.season ?? "Not confirmed"}</dd>
                   </div>
                   <div>
                     <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Best time</dt>
-                    <dd className="mt-1 text-foreground/90">{h.bestTime}</dd>
+                    <dd className="mt-1 text-foreground/90">{h.best_time ?? h.best_time_to_visit ?? "Not confirmed"}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Price</dt>
-                    <dd className="mt-1 text-foreground/90">{h.pricePerNight}</dd>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Last verified</dt>
+                    <dd className="mt-1 text-foreground/90">{h.last_verified_date ?? "Not confirmed"}</dd>
                   </div>
                 </dl>
 
-                {h.tags && h.tags.length > 0 && (
+                {badges.length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-2">
-                    {h.tags.map((t) => (
+                    {badges.map((t) => (
                       <span
                         key={t}
                         className="rounded-sm border border-primary/40 bg-primary/10 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-primary"
                       >
-                        {TAG_LABEL[t]}
+                        {t}
                       </span>
                     ))}
                   </div>
                 )}
 
-                {slug && (
-                  <p className="mt-5 text-xs uppercase tracking-[0.25em] text-primary">
-                    View hotel →
-                  </p>
-                )}
+                <p className="mt-5 text-xs uppercase tracking-[0.25em] text-primary">
+                  View hotel →
+                </p>
               </div>
             </div>
           </article>
-          );
-          return slug ? (
-            <Link key={h.name} to="/hotels/$slug" params={{ slug }} className="block">
-              {CardInner}
-            </Link>
-          ) : (
-            <div key={h.name}>{CardInner}</div>
+          </Link>
           );
         })}
       </section>
@@ -447,43 +447,34 @@ function LuxuryPoolHotels() {
               <thead>
                 <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   <th className="px-5 py-3 font-normal">Hotel</th>
-                  <th className="px-3 py-3 text-right font-normal">View</th>
-                  <th className="px-3 py-3 text-right font-normal">Pool size</th>
-                  <th className="px-3 py-3 text-right font-normal">Loungers</th>
-                  <th className="px-3 py-3 text-right font-normal">Service</th>
-                  <th className="px-3 py-3 text-right font-normal">Wow</th>
+                  {POOL_CRITERIA.map((c) => (
+                    <th key={c.key} className="px-3 py-3 text-right font-normal">{c.label}</th>
+                  ))}
                   <th className="px-5 py-3 text-right font-normal text-primary">Pool Score</th>
                 </tr>
               </thead>
               <tbody>
-                {TOP_10.filter((h) => h.subscores).map((h) => (
-                  <tr key={h.name} className="border-t border-border/40 align-top">
+                {visible.map((h) => {
+                  const c = toCanonicalComponents(h.pool_components);
+                  return (
+                  <tr key={h.id} className="border-t border-border/40 align-top">
                     <td className="px-5 py-4">
                       <p className="font-display text-lg tracking-wide text-foreground">{h.name}</p>
                       <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                         {h.neighborhood}
                       </p>
                     </td>
-                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
-                      {h.subscores!.view.toFixed(1)}
-                    </td>
-                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
-                      {h.subscores!.size.toFixed(1)}
-                    </td>
-                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
-                      {h.subscores!.loungers.toFixed(1)}
-                    </td>
-                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
-                      {h.subscores!.service.toFixed(1)}
-                    </td>
-                    <td className="px-3 py-4 text-right tabular-nums text-foreground/85">
-                      {h.subscores!.wow.toFixed(1)}
-                    </td>
+                    {POOL_CRITERIA.map((crit) => (
+                      <td key={crit.key} className="px-3 py-4 text-right tabular-nums text-foreground/85">
+                        {c[crit.key].toFixed(1)}
+                      </td>
+                    ))}
                     <td className="px-5 py-4 text-right font-display text-xl text-primary tabular-nums">
-                      {h.score.toFixed(1)}
+                      {h.pool_score_0_10!.toFixed(1)}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

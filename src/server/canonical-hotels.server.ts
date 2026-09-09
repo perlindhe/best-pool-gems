@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
  */
 
 export const CANONICAL_SELECT =
-  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur";
+  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, best_time_to_visit, qa_blocked";
 
 export type VerificationState = "verified" | "partially_verified" | "research_pending";
 
@@ -72,7 +72,36 @@ export type CanonicalHotel = {
   why_included: string | null;
   why_not_higher: string | null;
   price_from_eur: number | null;
+  editorial_status: "draft" | "review" | "published" | string;
+  verified_by: string | null;
+  verification_notes: string | null;
+  primary_source_url: string | null;
+  secondary_source_url: string | null;
+  pool_opening_hours: string | null;
+  day_pass_available: boolean | null;
+  guest_only: boolean | null;
+  best_time_to_visit: string | null;
+  qa_blocked: boolean | null;
 };
+
+/**
+ * One rule for "this profile is finished": verified, published, not blocked by
+ * QA and with a complete five-criteria Pool Score. Used for indexing, sitemap,
+ * ranking lists and the verified counter — so every page agrees.
+ */
+export function isIndexableHotel(h: {
+  verification_status: string;
+  editorial_status?: string | null;
+  qa_blocked?: boolean | null;
+  primary_source_url?: string | null;
+  secondary_source_url?: string | null;
+}) {
+  return (
+    h.verification_status === "verified" &&
+    (h.editorial_status ?? "published") === "published" &&
+    h.qa_blocked !== true
+  );
+}
 
 export type HotelFilters = {
   city?: string;
@@ -144,7 +173,13 @@ export async function listCanonicalHotels(filters: HotelFilters = {}) {
   if (filters.beachfront) q = q.eq("beachfront", true);
   if (filters.saltwater) q = q.eq("saltwater", true);
   if (filters.poolSize) q = q.eq("pool_size", filters.poolSize);
-  if (filters.verifiedOnly) q = q.in("verification_status", ["verified", "partially_verified"]);
+  if (filters.verifiedOnly) {
+    // "Verified" means finished: verified + published + not QA-blocked.
+    q = q
+      .eq("verification_status", "verified")
+      .eq("editorial_status", "published")
+      .eq("qa_blocked", false);
+  }
 
   q = q
     .order("pool_score_0_10", { ascending: false, nullsFirst: false })
@@ -260,13 +295,14 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
   const { data, error } = await supabaseAdmin
     .from("public_hotels_view")
     .select(
-      "pool_score_0_10, verification_status, last_verified_date, rooftop, infinity, heated_pool, year_round, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
+      "pool_score_0_10, verification_status, editorial_status, qa_blocked, last_verified_date, rooftop, infinity, heated_pool, year_round, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
     )
     .eq("city_slug", citySlug);
   if (error) throw new Error(error.message);
 
   const rows = (data ?? []) as unknown as CanonicalHotel[];
-  const scores = rows
+  const finished = rows.filter((r) => isIndexableHotel(r));
+  const scores = finished
     .map((r) => r.pool_score_0_10)
     .filter((s): s is number => typeof s === "number");
   const dates = rows
@@ -277,9 +313,7 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
   return {
     citySlug,
     total: rows.length,
-    verified: rows.filter(
-      (r) => r.verification_status === "verified" || r.verification_status === "partially_verified",
-    ).length,
+    verified: finished.length,
     researchPending: rows.filter((r) => r.verification_status === "research_pending").length,
     avgScore: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : null,
     topScore: scores.length ? Math.max(...scores) : null,
@@ -290,4 +324,22 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
       count: rows.filter((r) => r[f.column] === true).length,
     })).filter((f) => f.count > 0),
   };
+}
+
+/**
+ * Every canonical hotel for one destination, ordered the same way the
+ * rankings are. Destination hubs read this instead of any hardcoded list.
+ */
+export async function listCityHotels(citySlug: string) {
+  const { data, error, count } = await supabaseAdmin
+    .from("public_hotels_view")
+    .select(CANONICAL_SELECT, { count: "exact" })
+    .eq("city_slug", citySlug)
+    .order("pool_score_0_10", { ascending: false, nullsFirst: false })
+    .order("meta_rating_0_100", { ascending: false, nullsFirst: false })
+    .order("name", { ascending: true });
+  if (error) throw new Error(error.message);
+  const rows = (data ?? []) as unknown as CanonicalHotel[];
+  const withPhotos = await attachHeroPhotos(rows);
+  return { hotels: sortHotels(withPhotos as CanonicalHotel[]), total: count ?? withPhotos.length };
 }

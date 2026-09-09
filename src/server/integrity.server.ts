@@ -2,7 +2,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 /**
  * Data-integrity checks for the canonical hotel model.
- * Read-only: reports issues, never mutates.
+ * Reports issues and records which hotels are blocked from being published as verified.
  */
 
 export type IntegritySeverity = "critical" | "warning" | "info";
@@ -45,6 +45,10 @@ type Row = {
   primary_source_url: string | null;
   secondary_source_url: string | null;
   editorial_notes: string | null;
+  pool_count: number | null;
+  heated_pool: boolean | null;
+  rooftop: boolean | null;
+  qa_blocked: boolean | null;
 };
 
 const normalizeName = (s: string) =>
@@ -70,7 +74,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   const { data, error } = await supabaseAdmin
     .from("hotels")
     .select(
-      "id, slug, name, city, city_slug, is_published, hotel_status, canonical_hotel_id, verification_status, official_url, website_url, affiliate_url, booking_url, address, previous_names, has_pool, indoor, outdoor, year_round, season, adults_only, children_allowed, family_friendly, last_verified_date, editorial_status, primary_source_url, secondary_source_url, editorial_notes",
+      "id, slug, name, city, city_slug, is_published, hotel_status, canonical_hotel_id, verification_status, official_url, website_url, affiliate_url, booking_url, address, previous_names, has_pool, indoor, outdoor, year_round, season, adults_only, children_allowed, family_friendly, last_verified_date, editorial_status, primary_source_url, secondary_source_url, editorial_notes, pool_count, heated_pool, rooftop, qa_blocked",
     );
   if (error) throw new Error(error.message);
   const rows = (data ?? []) as unknown as Row[];
@@ -312,11 +316,86 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r) push("Image metadata missing", "warning", r, `${count} photo(s) missing alt text or attribution.`);
   }
 
+  // 8. Cross-page consistency: one hotel = one set of facts.
+  const today = new Date().toISOString().slice(0, 10);
+  const factRows = new Map(
+    (scoreData ?? []).map((s) => [s.hotel_id as string, s as Record<string, unknown>]),
+  );
+  for (const r of rows) {
+    if (r.last_verified_date && r.last_verified_date > today) {
+      push("Verification date in the future", "critical", r, `last_verified_date is ${r.last_verified_date}.`);
+    }
+    if (r.verification_status === "verified" && r.qa_blocked) {
+      push("Verified but QA-blocked", "critical", r, "Marked verified while a blocking QA issue is open.");
+    }
+    if (typeof r.pool_count === "number" && r.pool_count < 1 && r.has_pool) {
+      push("Contradiction", "critical", r, `Pool count is ${r.pool_count} but the hotel is listed as having a pool.`);
+    }
+    const facts = (factRows.get(r.id)?.["facts"] ?? null) as Record<string, unknown> | null;
+    if (facts) {
+      const compare: Array<[string, unknown, unknown]> = [
+        ["heated", facts["is_heated"], r.heated_pool],
+        ["rooftop", facts["is_rooftop"], r.rooftop],
+        ["indoor", facts["has_indoor"], r.indoor],
+        ["outdoor", facts["has_outdoor"], r.outdoor],
+        ["pool count", facts["pool_count"], r.pool_count],
+      ];
+      for (const [label, a, b] of compare) {
+        if (a == null || b == null) continue;
+        if (a !== b) {
+          push(
+            "Fact conflict",
+            "critical",
+            r,
+            `${label}: pool data says ${String(a)} but the hotel record says ${String(b)} — pages would disagree.`,
+          );
+        }
+      }
+    }
+    if (r.verification_status === "verified") {
+      const unsourced = [
+        r.indoor == null && r.outdoor == null ? "indoor/outdoor" : null,
+        r.heated_pool == null ? "heating" : null,
+        !r.season && !r.year_round ? "season" : null,
+      ].filter(Boolean);
+      if (unsourced.length) {
+        push("Missing pool facts", "warning", r, `Verified but ${unsourced.join(", ")} not recorded.`);
+      }
+    }
+  }
+
   const order: Record<IntegritySeverity, number> = { critical: 0, warning: 1, info: 2 };
   issues.sort((a, b) => order[a.severity] - order[b.severity] || a.check.localeCompare(b.check));
 
+  // Persist the blocking state so publishing rules can rely on it.
+  const blocked = new Set(issues.filter((i) => i.severity === "critical" && i.hotelId).map((i) => i.hotelId as string));
+  const reasonsById = new Map<string, string[]>();
+  for (const i of issues) {
+    if (i.severity !== "critical" || !i.hotelId) continue;
+    reasonsById.set(i.hotelId, [...(reasonsById.get(i.hotelId) ?? []), `${i.check}: ${i.detail}`]);
+  }
+  const stamp = new Date().toISOString();
+  await Promise.all(
+    rows.map(async (r) => {
+      const shouldBlock = blocked.has(r.id);
+      if (shouldBlock === Boolean(r.qa_blocked)) {
+        await supabaseAdmin.from("hotels").update({ qa_checked_at: stamp }).eq("id", r.id);
+        return;
+      }
+      await supabaseAdmin
+        .from("hotels")
+        .update({
+          qa_blocked: shouldBlock,
+          qa_blocked_reasons: shouldBlock ? (reasonsById.get(r.id) ?? []) : [],
+          qa_checked_at: stamp,
+        })
+        .eq("id", r.id);
+    }),
+  );
+
   return {
     checkedHotels: rows.length,
+    blockedHotels: blocked.size,
     counts: {
       critical: issues.filter((i) => i.severity === "critical").length,
       warning: issues.filter((i) => i.severity === "warning").length,
