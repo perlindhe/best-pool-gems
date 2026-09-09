@@ -40,7 +40,7 @@ export const Route = createFileRoute("/hotels/$slug")({
   head: ({ params, loaderData }) => {
     if (!loaderData) return {};
     const { hotel, photos } = loaderData;
-    const title = `${hotel.name} — Pool review · Best Pool Hotels`;
+    const title = `${hotel.name} Pool Review — Size, Heating & Access`;
     const description =
       hotel.editorial_notes?.slice(0, 155) ||
       `Pool review of ${hotel.name} in ${hotel.city}. Live guest ratings and pool facts.`;
