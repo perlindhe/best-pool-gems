@@ -17,6 +17,24 @@ const POSITIVE = [
   "enjoy", "love", "recommend",
 ];
 
+// A quote is only published when it names something concrete about the pool.
+const CONCRETE = [
+  "heated", "heating", "temperature", "degrees", "warm", "cold", "lukewarm",
+  "metre", "meter", "metres", "meters", "length", "laps", "lane", "深",
+  "depth", "shallow", "deep", "rooftop", "roof", "indoor", "outdoor", "infinity",
+  "lounger", "sunbed", "chair", "towel", "shade", "sun", "morning", "afternoon",
+  "season", "open", "closed", "hours", "children", "kids", "adults", "crowded",
+  "quiet", "view", "salt", "chlorine", "clean", "dirty", "renovation", "day pass",
+  "spa", "jacuzzi", "bar", "size", "small", "large", "busy", "月", "januar",
+];
+
+function isSubstantive(q: PoolQuote) {
+  const text = (q.quote ?? "").trim();
+  if (text.length < 60) return false;
+  const t = text.toLowerCase();
+  return CONCRETE.some((w) => t.includes(w));
+}
+
 type Sentiment = "positive" | "negative" | "neutral";
 
 function classify(text: string): Sentiment {
