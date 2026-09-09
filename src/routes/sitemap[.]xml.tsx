@@ -55,20 +55,34 @@ export const Route = createFileRoute("/sitemap.xml")({
           priority: "0.7",
         });
 
+        // Only fully verified + published hotel profiles belong in the sitemap.
+        // Partially verified and research-pending profiles stay reachable for
+        // visitors but are noindex, so they must never be submitted to Google.
         try {
-          const { data } = await supabaseAdmin
-            .from("public_hotels_view")
-            .select("slug")
-            .limit(2000);
-          if (data) {
-            for (const h of data as Array<{ slug: string | null }>) {
+          const pageSize = 1000;
+          for (let offset = 0; ; ) {
+            const { data, error } = await supabaseAdmin
+              .from("hotels")
+              .select("slug, updated_at")
+              .eq("is_published", true)
+              .eq("editorial_status", "published")
+              .eq("verification_status", "verified")
+              .eq("hotel_status", "active")
+              .is("canonical_hotel_id", null)
+              .order("slug")
+              .range(offset, offset + pageSize - 1);
+            if (error) throw error;
+            if (!data || data.length === 0) break;
+            for (const h of data as Array<{ slug: string | null; updated_at: string | null }>) {
               if (!h.slug) continue;
               entries.push({
                 path: `/hotels/${h.slug}`,
-                changefreq: "weekly",
+                lastmod: h.updated_at ? h.updated_at.slice(0, 10) : undefined,
+                changefreq: "monthly",
                 priority: "0.6",
               });
             }
+            offset += data.length;
           }
         } catch {
           // ignore — sitemap should still serve static routes even if DB is down
