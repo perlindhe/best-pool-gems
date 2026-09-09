@@ -174,7 +174,6 @@ function Home() {
                   <div className="p-5">
                     <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
                       {h.city}
-                      {h.pool_score_0_10 != null ? ` · ${h.pool_score_0_10.toFixed(1)}/10` : ""}
                     </p>
                     <h3 className="mt-2 font-display text-2xl tracking-wide group-hover:text-primary">
                       {h.name}

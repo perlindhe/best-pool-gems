@@ -283,7 +283,7 @@ function RankingsPage() {
 
 function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) {
   // A score only shows when all five criteria are individually assessed.
-  const pool = hasCompletePoolScore(hotel.pool_score_0_10, hotel.pool_components)
+  const pool = hasCompletePoolScore(hotel.pool_components, hotel.pool_score_0_10)
     ? hotel.pool_score_0_10
     : null;
   const meta = hotel.meta_rating_0_100;
