@@ -235,6 +235,83 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     );
   }
 
+  // 7. Editorial QA: scores, sources, notes, quotes and images.
+  const scoreByHotel = new Map(
+    (scoreData ?? []).map((s) => [s.hotel_id as string, s as Record<string, unknown>]),
+  );
+  for (const r of rows) {
+    const s = scoreByHotel.get(r.id);
+    const comps = (s?.["components"] ?? {}) as Record<string, number | null>;
+    const values = Object.values(comps).filter((v): v is number => typeof v === "number");
+    const total = (s?.["pool_score_0_10"] as number | null) ?? null;
+
+    if (values.length >= 5 && new Set(values).size === 1) {
+      push("Identical sub-scores", "warning", r, `All criteria scored ${values[0]} — confirm this is a real judgement.`);
+    }
+    if (total != null && r.verification_status !== "verified") {
+      push("Score without verification", "critical", r, "A final Pool Score exists but the profile is not verified.");
+    }
+    if (total != null && values.length < 5) {
+      push("Incomplete score", "critical", r, `Only ${values.length} of 5 criteria assessed.`);
+    }
+    const bestTime = (s?.["best_time"] as string | null) ?? null;
+    if (r.is_published && (!bestTime || /not specified/i.test(bestTime))) {
+      push("Missing best time", "warning", r, "No usable \"best time to visit\" recorded.");
+    }
+    if (r.verification_status === "verified" && !(r.primary_source_url && r.secondary_source_url)) {
+      push("Missing sources", "critical", r, "A verified profile needs both a primary and a secondary source URL.");
+    }
+    const note = (r.editorial_notes ?? "").trim();
+    if (r.is_published && note.length > 0 && note.length < 120) {
+      push("Thin editor's note", "warning", r, `Editor's note is only ${note.length} characters.`);
+    }
+    if (r.editorial_status === "published" && note.length === 0) {
+      push("Missing editor's note", "warning", r, "Published without an editorial note.");
+    }
+  }
+
+  // Duplicate editor's notes across hotels.
+  const noteBuckets = new Map<string, Row[]>();
+  for (const r of rows) {
+    const note = (r.editorial_notes ?? "").trim().toLowerCase();
+    if (note.length < 40) continue;
+    noteBuckets.set(note, [...(noteBuckets.get(note) ?? []), r]);
+  }
+  for (const [, group] of noteBuckets) {
+    if (group.length > 1) {
+      push(
+        "Duplicate editor's note",
+        "critical",
+        group[0]!,
+        `Identical editorial note on: ${group.map((g) => g.slug).join(", ")}.`,
+      );
+    }
+  }
+
+  // Quotes without a source link, and images without alt text or attribution.
+  const [{ data: quoteRows }, { data: photoRows }] = await Promise.all([
+    supabaseAdmin.from("pool_quotes").select("hotel_id, source, source_url"),
+    supabaseAdmin.from("hotel_photos").select("hotel_id, source, alt_text, attribution, image_credit"),
+  ]);
+  for (const q of quoteRows ?? []) {
+    if (q.source_url) continue;
+    const r = byId.get(q.hotel_id as string);
+    if (r) push("Quote without source link", "warning", r, `A ${q.source} quote has no clickable source.`);
+  }
+  const photoIssues = new Map<string, number>();
+  for (const p of photoRows ?? []) {
+    const missingAlt = !((p.alt_text as string | null) ?? "").trim();
+    const missingCredit =
+      !((p.attribution as string | null) ?? "").trim() && !((p.image_credit as string | null) ?? "").trim();
+    if (!missingAlt && !missingCredit) continue;
+    const key = p.hotel_id as string;
+    photoIssues.set(key, (photoIssues.get(key) ?? 0) + 1);
+  }
+  for (const [hotelId, count] of photoIssues) {
+    const r = byId.get(hotelId);
+    if (r) push("Image metadata missing", "warning", r, `${count} photo(s) missing alt text or attribution.`);
+  }
+
   const order: Record<IntegritySeverity, number> = { critical: 0, warning: 1, info: 2 };
   issues.sort((a, b) => order[a.severity] - order[b.severity] || a.check.localeCompare(b.check));
 
