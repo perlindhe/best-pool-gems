@@ -46,10 +46,22 @@ export const getHotelsForCompare = createServerFn({ method: "GET" })
 
     const ids = (rows ?? []).map((r) => r.id as string);
     const [{ data: pool }, { data: meta }] = await Promise.all([
-      supabaseAdmin.from("pool_scores").select("hotel_id, pool_score_0_10").in("hotel_id", ids),
+      supabaseAdmin.from("pool_scores").select("hotel_id, pool_score_0_10, components").in("hotel_id", ids),
       supabaseAdmin.from("meta_scores").select("hotel_id, meta_rating_0_100").in("hotel_id", ids),
     ]);
-    const poolMap = new Map((pool ?? []).map((p) => [p.hotel_id as string, p.pool_score_0_10 as number | null]));
+    const { hasCompletePoolScore } = await import("@/lib/scoring");
+    // Only surface a Pool Score when all five criteria are individually scored.
+    const poolMap = new Map(
+      (pool ?? []).map((p) => [
+        p.hotel_id as string,
+        hasCompletePoolScore(
+          p.components as Record<string, number> | null,
+          p.pool_score_0_10 as number | null,
+        )
+          ? (p.pool_score_0_10 as number | null)
+          : null,
+      ]),
+    );
     const metaMap = new Map((meta ?? []).map((m) => [m.hotel_id as string, m.meta_rating_0_100 as number | null]));
 
     const merged = (rows ?? []).map((r) => ({
