@@ -30,9 +30,11 @@ export const Route = createFileRoute("/$citySlug/")({
   },
 
 
-  head: ({ params, loaderData }) => {
+  head: ({ params, loaderData, match }) => {
     const city = loaderData?.city;
     if (!city) return {};
+    // Paginated variants add no separate search value — keep page 1 only.
+    const pageNo = Number((match?.search as { page?: number } | undefined)?.page ?? 1);
     const title = `Best pool hotels in ${city.name} — Best Pool Hotels`;
     const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
     const url = `https://bestpoolhotels.com/${params.citySlug}`;
