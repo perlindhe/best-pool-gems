@@ -572,6 +572,51 @@ function HotelDetailPage() {
                   on Google and TripAdvisor, and our notes from the property.
                 </p>
               )}
+              {(hotel.primary_source_url || hotel.secondary_source_url) && (
+                <ul className="mt-4 space-y-1.5 text-sm">
+                  {hotel.primary_source_url && (
+                    <li>
+                      <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        Primary source:{" "}
+                      </span>
+                      <a
+                        href={hotel.primary_source_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="text-primary hover:underline"
+                      >
+                        {hotel.primary_source_url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 48)} ↗
+                      </a>
+                    </li>
+                  )}
+                  {hotel.secondary_source_url && (
+                    <li>
+                      <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        Second source:{" "}
+                      </span>
+                      <a
+                        href={hotel.secondary_source_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="text-primary hover:underline"
+                      >
+                        {hotel.secondary_source_url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 48)} ↗
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              )}
+              <p className="mt-4 text-sm text-muted-foreground">
+                <span className="text-[10px] uppercase tracking-[0.22em]">Checked by: </span>
+                <a href="/editors" className="text-primary hover:underline">
+                  {hotel.verified_by ?? "BestPoolHotels Editorial"}
+                </a>
+              </p>
+              {hotel.verification_notes && (
+                <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                  {hotel.verification_notes}
+                </p>
+              )}
               <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/80">
                 Affiliate disclosure: booking links may earn us a commission at no
                 extra cost to you. Rankings are editorial and not paid placements.
