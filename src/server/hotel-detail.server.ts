@@ -27,7 +27,9 @@ export async function getHotelDetail(slug: string) {
 
   const { data: editorial } = await supabaseAdmin
     .from("hotels")
-    .select("last_verified_date, sources, why_included, why_not_higher")
+    .select(
+      "last_verified_date, sources, why_included, why_not_higher, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, children_allowed, season",
+    )
     .eq("id", hotel.id as string)
     .maybeSingle();
 
@@ -56,6 +58,16 @@ export async function getHotelDetail(slug: string) {
     editorial_sources,
     why_included: (editorial?.why_included as string | null) ?? null,
     why_not_higher: (editorial?.why_not_higher as string | null) ?? null,
+    editorial_status: (editorial?.editorial_status as string | null) ?? "draft",
+    verified_by: (editorial?.verified_by as string | null) ?? null,
+    verification_notes: (editorial?.verification_notes as string | null) ?? null,
+    primary_source_url: (editorial?.primary_source_url as string | null) ?? null,
+    secondary_source_url: (editorial?.secondary_source_url as string | null) ?? null,
+    pool_opening_hours: (editorial?.pool_opening_hours as string | null) ?? null,
+    day_pass_available: (editorial?.day_pass_available as boolean | null) ?? null,
+    guest_only: (editorial?.guest_only as boolean | null) ?? null,
+    children_allowed: (editorial?.children_allowed as boolean | null) ?? null,
+    season: (editorial?.season as string | null) ?? null,
   };
 
   const { data: photoRows } = await supabaseAdmin

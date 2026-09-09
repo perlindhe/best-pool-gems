@@ -103,11 +103,8 @@ export function CollectionPage({
                       <h3 className="font-display text-2xl tracking-wide group-hover:text-primary md:text-3xl">
                         {i + 1}. {h.name}
                       </h3>
-                      {typeof h.pool_score_0_10 === "number" && (
-                        <span className="font-display text-2xl text-primary">
-                          {h.pool_score_0_10.toFixed(1)}
-                        </span>
-                      )}
+                      {/* Pool Score is only published once all five criteria
+                          are individually assessed, so list pages show none. */}
                     </div>
                     <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       {[h.neighborhood, h.pool_type].filter(Boolean).join(" · ")}

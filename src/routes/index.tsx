@@ -53,9 +53,9 @@ export const Route = createFileRoute("/")({
   ),
   head: () => ({
     meta: [
-      { title: "Best hotel pools — Best Pool Hotels" },
-      { name: "description", content: "Independent guide to the best hotel pools in the world's biggest travel cities. Rankings, guides and insider tips." },
-      { property: "og:title", content: "Best hotel pools — Best Pool Hotels" },
+      { title: "Best Hotel Pools in the World — Independent Rankings" },
+      { name: "description", content: "Independent rankings and detailed reviews of the world's best hotel pools, including heating, size, access, seasonality and verified pool facts." },
+      { property: "og:title", content: "Best Hotel Pools in the World — Independent Rankings" },
       { property: "og:description", content: "Independent rankings of the world's most beautiful hotel pools." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://bestpoolhotels.com/" },
@@ -174,7 +174,6 @@ function Home() {
                   <div className="p-5">
                     <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
                       {h.city}
-                      {h.pool_score_0_10 != null ? ` · ${h.pool_score_0_10.toFixed(1)}/10` : ""}
                     </p>
                     <h3 className="mt-2 font-display text-2xl tracking-wide group-hover:text-primary">
                       {h.name}

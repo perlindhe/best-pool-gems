@@ -40,16 +40,23 @@ export const Route = createFileRoute("/hotels/$slug")({
   head: ({ params, loaderData }) => {
     if (!loaderData) return {};
     const { hotel, photos } = loaderData;
-    const title = `${hotel.name} — Pool review · Best Pool Hotels`;
+    const title = `${hotel.name} Pool Review — Size, Heating & Access`;
     const description =
       hotel.editorial_notes?.slice(0, 155) ||
       `Pool review of ${hotel.name} in ${hotel.city}. Live guest ratings and pool facts.`;
     const image = photos[0]?.url || hotel.cover_image_url || undefined;
     const url = `https://bestpoolhotels.com/hotels/${params.slug}`;
-    const google = hotel.sources_used?.find((s) => s.source === "google");
-    const ratingValue =
-      hotel.meta_rating_0_100 != null ? +(hotel.meta_rating_0_100 / 20).toFixed(2) : null;
-    const reviewCount = google?.rating_count ?? 0;
+    // Index control: only a fully verified, published profile may be indexed.
+    // Everything else stays reachable for visitors but is kept out of search.
+    const status = hotel.editorial_status;
+    const robots =
+      status === "draft" || status === "review"
+        ? "noindex, nofollow"
+        : hotel.verification_status === "verified" && status === "published"
+          ? "index, follow"
+          : "noindex, follow";
+    // No AggregateRating: the ratings shown here come from third parties and
+    // must never be marked up as this site's own reviews.
     const jsonLd: Record<string, unknown> = {
       "@context": "https://schema.org",
       "@type": "Hotel",
@@ -64,18 +71,11 @@ export const Route = createFileRoute("/hotels/$slug")({
         ...(hotel.neighborhood ? { addressRegion: hotel.neighborhood } : {}),
       },
     };
-    if (ratingValue != null) {
-      jsonLd.aggregateRating = {
-        "@type": "AggregateRating",
-        ratingValue,
-        bestRating: 5,
-        ...(reviewCount > 0 ? { reviewCount } : { ratingCount: 1 }),
-      };
-    }
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "robots", content: robots },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },

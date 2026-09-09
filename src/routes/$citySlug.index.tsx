@@ -30,10 +30,12 @@ export const Route = createFileRoute("/$citySlug/")({
   },
 
 
-  head: ({ params, loaderData }) => {
+  head: ({ params, loaderData, match }) => {
     const city = loaderData?.city;
     if (!city) return {};
-    const title = `Best pool hotels in ${city.name} — Best Pool Hotels`;
+    // Paginated variants add no separate search value — keep page 1 only.
+    const pageNo = Number((match?.search as { page?: number } | undefined)?.page ?? 1);
+    const title = `Best Pool Hotels in ${city.name} — Ranked & Reviewed`;
     const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
     const url = `https://bestpoolhotels.com/${params.citySlug}`;
     const ld = {
@@ -80,6 +82,7 @@ export const Route = createFileRoute("/$citySlug/")({
         { property: "og:image", content: city.image },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: city.image },
+        ...(pageNo > 1 ? [{ name: "robots", content: "noindex, follow" }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],

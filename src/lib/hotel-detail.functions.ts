@@ -46,6 +46,16 @@ export type HotelDetail = {
   year_round: boolean | null;
   pool_size: string | null;
   pool_view: string | null;
+  editorial_status: "draft" | "review" | "published" | string;
+  verified_by: string | null;
+  verification_notes: string | null;
+  primary_source_url: string | null;
+  secondary_source_url: string | null;
+  pool_opening_hours: string | null;
+  day_pass_available: boolean | null;
+  guest_only: boolean | null;
+  children_allowed: boolean | null;
+  season: string | null;
 };
 
 

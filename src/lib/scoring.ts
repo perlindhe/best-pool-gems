@@ -161,3 +161,30 @@ function round(n: number, p: number) {
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
+
+/**
+ * A Pool Score may only be shown when all five criteria have been judged
+ * individually. Missing or all-zero components mean "Not yet scored" —
+ * never a neutral fallback number.
+ */
+export function hasCompletePoolScore(
+  components: Record<string, number> | null | undefined,
+  total: number | null | undefined,
+): boolean {
+  if (total == null || !components) return false;
+  const c = toCanonicalComponents(components as AnyComponents);
+  return POOL_CRITERIA.every(({ key }) => {
+    const v = Number(c[key]);
+    return Number.isFinite(v) && v > 0;
+  });
+}
+
+/** True when several criteria carry the same value — an editorial warning, not a block. */
+export function hasIdenticalSubscores(
+  components: Record<string, number> | null | undefined,
+): boolean {
+  if (!components) return false;
+  const c = toCanonicalComponents(components as AnyComponents);
+  const values = POOL_CRITERIA.map(({ key }) => Number(c[key]));
+  return new Set(values).size === 1;
+}
