@@ -5,6 +5,7 @@ import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { listRankedHotels, listRankingFacets, type RankedHotel } from "@/lib/rankings.functions";
+import { hasCompletePoolScore } from "@/lib/scoring";
 
 const PAGE_SIZE = 24;
 
