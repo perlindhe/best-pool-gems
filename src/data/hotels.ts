@@ -10,31 +10,6 @@ import losAngelesImg from "@/assets/los-angeles.jpg";
 import sydneyImg from "@/assets/sydney.jpg";
 import creteImg from "@/assets/crete.jpg";
 
-export type HotelTag = "rooftop" | "resort" | "quiet" | "spa";
-
-export type PoolSubscores = {
-  view: number;
-  size: number;
-  loungers: number;
-  service: number;
-  wow: number;
-};
-
-export type Hotel = {
-  rank: number;
-  name: string;
-  neighborhood: string;
-  score: number;
-  pricePerNight: string;
-  poolType: string;
-  highlight: string;
-  description: string;
-  vibe?: string;
-  bestTime?: string;
-  tags?: HotelTag[];
-  subscores?: PoolSubscores;
-};
-
 export type City = {
   slug: string;
   name: string;
