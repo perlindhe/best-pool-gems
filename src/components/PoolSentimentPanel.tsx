@@ -116,7 +116,7 @@ export function PoolSentimentPanel({
           </div>
         </div>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          All {quotes.length} guest comments we collected about the pool at {hotelName} —
+          All {usable.length} substantive guest comments about the pool at {hotelName} —
           praise and criticism alike, unedited and linked to their source.
         </p>
 
@@ -171,6 +171,9 @@ export function PoolSentimentPanel({
         <p className="mt-6 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
           Comments are grouped automatically by tone and shown verbatim. We never remove
           negative feedback.
+          {generic > 0
+            ? ` ${generic} further comment${generic === 1 ? " was" : "s were"} too short or too generic to quote and are not shown.`
+            : ""}
         </p>
       </div>
     </section>
