@@ -11,9 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationStandardsRouteImport } from './routes/verification-standards'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RooftopPoolHotelsRouteImport } from './routes/rooftop-pool-hotels'
 import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
+import { Route as IndoorPoolHotelsRouteImport } from './routes/indoor-pool-hotels'
+import { Route as HeatedPoolHotelsRouteImport } from './routes/heated-pool-hotels'
+import { Route as FamilyPoolHotelsRouteImport } from './routes/family-pool-hotels'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as CorrectionsRouteImport } from './routes/corrections'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -49,6 +53,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RooftopPoolHotelsRoute = RooftopPoolHotelsRouteImport.update({
+  id: '/rooftop-pool-hotels',
+  path: '/rooftop-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RankingsRoute = RankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
@@ -62,6 +71,21 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
   id: '/integritetspolicy',
   path: '/integritetspolicy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndoorPoolHotelsRoute = IndoorPoolHotelsRouteImport.update({
+  id: '/indoor-pool-hotels',
+  path: '/indoor-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeatedPoolHotelsRoute = HeatedPoolHotelsRouteImport.update({
+  id: '/heated-pool-hotels',
+  path: '/heated-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilyPoolHotelsRoute = FamilyPoolHotelsRouteImport.update({
+  id: '/family-pool-hotels',
+  path: '/family-pool-hotels',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DisclosureRoute = DisclosureRouteImport.update({
@@ -200,9 +224,13 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/corrections': typeof CorrectionsRoute
   '/disclosure': typeof DisclosureRoute
+  '/family-pool-hotels': typeof FamilyPoolHotelsRoute
+  '/heated-pool-hotels': typeof HeatedPoolHotelsRoute
+  '/indoor-pool-hotels': typeof IndoorPoolHotelsRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
+  '/rooftop-pool-hotels': typeof RooftopPoolHotelsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
@@ -231,9 +259,13 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/corrections': typeof CorrectionsRoute
   '/disclosure': typeof DisclosureRoute
+  '/family-pool-hotels': typeof FamilyPoolHotelsRoute
+  '/heated-pool-hotels': typeof HeatedPoolHotelsRoute
+  '/indoor-pool-hotels': typeof IndoorPoolHotelsRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
+  '/rooftop-pool-hotels': typeof RooftopPoolHotelsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
@@ -263,9 +295,13 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/corrections': typeof CorrectionsRoute
   '/disclosure': typeof DisclosureRoute
+  '/family-pool-hotels': typeof FamilyPoolHotelsRoute
+  '/heated-pool-hotels': typeof HeatedPoolHotelsRoute
+  '/indoor-pool-hotels': typeof IndoorPoolHotelsRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
+  '/rooftop-pool-hotels': typeof RooftopPoolHotelsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
@@ -296,9 +332,13 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/corrections'
     | '/disclosure'
+    | '/family-pool-hotels'
+    | '/heated-pool-hotels'
+    | '/indoor-pool-hotels'
     | '/integritetspolicy'
     | '/privacy'
     | '/rankings'
+    | '/rooftop-pool-hotels'
     | '/sitemap.xml'
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
@@ -327,9 +367,13 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/corrections'
     | '/disclosure'
+    | '/family-pool-hotels'
+    | '/heated-pool-hotels'
+    | '/indoor-pool-hotels'
     | '/integritetspolicy'
     | '/privacy'
     | '/rankings'
+    | '/rooftop-pool-hotels'
     | '/sitemap.xml'
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
@@ -358,9 +402,13 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/corrections'
     | '/disclosure'
+    | '/family-pool-hotels'
+    | '/heated-pool-hotels'
+    | '/indoor-pool-hotels'
     | '/integritetspolicy'
     | '/privacy'
     | '/rankings'
+    | '/rooftop-pool-hotels'
     | '/sitemap.xml'
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
@@ -390,9 +438,13 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   CorrectionsRoute: typeof CorrectionsRoute
   DisclosureRoute: typeof DisclosureRoute
+  FamilyPoolHotelsRoute: typeof FamilyPoolHotelsRoute
+  HeatedPoolHotelsRoute: typeof HeatedPoolHotelsRoute
+  IndoorPoolHotelsRoute: typeof IndoorPoolHotelsRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
   PrivacyRoute: typeof PrivacyRoute
   RankingsRoute: typeof RankingsRoute
+  RooftopPoolHotelsRoute: typeof RooftopPoolHotelsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VerificationStandardsRoute: typeof VerificationStandardsRoute
   CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
@@ -431,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rooftop-pool-hotels': {
+      id: '/rooftop-pool-hotels'
+      path: '/rooftop-pool-hotels'
+      fullPath: '/rooftop-pool-hotels'
+      preLoaderRoute: typeof RooftopPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rankings': {
       id: '/rankings'
       path: '/rankings'
@@ -450,6 +509,27 @@ declare module '@tanstack/react-router' {
       path: '/integritetspolicy'
       fullPath: '/integritetspolicy'
       preLoaderRoute: typeof IntegritetspolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/indoor-pool-hotels': {
+      id: '/indoor-pool-hotels'
+      path: '/indoor-pool-hotels'
+      fullPath: '/indoor-pool-hotels'
+      preLoaderRoute: typeof IndoorPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heated-pool-hotels': {
+      id: '/heated-pool-hotels'
+      path: '/heated-pool-hotels'
+      fullPath: '/heated-pool-hotels'
+      preLoaderRoute: typeof HeatedPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family-pool-hotels': {
+      id: '/family-pool-hotels'
+      path: '/family-pool-hotels'
+      fullPath: '/family-pool-hotels'
+      preLoaderRoute: typeof FamilyPoolHotelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disclosure': {
@@ -641,9 +721,13 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   CorrectionsRoute: CorrectionsRoute,
   DisclosureRoute: DisclosureRoute,
+  FamilyPoolHotelsRoute: FamilyPoolHotelsRoute,
+  HeatedPoolHotelsRoute: HeatedPoolHotelsRoute,
+  IndoorPoolHotelsRoute: IndoorPoolHotelsRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
   PrivacyRoute: PrivacyRoute,
   RankingsRoute: RankingsRoute,
+  RooftopPoolHotelsRoute: RooftopPoolHotelsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VerificationStandardsRoute: VerificationStandardsRoute,
   CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
