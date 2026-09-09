@@ -163,7 +163,7 @@ function ComparePage() {
               <p className="mt-3 text-sm text-muted-foreground">
                 Pool score{" "}
                 <span className="text-foreground">
-                  {h.pool_score_0_10 != null ? h.pool_score_0_10.toFixed(1) : "—"}/10
+                  {h.pool_score_0_10 != null ? `${h.pool_score_0_10.toFixed(1)}/10` : "Not yet scored"}
                 </span>
                 {" · "}
                 Meta{" "}
