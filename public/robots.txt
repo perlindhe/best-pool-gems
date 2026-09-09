@@ -4,6 +4,5 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
-Disallow: /compare/
 
 Sitemap: https://bestpoolhotels.com/sitemap.xml
