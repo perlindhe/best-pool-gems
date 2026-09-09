@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerificationStandardsRouteImport } from './routes/verification-standards'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
+import { Route as CorrectionsRouteImport } from './routes/corrections'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -37,6 +39,11 @@ import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/
 import { Route as ApiPublicHooksBackfillPoolQuotesRouteImport } from './routes/api/public/hooks/backfill-pool-quotes'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
 
+const VerificationStandardsRoute = VerificationStandardsRouteImport.update({
+  id: '/verification-standards',
+  path: '/verification-standards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -60,6 +67,11 @@ const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
 const DisclosureRoute = DisclosureRouteImport.update({
   id: '/disclosure',
   path: '/disclosure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CorrectionsRoute = CorrectionsRouteImport.update({
+  id: '/corrections',
+  path: '/corrections',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -186,11 +198,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
+  '/corrections': typeof CorrectionsRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -215,11 +229,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
+  '/corrections': typeof CorrectionsRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -245,11 +261,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/cookies': typeof CookiesRoute
+  '/corrections': typeof CorrectionsRoute
   '/disclosure': typeof DisclosureRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -276,11 +294,13 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cookies'
+    | '/corrections'
     | '/disclosure'
     | '/integritetspolicy'
     | '/privacy'
     | '/rankings'
     | '/sitemap.xml'
+    | '/verification-standards'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -305,11 +325,13 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cookies'
+    | '/corrections'
     | '/disclosure'
     | '/integritetspolicy'
     | '/privacy'
     | '/rankings'
     | '/sitemap.xml'
+    | '/verification-standards'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -334,11 +356,13 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/cookies'
+    | '/corrections'
     | '/disclosure'
     | '/integritetspolicy'
     | '/privacy'
     | '/rankings'
     | '/sitemap.xml'
+    | '/verification-standards'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
     | '/barcelona/luxury-pool-hotels'
@@ -364,11 +388,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   CookiesRoute: typeof CookiesRoute
+  CorrectionsRoute: typeof CorrectionsRoute
   DisclosureRoute: typeof DisclosureRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
   PrivacyRoute: typeof PrivacyRoute
   RankingsRoute: typeof RankingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VerificationStandardsRoute: typeof VerificationStandardsRoute
   CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
   AdminLoginRoute: typeof AdminLoginRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
@@ -391,6 +417,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verification-standards': {
+      id: '/verification-standards'
+      path: '/verification-standards'
+      fullPath: '/verification-standards'
+      preLoaderRoute: typeof VerificationStandardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -424,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/disclosure'
       fullPath: '/disclosure'
       preLoaderRoute: typeof DisclosureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corrections': {
+      id: '/corrections'
+      path: '/corrections'
+      fullPath: '/corrections'
+      preLoaderRoute: typeof CorrectionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cookies': {
@@ -599,11 +639,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   CookiesRoute: CookiesRoute,
+  CorrectionsRoute: CorrectionsRoute,
   DisclosureRoute: DisclosureRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
   PrivacyRoute: PrivacyRoute,
   RankingsRoute: RankingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VerificationStandardsRoute: VerificationStandardsRoute,
   CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
   AdminLoginRoute: AdminLoginRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,

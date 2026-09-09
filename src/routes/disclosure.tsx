@@ -57,7 +57,7 @@ function Disclosure() {
             Email{" "}
             <a href="mailto:hello@bestpoolhotels.com" className="text-primary underline">hello@bestpoolhotels.com</a>{" "}
             with any questions. Also see our{" "}
-            <Link to="/integritetspolicy" className="text-primary underline">
+            <Link to="/privacy" className="text-primary underline">
               privacy policy
             </Link>{" "}
             and{" "}
