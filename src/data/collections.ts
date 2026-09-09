@@ -61,6 +61,37 @@ export const collections: Collection[] = [
     lastUpdated: "2026-08-19",
   },
   {
+    citySlug: "barcelona",
+    articleSlug: "indoor-pool-hotels",
+    city: "Barcelona",
+    category: "Indoor",
+    title: "Barcelona hotels with indoor pools",
+    metaTitle: "Indoor pool hotels in Barcelona — verified list 2026",
+    excerpt:
+      "Barcelona hotels with a genuine indoor pool you can swim in whatever the weather — checked against each hotel's own spa and wellness pages.",
+    hero: "When the tramuntana blows or the rooftop closes for winter, an indoor pool is the only reliable swim in Barcelona. These are the hotels that have one.",
+    intro: [
+      "Indoor pools are rare in Barcelona. Most city hotels put their water on the roof, which means a short season and a windy shoulder season. The properties below keep a pool under cover, usually as part of a spa floor.",
+      "We only list a hotel here when the indoor pool is described on the hotel's own website or confirmed by two independent sources. Small hydrotherapy or plunge pools are noted as such rather than presented as swimming pools.",
+      "Indoor does not automatically mean open all day: several of these pools sit inside a spa with its own hours, age limits and occasional adults-only slots. The access rules are listed on each hotel page, and marked \"not confirmed\" where we have not seen them stated.",
+    ],
+    faqs: [
+      {
+        question: "Are indoor hotel pools in Barcelona heated?",
+        answer:
+          "Almost always, typically between 28 and 30°C because they sit inside a spa. We still only state heating on a hotel page when the property or two independent sources confirm it.",
+      },
+      {
+        question: "Can I swim indoors in Barcelona in winter?",
+        answer:
+          "Yes — this is the main reason to book one of these hotels between November and March, when most rooftop pools in the city are closed or unheated.",
+      },
+    ],
+    filter: { indoor: true },
+    minHotels: 4,
+    lastUpdated: "2026-09-09",
+  },
+  {
     citySlug: "gran-canaria",
     articleSlug: "heated-pools-winter",
     city: "Gran Canaria",
