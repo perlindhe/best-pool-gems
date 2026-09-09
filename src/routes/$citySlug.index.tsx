@@ -12,7 +12,8 @@ import { getCityHubSummaryFn } from "@/lib/city-hub.functions";
 const PAGE_SIZE = 10;
 
 const citySearchSchema = z.object({
-  page: fallback(z.number().int().min(1).max(20), 1).default(1),
+  // No default: /city stays clean (no ?page=1 redirect); page 2+ is opt-in.
+  page: fallback(z.number().int().min(1).max(20), 1).optional(),
 });
 
 export const Route = createFileRoute("/$citySlug/")({
@@ -119,7 +120,7 @@ function CityHub() {
 
 
 
-  const { page } = Route.useSearch();
+  const { page = 1 } = Route.useSearch();
   const otherCities = cities.filter((c) => c.slug !== city.slug);
   const totalPages = Math.max(1, Math.ceil(city.hotels.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -300,7 +301,7 @@ function CityHub() {
                 <Link
                   to="/$citySlug"
                   params={{ citySlug: city.slug }}
-                  search={{ page: currentPage - 1 }}
+                  search={currentPage - 1 === 1 ? {} : { page: currentPage - 1 }}
                   className="text-sm uppercase tracking-[0.25em] text-primary hover:underline"
                 >
                   ← Page {currentPage - 1}
@@ -314,7 +315,7 @@ function CityHub() {
                     key={p}
                     to="/$citySlug"
                     params={{ citySlug: city.slug }}
-                    search={{ page: p }}
+                    search={p === 1 ? {} : { page: p }}
                     className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.25em] transition ${
                       p === currentPage
                         ? "bg-primary text-primary-foreground"
