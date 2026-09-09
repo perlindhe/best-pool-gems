@@ -84,8 +84,6 @@ export const Route = createFileRoute("/sitemap.xml")({
             }
             offset += data.length;
           }
-        } catch {
-          // ignore — sitemap should still serve static routes even if DB is down
         }
 
         const seen = new Set<string>();
