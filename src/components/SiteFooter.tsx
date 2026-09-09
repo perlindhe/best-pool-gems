@@ -18,6 +18,8 @@ export function SiteFooter() {
             <li><Link to="/" className="hover:text-primary">Best hotel pools</Link></li>
             <li><Link to="/about" className="hover:text-primary">About Best Pool Hotels</Link></li>
             <li><Link to="/editors" className="hover:text-primary">Our editors</Link></li>
+            <li><Link to="/verification-standards" className="hover:text-primary">Verification standards</Link></li>
+            <li><Link to="/corrections" className="hover:text-primary">Corrections & contact</Link></li>
             <li><Link to="/disclosure" className="hover:text-primary">Affiliate links & disclosure</Link></li>
           </ul>
         </div>
