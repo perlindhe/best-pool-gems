@@ -71,18 +71,11 @@ export const Route = createFileRoute("/hotels/$slug")({
         ...(hotel.neighborhood ? { addressRegion: hotel.neighborhood } : {}),
       },
     };
-    if (ratingValue != null) {
-      jsonLd.aggregateRating = {
-        "@type": "AggregateRating",
-        ratingValue,
-        bestRating: 5,
-        ...(reviewCount > 0 ? { reviewCount } : { ratingCount: 1 }),
-      };
-    }
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "robots", content: robots },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
