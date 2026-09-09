@@ -27,7 +27,9 @@ export async function getHotelDetail(slug: string) {
 
   const { data: editorial } = await supabaseAdmin
     .from("hotels")
-    .select("last_verified_date, sources, why_included, why_not_higher")
+    .select(
+      "last_verified_date, sources, why_included, why_not_higher, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, children_allowed, season",
+    )
     .eq("id", hotel.id as string)
     .maybeSingle();
 
