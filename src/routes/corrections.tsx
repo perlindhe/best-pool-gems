@@ -89,7 +89,7 @@ function Corrections() {
               hello@bestpoolhotels.com
             </a>
             . Best Pool Hotels is an independent editorial site run by{" "}
-            <Link to="/editors/per-lindhe" className="text-primary underline">
+            <Link to="/editors/$slug" params={{ slug: "per-lindhe" }} className="text-primary underline">
               Per Lindhe
             </Link>{" "}
             with a small research desk. See our{" "}
