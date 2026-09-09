@@ -281,7 +281,10 @@ function RankingsPage() {
 }
 
 function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) {
-  const pool = hotel.pool_score_0_10;
+  // A score only shows when all five criteria are individually assessed.
+  const pool = hasCompletePoolScore(hotel.pool_score_0_10, hotel.pool_components)
+    ? hotel.pool_score_0_10
+    : null;
   const meta = hotel.meta_rating_0_100;
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
