@@ -299,6 +299,74 @@ function HotelDetailPage() {
               </div>
             </div>
 
+            {/* Practical information — "Not confirmed" wherever we lack a source */}
+            <div className="mt-8 overflow-hidden rounded-lg border border-border/60 bg-surface/40">
+              <div className="p-6 md:p-8">
+                <p className="text-xs uppercase tracking-[0.3em] text-primary">
+                  Practical pool information
+                </p>
+                <dl className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                  <PracticalFact label="Number of pools" value={hotel.pool_count ?? null} />
+                  <PracticalFact label="Pool type" value={hotel.pool_type} />
+                  <PracticalFact label="Pool size" value={hotel.pool_size} />
+                  <PracticalFact label="Pool depth" value={null} />
+                  <PracticalFact
+                    label="Heating"
+                    value={
+                      hotel.heated_pool === true
+                        ? "Heated"
+                        : hotel.heated_pool === false
+                          ? "Not heated"
+                          : null
+                    }
+                  />
+                  <PracticalFact
+                    label="Season"
+                    value={hotel.season ?? (hotel.year_round ? "Open year-round" : null)}
+                  />
+                  <PracticalFact label="Opening hours" value={hotel.pool_opening_hours} />
+                  <PracticalFact
+                    label="Who can use the pool"
+                    value={
+                      hotel.guest_only === true
+                        ? "Hotel guests only"
+                        : hotel.day_pass_available === true
+                          ? "Guests and day-pass visitors"
+                          : null
+                    }
+                  />
+                  <PracticalFact
+                    label="Day pass"
+                    value={
+                      hotel.day_pass_available === true
+                        ? "Available"
+                        : hotel.day_pass_available === false
+                          ? "Not available"
+                          : null
+                    }
+                  />
+                  <PracticalFact
+                    label="Children"
+                    value={
+                      hotel.adults_only === true
+                        ? "Adults only"
+                        : hotel.children_allowed === true
+                          ? "Children welcome"
+                          : hotel.children_allowed === false
+                            ? "Not allowed at the pool"
+                            : null
+                    }
+                  />
+                  <PracticalFact label="Best time to visit" value={hotel.best_time} />
+                  <PracticalFact label="View from the pool" value={hotel.pool_view} />
+                </dl>
+                <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
+                  "Not confirmed" means we have not yet seen this detail in the hotel's own
+                  material or in a second independent source. We never estimate it.
+                </p>
+              </div>
+            </div>
+
             {/* Meta rating breakdown */}
             <div className="mt-14">
               <SectionHeading
@@ -504,6 +572,51 @@ function HotelDetailPage() {
                   on Google and TripAdvisor, and our notes from the property.
                 </p>
               )}
+              {(hotel.primary_source_url || hotel.secondary_source_url) && (
+                <ul className="mt-4 space-y-1.5 text-sm">
+                  {hotel.primary_source_url && (
+                    <li>
+                      <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        Primary source:{" "}
+                      </span>
+                      <a
+                        href={hotel.primary_source_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="text-primary hover:underline"
+                      >
+                        {hotel.primary_source_url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 48)} ↗
+                      </a>
+                    </li>
+                  )}
+                  {hotel.secondary_source_url && (
+                    <li>
+                      <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        Second source:{" "}
+                      </span>
+                      <a
+                        href={hotel.secondary_source_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="text-primary hover:underline"
+                      >
+                        {hotel.secondary_source_url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 48)} ↗
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              )}
+              <p className="mt-4 text-sm text-muted-foreground">
+                <span className="text-[10px] uppercase tracking-[0.22em]">Checked by: </span>
+                <a href="/editors" className="text-primary hover:underline">
+                  {hotel.verified_by ?? "BestPoolHotels Editorial"}
+                </a>
+              </p>
+              {hotel.verification_notes && (
+                <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                  {hotel.verification_notes}
+                </p>
+              )}
               <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/80">
                 Affiliate disclosure: booking links may earn us a commission at no
                 extra cost to you. Rankings are editorial and not paid placements.
@@ -579,6 +692,19 @@ function ComparedWith({ slug }: { slug: string }) {
   );
 }
 
+
+/** One practical fact. Shows "Not confirmed" instead of guessing. */
+function PracticalFact({ label, value }: { label: string; value: string | number | null }) {
+  const confirmed = value !== null && value !== undefined && `${value}`.trim() !== "";
+  return (
+    <div className="border-b border-border/40 pb-3">
+      <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</dt>
+      <dd className={confirmed ? "mt-1 text-sm text-foreground" : "mt-1 text-sm text-muted-foreground/70"}>
+        {confirmed ? value : "Not confirmed"}
+      </dd>
+    </div>
+  );
+}
 
 function ScoreBlock({
   label,
