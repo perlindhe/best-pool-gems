@@ -82,7 +82,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
 
   const { data: scoreData, error: scoreError } = await supabaseAdmin
     .from("pool_scores")
-    .select("hotel_id, pool_score_0_10, components, updated_at");
+    .select("hotel_id, pool_score_0_10, components, facts, updated_at");
   if (scoreError) throw new Error(scoreError.message);
 
   const push = (
