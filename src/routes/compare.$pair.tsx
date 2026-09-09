@@ -192,7 +192,11 @@ function ComparePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
-              <Row label="Pool score" a={fmt(a.pool_score_0_10, "/10")} b={fmt(b.pool_score_0_10, "/10")} />
+              <Row
+                label="Pool score"
+                a={a.pool_score_0_10 != null ? fmt(a.pool_score_0_10, "/10") : "Not yet scored"}
+                b={b.pool_score_0_10 != null ? fmt(b.pool_score_0_10, "/10") : "Not yet scored"}
+              />
               <Row label="Meta rating" a={fmt(a.meta_rating_0_100, "/100", 0)} b={fmt(b.meta_rating_0_100, "/100", 0)} />
               <Row label="Pool type" a={a.pool_type ?? "—"} b={b.pool_type ?? "—"} />
               <Row label="Setting" a={a.pool_setting ?? "—"} b={b.pool_setting ?? "—"} />
