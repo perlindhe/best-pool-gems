@@ -648,6 +648,19 @@ function ComparedWith({ slug }: { slug: string }) {
 }
 
 
+/** One practical fact. Shows "Not confirmed" instead of guessing. */
+function PracticalFact({ label, value }: { label: string; value: string | number | null }) {
+  const confirmed = value !== null && value !== undefined && `${value}`.trim() !== "";
+  return (
+    <div className="border-b border-border/40 pb-3">
+      <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</dt>
+      <dd className={confirmed ? "mt-1 text-sm text-foreground" : "mt-1 text-sm text-muted-foreground/70"}>
+        {confirmed ? value : "Not confirmed"}
+      </dd>
+    </div>
+  );
+}
+
 function ScoreBlock({
   label,
   value,
