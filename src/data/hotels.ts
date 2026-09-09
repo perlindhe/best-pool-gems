@@ -42,7 +42,6 @@ export type City = {
   tagline: string;
   intro: string;
   image: string;
-  hotels: Hotel[];
 };
 
 export const barcelonaTop10: Hotel[] = [
@@ -588,7 +587,6 @@ export const cities: City[] = [
     intro:
       "Barcelona is a city where the rooftops matter as much as the streets. Here we rank the hotels that combine Gaudí views, Mediterranean breezes and crystal-clear blue water.",
     image: barcelonaImg,
-    hotels: barcelonaTop10,
   },
   {
     slug: "paris",
@@ -598,7 +596,6 @@ export const cities: City[] = [
     intro:
       "Paris keeps its pools tucked behind Haussmannian facades. Here are the hotels where you swim in marble, mosaic and golden light — with the Eiffel Tower as your neighbor.",
     image: parisImg,
-    hotels: parisTop20,
   },
   {
     slug: "london",
@@ -608,7 +605,6 @@ export const cities: City[] = [
     intro:
       "In ten years London went from 'no pools' to home of Europe's most spectacular sky pools.",
     image: londonImg,
-    hotels: londonTop20,
   },
   {
     slug: "new-york",
@@ -617,7 +613,6 @@ export const cities: City[] = [
     tagline: "Rooftop pools with skyscrapers in the background",
     intro: "Manhattan's pools are nearly always on the roof — and often worth the hype.",
     image: newyorkImg,
-    hotels: newYorkTop20,
   },
   {
     slug: "gran-canaria",
@@ -627,7 +622,6 @@ export const cities: City[] = [
     intro:
       "Gran Canaria's resort hotels turn the Atlantic into a backdrop — infinity pools above black-rock cliffs, palm-lined decks and warm water from January to December.",
     image: granCanariaImg,
-    hotels: granCanariaTop20,
   },
   {
     slug: "mallorca",
@@ -637,7 +631,6 @@ export const cities: City[] = [
     intro:
       "From Deià to Cap de Formentor, Mallorca hides some of Europe's most beautifully placed hotel pools — pine forests, stone terraces and that very specific Balearic blue.",
     image: mallorcaImg,
-    hotels: mallorcaTop20,
   },
   {
     slug: "bangkok",
@@ -647,7 +640,6 @@ export const cities: City[] = [
     intro:
       "Bangkok perfected the rooftop infinity pool. We rank the city's most spectacular sky pools — the ones with the skyline view, the cocktail program and the warm tropical evenings.",
     image: bangkokImg,
-    hotels: bangkokTop20,
   },
   {
     slug: "malaga",
@@ -657,7 +649,6 @@ export const cities: City[] = [
     intro:
       "Málaga's hotel scene has grown up fast — rooftop pools with cathedral views, port-side resorts and warm Andalusian evenings that stretch long into October.",
     image: malagaImg,
-    hotels: malagaTop20,
   },
   {
     slug: "los-angeles",
@@ -667,7 +658,6 @@ export const cities: City[] = [
     intro:
       "From Bel Air's pink-tiled icon to rooftop infinity pools above the Sunset Strip, Los Angeles invented the cinematic hotel pool. Year-round sun, palm trees and cabanas included.",
     image: losAngelesImg,
-    hotels: losAngelesTop20,
   },
   {
     slug: "sydney",
@@ -677,7 +667,6 @@ export const cities: City[] = [
     intro:
       "Sydney's best hotel pools are aimed straight at the harbour — rooftop decks framing the Opera House, sky-high indoor pools above Circular Quay and one boutique that lets you swim in the harbour itself.",
     image: sydneyImg,
-    hotels: sydneyTop20,
   },
   {
     slug: "crete",
@@ -687,7 +676,6 @@ export const cities: City[] = [
     intro:
       "Crete does pools at two extremes: sprawling lagoon resorts on the north coast and tiny private plunge pools cut into the cliffs around Elounda. We rank the island's best, from Chania rooftops to Mirabello Bay infinity edges.",
     image: creteImg,
-    hotels: creteTop15,
   },
 ];
 
