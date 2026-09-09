@@ -148,6 +148,10 @@ function ComparePage() {
               <img
                 src={h.cover_image_url}
                 alt={`Pool at ${h.name}`}
+                width={1200}
+                height={864}
+                loading="lazy"
+                decoding="async"
                 className="h-72 w-full object-cover transition duration-700 group-hover:scale-[1.03]"
               />
             )}

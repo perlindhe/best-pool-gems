@@ -111,6 +111,8 @@ function GuidePage() {
             alt={guide.title}
             width={1280}
             height={896}
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 -z-10 h-full w-full object-cover"
           />
           <div className="absolute inset-0 -z-10 bg-gradient-hero" />

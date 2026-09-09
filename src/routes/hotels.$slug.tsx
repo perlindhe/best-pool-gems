@@ -174,6 +174,10 @@ function HotelDetailPage() {
           <img
             src={hero}
             alt={`Pool at ${hotel.name}`}
+            width={1920}
+            height={1280}
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 -z-10 h-full w-full object-cover"
           />
         )}
@@ -290,7 +294,10 @@ function HotelDetailPage() {
                 <img
                   src={photos[1].url}
                   alt={`Pool detail at ${hotel.name}`}
+                  width={1200}
+                  height={624}
                   loading="lazy"
+                  decoding="async"
                   className="h-40 w-full object-cover md:h-52"
                 />
               )}
@@ -421,7 +428,10 @@ function HotelDetailPage() {
                     <img
                       src={p.url}
                       alt={`${hotel.name} — photo ${i + 2}`}
+                      width={800}
+                      height={600}
                       loading="lazy"
+                      decoding="async"
                       className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                     />
                     {p.attribution && (

@@ -228,6 +228,8 @@ function LuxuryPoolHotels() {
           alt="Rooftop pool in Barcelona"
           width={1920}
           height={1280}
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 -z-10 h-full w-full object-cover"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
@@ -345,7 +347,10 @@ function LuxuryPoolHotels() {
                   <img
                     src={photo}
                     alt={`${h.name} pool`}
+                    width={1200}
+                    height={900}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
                   />
                 ) : (
