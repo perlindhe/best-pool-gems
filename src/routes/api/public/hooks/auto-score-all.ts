@@ -37,11 +37,16 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
         );
 
         const citySlug = url.searchParams.get("city_slug");
+        const slugsParam = url.searchParams.get("slugs");
+        const slugs = slugsParam
+          ? slugsParam.split(",").map((s) => s.trim()).filter(Boolean)
+          : null;
 
         let countQuery = supabaseAdmin
           .from("hotels")
           .select("id", { count: "exact", head: true });
         if (citySlug) countQuery = countQuery.eq("city_slug", citySlug);
+        if (slugs) countQuery = countQuery.in("slug", slugs);
         const { count: total } = await countQuery;
 
         let listQuery = supabaseAdmin
@@ -49,7 +54,9 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
           .select("id, name")
           .order("name", { ascending: true });
         if (citySlug) listQuery = listQuery.eq("city_slug", citySlug);
+        if (slugs) listQuery = listQuery.in("slug", slugs);
         const { data: hotels, error } = await listQuery.range(offset, offset + limit - 1);
+
         if (error) return json({ error: error.message }, 500);
 
         const results: Array<{
