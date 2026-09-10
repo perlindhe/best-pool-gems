@@ -40,6 +40,7 @@ import { Route as ApiPublicHooksRunIntegrityRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
+import { Route as ApiPublicHooksEnhancedVerifyRouteImport } from './routes/api/public/hooks/enhanced-verify'
 import { Route as ApiPublicHooksClassifyPoolPhotosRouteImport } from './routes/api/public/hooks/classify-pool-photos'
 import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/api/public/hooks/backfill-tripadvisor'
 import { Route as ApiPublicHooksBackfillPoolQuotesRouteImport } from './routes/api/public/hooks/backfill-pool-quotes'
@@ -207,6 +208,12 @@ const ApiPublicHooksRefreshAllPhotosRoute =
     path: '/api/public/hooks/refresh-all-photos',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksEnhancedVerifyRoute =
+  ApiPublicHooksEnhancedVerifyRouteImport.update({
+    id: '/api/public/hooks/enhanced-verify',
+    path: '/api/public/hooks/enhanced-verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksClassifyPoolPhotosRoute =
   ApiPublicHooksClassifyPoolPhotosRouteImport.update({
     id: '/api/public/hooks/classify-pool-photos',
@@ -261,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
+  '/api/public/hooks/enhanced-verify': typeof ApiPublicHooksEnhancedVerifyRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -298,6 +306,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
+  '/api/public/hooks/enhanced-verify': typeof ApiPublicHooksEnhancedVerifyRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -336,6 +345,7 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
   '/api/public/hooks/backfill-tripadvisor': typeof ApiPublicHooksBackfillTripadvisorRoute
   '/api/public/hooks/classify-pool-photos': typeof ApiPublicHooksClassifyPoolPhotosRoute
+  '/api/public/hooks/enhanced-verify': typeof ApiPublicHooksEnhancedVerifyRoute
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-pool-quotes'
     | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/classify-pool-photos'
+    | '/api/public/hooks/enhanced-verify'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-pool-quotes'
     | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/classify-pool-photos'
+    | '/api/public/hooks/enhanced-verify'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -449,6 +461,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-pool-quotes'
     | '/api/public/hooks/backfill-tripadvisor'
     | '/api/public/hooks/classify-pool-photos'
+    | '/api/public/hooks/enhanced-verify'
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
@@ -487,6 +500,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillPoolQuotesRoute: typeof ApiPublicHooksBackfillPoolQuotesRoute
   ApiPublicHooksBackfillTripadvisorRoute: typeof ApiPublicHooksBackfillTripadvisorRoute
   ApiPublicHooksClassifyPoolPhotosRoute: typeof ApiPublicHooksClassifyPoolPhotosRoute
+  ApiPublicHooksEnhancedVerifyRoute: typeof ApiPublicHooksEnhancedVerifyRoute
   ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
   ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
   ApiPublicHooksRefreshMissingPhotosRoute: typeof ApiPublicHooksRefreshMissingPhotosRoute
@@ -714,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshAllPhotosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/enhanced-verify': {
+      id: '/api/public/hooks/enhanced-verify'
+      path: '/api/public/hooks/enhanced-verify'
+      fullPath: '/api/public/hooks/enhanced-verify'
+      preLoaderRoute: typeof ApiPublicHooksEnhancedVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/classify-pool-photos': {
       id: '/api/public/hooks/classify-pool-photos'
       path: '/api/public/hooks/classify-pool-photos'
@@ -787,6 +808,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillTripadvisorRoute:
     ApiPublicHooksBackfillTripadvisorRoute,
   ApiPublicHooksClassifyPoolPhotosRoute: ApiPublicHooksClassifyPoolPhotosRoute,
+  ApiPublicHooksEnhancedVerifyRoute: ApiPublicHooksEnhancedVerifyRoute,
   ApiPublicHooksRefreshAllPhotosRoute: ApiPublicHooksRefreshAllPhotosRoute,
   ApiPublicHooksRefreshGoogleRatingsRoute:
     ApiPublicHooksRefreshGoogleRatingsRoute,
