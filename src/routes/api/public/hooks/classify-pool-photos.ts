@@ -35,6 +35,7 @@ export const Route = createFileRoute("/api/public/hooks/classify-pool-photos")({
 
         const citySlug = url.searchParams.get("city_slug");
         const hotelSlug = url.searchParams.get("hotel_slug");
+        const pendingOnly = url.searchParams.get("pending_only") === "1";
         const limitParam = Number(url.searchParams.get("limit") ?? "");
         let hotelsQuery = supabaseAdmin
           .from("hotels")
@@ -42,9 +43,20 @@ export const Route = createFileRoute("/api/public/hooks/classify-pool-photos")({
           .eq("is_published", true);
         if (citySlug) hotelsQuery = hotelsQuery.eq("city_slug", citySlug);
         if (hotelSlug) hotelsQuery = hotelsQuery.eq("slug", hotelSlug);
+        if (pendingOnly) {
+          const { data: pending, error: pendingError } = await supabaseAdmin
+            .from("hotel_photos")
+            .select("hotel_id")
+            .is("is_pool", null);
+          if (pendingError) return json({ error: pendingError.message }, 500);
+          const ids = [...new Set((pending ?? []).map((p) => p.hotel_id))];
+          if (ids.length === 0) return json({ total_hotels: 0, results: [] });
+          hotelsQuery = hotelsQuery.in("id", ids);
+        }
         if (Number.isFinite(limitParam) && limitParam > 0) {
           hotelsQuery = hotelsQuery.limit(limitParam);
         }
+
         const { data: hotels, error } = await hotelsQuery;
         if (error) return json({ error: error.message }, 500);
 
