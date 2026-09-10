@@ -34,6 +34,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
+import { Route as ApiPublicHooksWriteEditorialRouteImport } from './routes/api/public/hooks/write-editorial'
 import { Route as ApiPublicHooksVerifyPoolExistenceRouteImport } from './routes/api/public/hooks/verify-pool-existence'
 import { Route as ApiPublicHooksRunIntegrityRouteImport } from './routes/api/public/hooks/run-integrity'
 import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
@@ -170,6 +171,12 @@ const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ApiPublicHotelsRoute,
 } as any)
+const ApiPublicHooksWriteEditorialRoute =
+  ApiPublicHooksWriteEditorialRouteImport.update({
+    id: '/api/public/hooks/write-editorial',
+    path: '/api/public/hooks/write-editorial',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksVerifyPoolExistenceRoute =
   ApiPublicHooksVerifyPoolExistenceRouteImport.update({
     id: '/api/public/hooks/verify-pool-existence',
@@ -259,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
   '/api/public/hooks/run-integrity': typeof ApiPublicHooksRunIntegrityRoute
   '/api/public/hooks/verify-pool-existence': typeof ApiPublicHooksVerifyPoolExistenceRoute
+  '/api/public/hooks/write-editorial': typeof ApiPublicHooksWriteEditorialRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -295,6 +303,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
   '/api/public/hooks/run-integrity': typeof ApiPublicHooksRunIntegrityRoute
   '/api/public/hooks/verify-pool-existence': typeof ApiPublicHooksVerifyPoolExistenceRoute
+  '/api/public/hooks/write-editorial': typeof ApiPublicHooksWriteEditorialRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRoutesById {
@@ -332,6 +341,7 @@ export interface FileRoutesById {
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
   '/api/public/hooks/run-integrity': typeof ApiPublicHooksRunIntegrityRoute
   '/api/public/hooks/verify-pool-existence': typeof ApiPublicHooksVerifyPoolExistenceRoute
+  '/api/public/hooks/write-editorial': typeof ApiPublicHooksWriteEditorialRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
 export interface FileRouteTypes {
@@ -370,6 +380,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/refresh-missing-photos'
     | '/api/public/hooks/run-integrity'
     | '/api/public/hooks/verify-pool-existence'
+    | '/api/public/hooks/write-editorial'
     | '/api/public/hotels/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/refresh-missing-photos'
     | '/api/public/hooks/run-integrity'
     | '/api/public/hooks/verify-pool-existence'
+    | '/api/public/hooks/write-editorial'
     | '/api/public/hotels/$slug'
   id:
     | '__root__'
@@ -442,6 +454,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/refresh-missing-photos'
     | '/api/public/hooks/run-integrity'
     | '/api/public/hooks/verify-pool-existence'
+    | '/api/public/hooks/write-editorial'
     | '/api/public/hotels/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -479,6 +492,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRefreshMissingPhotosRoute: typeof ApiPublicHooksRefreshMissingPhotosRoute
   ApiPublicHooksRunIntegrityRoute: typeof ApiPublicHooksRunIntegrityRoute
   ApiPublicHooksVerifyPoolExistenceRoute: typeof ApiPublicHooksVerifyPoolExistenceRoute
+  ApiPublicHooksWriteEditorialRoute: typeof ApiPublicHooksWriteEditorialRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -658,6 +672,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHotelsSlugRouteImport
       parentRoute: typeof ApiPublicHotelsRoute
     }
+    '/api/public/hooks/write-editorial': {
+      id: '/api/public/hooks/write-editorial'
+      path: '/api/public/hooks/write-editorial'
+      fullPath: '/api/public/hooks/write-editorial'
+      preLoaderRoute: typeof ApiPublicHooksWriteEditorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/verify-pool-existence': {
       id: '/api/public/hooks/verify-pool-existence'
       path: '/api/public/hooks/verify-pool-existence'
@@ -774,6 +795,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRunIntegrityRoute: ApiPublicHooksRunIntegrityRoute,
   ApiPublicHooksVerifyPoolExistenceRoute:
     ApiPublicHooksVerifyPoolExistenceRoute,
+  ApiPublicHooksWriteEditorialRoute: ApiPublicHooksWriteEditorialRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
