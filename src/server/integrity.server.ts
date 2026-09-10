@@ -49,6 +49,8 @@ type Row = {
   heated_pool: boolean | null;
   rooftop: boolean | null;
   qa_blocked: boolean | null;
+  pool_type: string | null;
+
 };
 
 const normalizeName = (s: string) =>
@@ -74,7 +76,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   const { data, error } = await supabaseAdmin
     .from("hotels")
     .select(
-      "id, slug, name, city, city_slug, is_published, hotel_status, canonical_hotel_id, verification_status, official_url, website_url, affiliate_url, booking_url, address, previous_names, has_pool, indoor, outdoor, year_round, season, adults_only, children_allowed, family_friendly, last_verified_date, editorial_status, primary_source_url, secondary_source_url, editorial_notes, pool_count, heated_pool, rooftop, qa_blocked",
+      "id, slug, name, city, city_slug, is_published, hotel_status, canonical_hotel_id, verification_status, official_url, website_url, affiliate_url, booking_url, address, previous_names, has_pool, indoor, outdoor, year_round, season, adults_only, children_allowed, family_friendly, last_verified_date, editorial_status, primary_source_url, secondary_source_url, editorial_notes, pool_count, pool_type, heated_pool, rooftop, qa_blocked",
     );
   if (error) throw new Error(error.message);
   const rows = (data ?? []) as unknown as Row[];
@@ -272,7 +274,35 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r.editorial_status === "published" && note.length === 0) {
       push("Missing editor's note", "warning", r, "Published without an editorial note.");
     }
+
+    // The final score must match the sum of the five criteria (each 0–2).
+    if (total != null && values.length === 5) {
+      const sum = values.reduce((a, b) => a + b, 0);
+      if (Math.abs(sum - total) > 0.15) {
+        push(
+          "Score does not match sub-scores",
+          "critical",
+          r,
+          `Criteria add up to ${sum.toFixed(1)} but the Pool Score is ${total}.`,
+        );
+      }
+    }
+
+    // Free-text pool type must not contradict the structured pool count.
+    const typeText = (r.pool_type ?? "").toLowerCase();
+    const spelled: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+    const spelledHit = Object.keys(spelled).find((w) => new RegExp(`\\b${w}\\b[^.]{0,20}pool`).test(typeText));
+    const statedCount = spelledHit ? spelled[spelledHit]! : null;
+    if (statedCount != null && r.pool_count != null && statedCount !== r.pool_count) {
+      push(
+        "Contradiction",
+        "critical",
+        r,
+        `Pool type text says ${statedCount} pool(s) but pool_count is ${r.pool_count}.`,
+      );
+    }
   }
+
 
   // Duplicate editor's notes across hotels.
   const noteBuckets = new Map<string, Row[]>();
