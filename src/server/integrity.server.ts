@@ -268,7 +268,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r.verification_status === "verified" && !(r.primary_source_url && r.secondary_source_url)) {
       push("Missing sources", "critical", r, "A verified profile needs both a primary and a secondary source URL.");
     }
-    const note = (r.editorial_notes ?? "").trim();
+    const note = (((s?.["editorial_notes"] as string | null) ?? r.editorial_notes) ?? "").trim();
     if (r.is_published && note.length > 0 && note.length < 120) {
       push("Thin editor's note", "warning", r, `Editor's note is only ${note.length} characters.`);
     }
@@ -276,15 +276,15 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
       push("Missing editor's note", "warning", r, "Published without an editorial note.");
     }
 
-    // The final score must match the sum of the five criteria (each 0–2).
+    // The published Pool Score must equal the average of the five criteria.
     if (total != null && values.length === 5) {
-      const sum = values.reduce((a, b) => a + b, 0);
-      if (Math.abs(sum - total) > 0.15) {
+      const avg = values.reduce((a, b) => a + b, 0) / 5;
+      if (Math.abs(avg - total) > 0.15) {
         push(
           "Score does not match sub-scores",
           "critical",
           r,
-          `Criteria add up to ${sum.toFixed(1)} but the Pool Score is ${total}.`,
+          `Criteria average ${avg.toFixed(1)} but the Pool Score is ${total}.`,
         );
       }
     }
