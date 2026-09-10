@@ -49,6 +49,8 @@ type Row = {
   heated_pool: boolean | null;
   rooftop: boolean | null;
   qa_blocked: boolean | null;
+  pool_type: string | null;
+
 };
 
 const normalizeName = (s: string) =>
