@@ -76,7 +76,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   const { data, error } = await supabaseAdmin
     .from("hotels")
     .select(
-      "id, slug, name, city, city_slug, is_published, hotel_status, canonical_hotel_id, verification_status, official_url, website_url, affiliate_url, booking_url, address, previous_names, has_pool, indoor, outdoor, year_round, season, adults_only, children_allowed, family_friendly, last_verified_date, editorial_status, primary_source_url, secondary_source_url, editorial_notes, pool_count, heated_pool, rooftop, qa_blocked",
+      "id, slug, name, city, city_slug, is_published, hotel_status, canonical_hotel_id, verification_status, official_url, website_url, affiliate_url, booking_url, address, previous_names, has_pool, indoor, outdoor, year_round, season, adults_only, children_allowed, family_friendly, last_verified_date, editorial_status, primary_source_url, secondary_source_url, editorial_notes, pool_count, pool_type, heated_pool, rooftop, qa_blocked",
     );
   if (error) throw new Error(error.message);
   const rows = (data ?? []) as unknown as Row[];
