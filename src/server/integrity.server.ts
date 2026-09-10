@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { computePoolScore } from "@/lib/scoring";
 
 /**
  * Data-integrity checks for the canonical hotel model.
