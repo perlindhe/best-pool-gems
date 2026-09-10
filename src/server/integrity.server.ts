@@ -136,6 +136,8 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   const nameBuckets = new Map<string, Row[]>();
   const hostBuckets = new Map<string, Row[]>();
   for (const r of rows) {
+    // A record already merged into another (renamed) is not a duplicate any more.
+    if (r.hotel_status === "renamed" && r.canonical_hotel_id) continue;
     const nk = `${r.city_slug}:${normalizeName(r.name)}`;
     nameBuckets.set(nk, [...(nameBuckets.get(nk) ?? []), r]);
     const h = host(r.official_url ?? r.website_url);
