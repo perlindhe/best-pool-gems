@@ -168,19 +168,35 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
   const judgments: PoolJudgment[] = new Array(photos.length).fill(null).map(() => ({ ...EMPTY }));
   for (let i = 0; i < photos.length; i += BATCH_SIZE) {
     const batchIdx = photos.slice(i, i + BATCH_SIZE).map((_, k) => i + k);
-    const validIdx = batchIdx.filter((k) => isLikelyImageUrl(photos[k].url));
+    const candidateIdx = batchIdx.filter((k) => isLikelyImageUrl(photos[k].url));
+    if (candidateIdx.length === 0) continue;
+
+    // Download the bytes ourselves; images we can't fetch are skipped for good
+    // rather than sent to the model, which cannot fetch them either.
+    const fetched = await Promise.all(candidateIdx.map((k) => toDataUrl(photos[k].url)));
+    const validIdx: number[] = [];
+    const images: string[] = [];
+    candidateIdx.forEach((k, n) => {
+      const dataUrl = fetched[n];
+      if (dataUrl) {
+        validIdx.push(k);
+        images.push(dataUrl);
+      }
+    });
     if (validIdx.length === 0) continue;
-    let result = await classifyBatch(validIdx.map((k) => photos[k].url));
+
+    let result = await classifyBatch(images);
     if (result.every((r) => r.is_pool === null)) {
-      // Retry whole batch once
+      // Retry the batch once — the images are already inlined, so a repeat only
+      // helps for transient gateway errors.
       await new Promise((r) => setTimeout(r, 800));
-      result = await classifyBatch(validIdx.map((k) => photos[k].url));
+      result = await classifyBatch(images);
     }
-    if (result.every((r) => r.is_pool === null) && validIdx.length > 1) {
-      // Per-image fallback so one bad URL doesn't kill the batch
+    if (result.every((r) => r.is_pool === null) && images.length > 1) {
+      // Per-image fallback so one bad image doesn't kill the batch
       result = [];
-      for (const k of validIdx) {
-        const single = await classifyBatch([photos[k].url]);
+      for (const img of images) {
+        const single = await classifyBatch([img]);
         result.push(single[0] ?? { ...EMPTY });
         await new Promise((r) => setTimeout(r, 200));
       }
@@ -188,6 +204,7 @@ export async function classifyAndReorderHotelPhotos(hotelId: string) {
     validIdx.forEach((k, idx) => {
       judgments[k] = result[idx] ?? { ...EMPTY };
     });
+
     if (i + BATCH_SIZE < photos.length) {
       await new Promise((r) => setTimeout(r, 250));
     }
