@@ -35,6 +35,7 @@ import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$art
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
 import { Route as ApiPublicHooksVerifyPoolExistenceRouteImport } from './routes/api/public/hooks/verify-pool-existence'
+import { Route as ApiPublicHooksRunIntegrityRouteImport } from './routes/api/public/hooks/run-integrity'
 import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
 import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
 import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
@@ -175,6 +176,12 @@ const ApiPublicHooksVerifyPoolExistenceRoute =
     path: '/api/public/hooks/verify-pool-existence',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRunIntegrityRoute =
+  ApiPublicHooksRunIntegrityRouteImport.update({
+    id: '/api/public/hooks/run-integrity',
+    path: '/api/public/hooks/run-integrity',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRefreshMissingPhotosRoute =
   ApiPublicHooksRefreshMissingPhotosRouteImport.update({
     id: '/api/public/hooks/refresh-missing-photos',
@@ -250,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
+  '/api/public/hooks/run-integrity': typeof ApiPublicHooksRunIntegrityRoute
   '/api/public/hooks/verify-pool-existence': typeof ApiPublicHooksVerifyPoolExistenceRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
+  '/api/public/hooks/run-integrity': typeof ApiPublicHooksRunIntegrityRoute
   '/api/public/hooks/verify-pool-existence': typeof ApiPublicHooksVerifyPoolExistenceRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
@@ -321,6 +330,7 @@ export interface FileRoutesById {
   '/api/public/hooks/refresh-all-photos': typeof ApiPublicHooksRefreshAllPhotosRoute
   '/api/public/hooks/refresh-google-ratings': typeof ApiPublicHooksRefreshGoogleRatingsRoute
   '/api/public/hooks/refresh-missing-photos': typeof ApiPublicHooksRefreshMissingPhotosRoute
+  '/api/public/hooks/run-integrity': typeof ApiPublicHooksRunIntegrityRoute
   '/api/public/hooks/verify-pool-existence': typeof ApiPublicHooksVerifyPoolExistenceRoute
   '/api/public/hotels/$slug': typeof ApiPublicHotelsSlugRoute
 }
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
+    | '/api/public/hooks/run-integrity'
     | '/api/public/hooks/verify-pool-existence'
     | '/api/public/hotels/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
+    | '/api/public/hooks/run-integrity'
     | '/api/public/hooks/verify-pool-existence'
     | '/api/public/hotels/$slug'
   id:
@@ -428,6 +440,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/refresh-all-photos'
     | '/api/public/hooks/refresh-google-ratings'
     | '/api/public/hooks/refresh-missing-photos'
+    | '/api/public/hooks/run-integrity'
     | '/api/public/hooks/verify-pool-existence'
     | '/api/public/hotels/$slug'
   fileRoutesById: FileRoutesById
@@ -464,6 +477,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRefreshAllPhotosRoute: typeof ApiPublicHooksRefreshAllPhotosRoute
   ApiPublicHooksRefreshGoogleRatingsRoute: typeof ApiPublicHooksRefreshGoogleRatingsRoute
   ApiPublicHooksRefreshMissingPhotosRoute: typeof ApiPublicHooksRefreshMissingPhotosRoute
+  ApiPublicHooksRunIntegrityRoute: typeof ApiPublicHooksRunIntegrityRoute
   ApiPublicHooksVerifyPoolExistenceRoute: typeof ApiPublicHooksVerifyPoolExistenceRoute
 }
 
@@ -651,6 +665,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksVerifyPoolExistenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/run-integrity': {
+      id: '/api/public/hooks/run-integrity'
+      path: '/api/public/hooks/run-integrity'
+      fullPath: '/api/public/hooks/run-integrity'
+      preLoaderRoute: typeof ApiPublicHooksRunIntegrityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/refresh-missing-photos': {
       id: '/api/public/hooks/refresh-missing-photos'
       path: '/api/public/hooks/refresh-missing-photos'
@@ -750,6 +771,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksRefreshGoogleRatingsRoute,
   ApiPublicHooksRefreshMissingPhotosRoute:
     ApiPublicHooksRefreshMissingPhotosRoute,
+  ApiPublicHooksRunIntegrityRoute: ApiPublicHooksRunIntegrityRoute,
   ApiPublicHooksVerifyPoolExistenceRoute:
     ApiPublicHooksVerifyPoolExistenceRoute,
 }

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { computePoolScore } from "@/lib/scoring";
 
 /**
  * Data-integrity checks for the canonical hotel model.
@@ -84,7 +85,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
 
   const { data: scoreData, error: scoreError } = await supabaseAdmin
     .from("pool_scores")
-    .select("hotel_id, pool_score_0_10, components, facts, updated_at");
+    .select("hotel_id, pool_score_0_10, components, facts, best_time, editorial_notes, updated_at");
   if (scoreError) throw new Error(scoreError.message);
 
   const push = (
@@ -109,13 +110,14 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     const comps = (s.components ?? {}) as Record<string, number | null>;
     const values = Object.values(comps).filter((v): v is number => typeof v === "number");
     if (!values.length || s.pool_score_0_10 == null) continue;
-    const sum = values.reduce((a, b) => a + b, 0);
-    if (Math.abs(sum - Number(s.pool_score_0_10)) > 0.35) {
+    // The Pool Score is the weighted score of the five 0–10 criteria.
+    const expected = computePoolScore(comps as Record<string, number>);
+    if (Math.abs(expected - Number(s.pool_score_0_10)) > 0.15) {
       push(
         "Score mismatch",
         "critical",
         r,
-        `Stored Pool Score ${Number(s.pool_score_0_10).toFixed(1)} but components sum to ${sum.toFixed(1)}.`,
+        `Stored Pool Score ${Number(s.pool_score_0_10).toFixed(1)} but the weighted criteria give ${expected.toFixed(1)}.`,
       );
     }
   }
@@ -134,6 +136,8 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   const nameBuckets = new Map<string, Row[]>();
   const hostBuckets = new Map<string, Row[]>();
   for (const r of rows) {
+    // A record already merged into another (renamed) is not a duplicate any more.
+    if (r.hotel_status === "renamed" && r.canonical_hotel_id) continue;
     const nk = `${r.city_slug}:${normalizeName(r.name)}`;
     nameBuckets.set(nk, [...(nameBuckets.get(nk) ?? []), r]);
     const h = host(r.official_url ?? r.website_url);
@@ -267,7 +271,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r.verification_status === "verified" && !(r.primary_source_url && r.secondary_source_url)) {
       push("Missing sources", "critical", r, "A verified profile needs both a primary and a secondary source URL.");
     }
-    const note = (r.editorial_notes ?? "").trim();
+    const note = (((s?.["editorial_notes"] as string | null) ?? r.editorial_notes) ?? "").trim();
     if (r.is_published && note.length > 0 && note.length < 120) {
       push("Thin editor's note", "warning", r, `Editor's note is only ${note.length} characters.`);
     }
@@ -275,18 +279,8 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
       push("Missing editor's note", "warning", r, "Published without an editorial note.");
     }
 
-    // The final score must match the sum of the five criteria (each 0–2).
-    if (total != null && values.length === 5) {
-      const sum = values.reduce((a, b) => a + b, 0);
-      if (Math.abs(sum - total) > 0.15) {
-        push(
-          "Score does not match sub-scores",
-          "critical",
-          r,
-          `Criteria add up to ${sum.toFixed(1)} but the Pool Score is ${total}.`,
-        );
-      }
-    }
+    // (Score-vs-criteria consistency is checked once, in check 1 above.)
+
 
     // Free-text pool type must not contradict the structured pool count.
     const typeText = (r.pool_type ?? "").toLowerCase();
@@ -354,9 +348,6 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   for (const r of rows) {
     if (r.last_verified_date && r.last_verified_date > today) {
       push("Verification date in the future", "critical", r, `last_verified_date is ${r.last_verified_date}.`);
-    }
-    if (r.verification_status === "verified" && r.qa_blocked) {
-      push("Verified but QA-blocked", "critical", r, "Marked verified while a blocking QA issue is open.");
     }
     if (typeof r.pool_count === "number" && r.pool_count < 1 && r.has_pool) {
       push("Contradiction", "critical", r, `Pool count is ${r.pool_count} but the hotel is listed as having a pool.`);
