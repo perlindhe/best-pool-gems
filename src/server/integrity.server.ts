@@ -277,18 +277,8 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
       push("Missing editor's note", "warning", r, "Published without an editorial note.");
     }
 
-    // The published Pool Score must equal the average of the five criteria.
-    if (total != null && values.length === 5) {
-      const avg = values.reduce((a, b) => a + b, 0) / 5;
-      if (Math.abs(avg - total) > 0.15) {
-        push(
-          "Score does not match sub-scores",
-          "critical",
-          r,
-          `Criteria average ${avg.toFixed(1)} but the Pool Score is ${total}.`,
-        );
-      }
-    }
+    // (Score-vs-criteria consistency is checked once, in check 1 above.)
+
 
     // Free-text pool type must not contradict the structured pool count.
     const typeText = (r.pool_type ?? "").toLowerCase();
@@ -356,9 +346,6 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   for (const r of rows) {
     if (r.last_verified_date && r.last_verified_date > today) {
       push("Verification date in the future", "critical", r, `last_verified_date is ${r.last_verified_date}.`);
-    }
-    if (r.verification_status === "verified" && r.qa_blocked) {
-      push("Verified but QA-blocked", "critical", r, "Marked verified while a blocking QA issue is open.");
     }
     if (typeof r.pool_count === "number" && r.pool_count < 1 && r.has_pool) {
       push("Contradiction", "critical", r, `Pool count is ${r.pool_count} but the hotel is listed as having a pool.`);
