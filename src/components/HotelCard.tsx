@@ -36,7 +36,7 @@ const summary = (h: CardHotel) => {
 export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
   const photoUrl = hotel.hero_photo_url ?? hotel.cover_image_url ?? null;
   const bookingUrl = hotel.affiliate_url ?? hotel.booking_url ?? null;
-  const scored = hasCompletePoolScore(hotel.pool_components, hotel.pool_score_0_10);
+  const scored = hasCompletePoolScore(hotel.pool_components, hotel.pool_score_0_10, hotel.verification_status);
   const blurb = summary(hotel);
 
   return (

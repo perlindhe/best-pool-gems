@@ -47,7 +47,7 @@ export function ThemeCollection({
           </p>
         ) : (
           hotels.map((h, i) => {
-            const score = hasCompletePoolScore(h.pool_components, h.pool_score_0_10)
+            const score = hasCompletePoolScore(h.pool_components, h.pool_score_0_10, h.verification_status)
               ? h.pool_score_0_10
               : null;
             return (
