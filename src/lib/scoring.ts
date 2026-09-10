@@ -170,8 +170,11 @@ function clamp(n: number, min: number, max: number) {
 export function hasCompletePoolScore(
   components: Record<string, number> | null | undefined,
   total: number | null | undefined,
+  verificationStatus?: string | null,
 ): boolean {
   if (total == null || !components) return false;
+  // An unverified profile never shows a final Pool Score.
+  if (verificationStatus != null && verificationStatus !== "verified") return false;
   const c = toCanonicalComponents(components as AnyComponents);
   return POOL_CRITERIA.every(({ key }) => {
     const v = Number(c[key]);
