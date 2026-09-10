@@ -272,7 +272,35 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r.editorial_status === "published" && note.length === 0) {
       push("Missing editor's note", "warning", r, "Published without an editorial note.");
     }
+
+    // The final score must match the sum of the five criteria (each 0–2).
+    if (total != null && values.length === 5) {
+      const sum = values.reduce((a, b) => a + b, 0);
+      if (Math.abs(sum - total) > 0.15) {
+        push(
+          "Score does not match sub-scores",
+          "critical",
+          r,
+          `Criteria add up to ${sum.toFixed(1)} but the Pool Score is ${total}.`,
+        );
+      }
+    }
+
+    // Free-text pool type must not contradict the structured pool count.
+    const typeText = (r.pool_type ?? "").toLowerCase();
+    const spelled: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+    const spelledHit = Object.keys(spelled).find((w) => new RegExp(`\\b${w}\\b[^.]{0,20}pool`).test(typeText));
+    const statedCount = spelledHit ? spelled[spelledHit]! : null;
+    if (statedCount != null && r.pool_count != null && statedCount !== r.pool_count) {
+      push(
+        "Contradiction",
+        "critical",
+        r,
+        `Pool type text says ${statedCount} pool(s) but pool_count is ${r.pool_count}.`,
+      );
+    }
   }
+
 
   // Duplicate editor's notes across hotels.
   const noteBuckets = new Map<string, Row[]>();
