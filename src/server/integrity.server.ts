@@ -110,14 +110,14 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     const comps = (s.components ?? {}) as Record<string, number | null>;
     const values = Object.values(comps).filter((v): v is number => typeof v === "number");
     if (!values.length || s.pool_score_0_10 == null) continue;
-    // The Pool Score is the average of the five 0–10 criteria.
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    if (Math.abs(avg - Number(s.pool_score_0_10)) > 0.35) {
+    // The Pool Score is the weighted score of the five 0–10 criteria.
+    const expected = computePoolScore(comps as Record<string, number>);
+    if (Math.abs(expected - Number(s.pool_score_0_10)) > 0.15) {
       push(
         "Score mismatch",
         "critical",
         r,
-        `Stored Pool Score ${Number(s.pool_score_0_10).toFixed(1)} but the criteria average ${avg.toFixed(1)}.`,
+        `Stored Pool Score ${Number(s.pool_score_0_10).toFixed(1)} but the weighted criteria give ${expected.toFixed(1)}.`,
       );
     }
   }
