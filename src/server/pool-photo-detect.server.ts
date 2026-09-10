@@ -13,8 +13,56 @@ export type PoolJudgment = {
 
 const EMPTY: PoolJudgment = { is_pool: null, pool_score: null, is_outdoor: null };
 const BATCH_SIZE = 6;
+const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
 
-async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
+/**
+ * The model provider fetches remote media URLs itself, and hosts like
+ * media-cdn.tripadvisor.com / lh3.googleusercontent.com block those fetchers
+ * (robots.txt / bot protection) even though the image opens fine in a browser.
+ * So we download the bytes here and inline them as a data URL instead.
+ * Returns null when the image can't be fetched — the caller skips it.
+ */
+async function toDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
+        Accept: "image/avif,image/webp,image/jpeg,image/png,*/*",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) {
+      console.warn(`[pool-detect] image fetch ${res.status}: ${url.slice(0, 120)}`);
+      return null;
+    }
+    const type = (res.headers.get("content-type") ?? "").split(";")[0]!.trim().toLowerCase();
+    if (!type.startsWith("image/")) {
+      console.warn(`[pool-detect] not an image (${type || "unknown"}): ${url.slice(0, 120)}`);
+      return null;
+    }
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength === 0 || buf.byteLength > MAX_IMAGE_BYTES) {
+      console.warn(`[pool-detect] image size ${buf.byteLength} rejected: ${url.slice(0, 120)}`);
+      return null;
+    }
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    }
+    return `data:${type};base64,${btoa(binary)}`;
+  } catch (e) {
+    console.warn(
+      `[pool-detect] image fetch failed (${e instanceof Error ? e.message : e}): ${url.slice(0, 120)}`,
+    );
+    return null;
+  }
+}
+
+/** `images` are inlined data URLs, already downloaded by the caller. */
+async function classifyBatch(images: string[]): Promise<PoolJudgment[]> {
+  const urls = images;
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) {
     console.warn("[pool-detect] LOVABLE_API_KEY missing — skipping classification");
@@ -44,6 +92,7 @@ async function classifyBatch(urls: string[]): Promise<PoolJudgment[]> {
       image_url: { url: u },
     })),
   ];
+
 
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
