@@ -84,7 +84,7 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
 
   const { data: scoreData, error: scoreError } = await supabaseAdmin
     .from("pool_scores")
-    .select("hotel_id, pool_score_0_10, components, facts, updated_at");
+    .select("hotel_id, pool_score_0_10, components, facts, best_time, editorial_notes, updated_at");
   if (scoreError) throw new Error(scoreError.message);
 
   const push = (
@@ -109,13 +109,14 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     const comps = (s.components ?? {}) as Record<string, number | null>;
     const values = Object.values(comps).filter((v): v is number => typeof v === "number");
     if (!values.length || s.pool_score_0_10 == null) continue;
-    const sum = values.reduce((a, b) => a + b, 0);
-    if (Math.abs(sum - Number(s.pool_score_0_10)) > 0.35) {
+    // The Pool Score is the average of the five 0–10 criteria.
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    if (Math.abs(avg - Number(s.pool_score_0_10)) > 0.35) {
       push(
         "Score mismatch",
         "critical",
         r,
-        `Stored Pool Score ${Number(s.pool_score_0_10).toFixed(1)} but components sum to ${sum.toFixed(1)}.`,
+        `Stored Pool Score ${Number(s.pool_score_0_10).toFixed(1)} but the criteria average ${avg.toFixed(1)}.`,
       );
     }
   }
