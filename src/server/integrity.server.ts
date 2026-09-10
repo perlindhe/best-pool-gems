@@ -259,7 +259,12 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
       push("Identical sub-scores", "warning", r, `All criteria scored ${values[0]} — confirm this is a real judgement.`);
     }
     if (total != null && r.verification_status !== "verified") {
-      push("Score without verification", "critical", r, "A final Pool Score exists but the profile is not verified.");
+      push(
+        "Score without verification",
+        "warning",
+        r,
+        "A stored Pool Score exists but the profile is not verified — the score stays hidden on every page until verification.",
+      );
     }
     if (total != null && values.length < 5) {
       push("Incomplete score", "critical", r, `Only ${values.length} of 5 criteria assessed.`);
