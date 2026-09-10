@@ -34,11 +34,17 @@ export const Route = createFileRoute("/api/public/hooks/classify-pool-photos")({
         const force = url.searchParams.get("force") === "1";
 
         const citySlug = url.searchParams.get("city_slug");
+        const hotelSlug = url.searchParams.get("hotel_slug");
+        const limitParam = Number(url.searchParams.get("limit") ?? "");
         let hotelsQuery = supabaseAdmin
           .from("hotels")
           .select("id, name")
           .eq("is_published", true);
         if (citySlug) hotelsQuery = hotelsQuery.eq("city_slug", citySlug);
+        if (hotelSlug) hotelsQuery = hotelsQuery.eq("slug", hotelSlug);
+        if (Number.isFinite(limitParam) && limitParam > 0) {
+          hotelsQuery = hotelsQuery.limit(limitParam);
+        }
         const { data: hotels, error } = await hotelsQuery;
         if (error) return json({ error: error.message }, 500);
 
