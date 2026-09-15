@@ -140,7 +140,18 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r.hotel_status === "renamed" && r.canonical_hotel_id) continue;
     const nk = `${r.city_slug}:${normalizeName(r.name)}`;
     nameBuckets.set(nk, [...(nameBuckets.get(nk) ?? []), r]);
-    const h = host(r.official_url ?? r.website_url);
+    // Hotel chains legitimately share one domain, so only an identical
+    // property page (host + path, ignoring tracking parameters) is a signal.
+    const raw = r.official_url ?? r.website_url;
+    let h: string | null = null;
+    if (raw) {
+      try {
+        const u = new URL(raw);
+        h = `${u.host.replace(/^www\./, "")}${u.pathname.replace(/\/+$/, "")}`;
+      } catch {
+        h = null;
+      }
+    }
     if (h) hostBuckets.set(h, [...(hostBuckets.get(h) ?? []), r]);
   }
   for (const [, group] of nameBuckets) {
@@ -167,7 +178,8 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   for (const r of rows) {
     for (const prev of r.previous_names ?? []) {
       const match = rows.find((o) => o.id !== r.id && normalizeName(o.name) === normalizeName(prev));
-      if (match) {
+      // Already merged into this hotel (old slug redirects) — nothing to fix.
+      if (match && match.canonical_hotel_id !== r.id) {
         push(
           "Rename not linked",
           "critical",
