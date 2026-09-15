@@ -1,0 +1,2 @@
+UPDATE public.hotels SET pool_type = 'Outdoor pool · beachfront' WHERE slug = 'barcelona-w';
+UPDATE public.hotels SET pool_type = 'Rooftop pool · separate spa vitality pool' WHERE slug = 'barcelona-mandarin-oriental';
