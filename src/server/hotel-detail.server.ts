@@ -18,7 +18,7 @@ export async function getHotelDetail(slug: string) {
   const { data: hotel, error } = await supabaseAdmin
     .from("public_hotels_view")
     .select(
-      "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at, verification_status, verification_method, affiliate_url, official_url, pool_count, rooftop, infinity, heated_pool, indoor, outdoor, adults_only, family_friendly, beachfront, saltwater, year_round, pool_size, pool_view",
+      "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at, verification_status, verification_method, affiliate_url, official_url, pool_count, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, documented_pool_areas, pool_status, ranking_eligible, score_version, score_updated_at, rooftop, infinity, heated_pool, indoor, outdoor, adults_only, family_friendly, beachfront, saltwater, year_round, pool_size, pool_view",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -97,8 +97,52 @@ export async function getHotelDetail(slug: string) {
     source_url: (q.source_url as string | null) ?? null,
   }));
 
-  return { hotel: hotelWithEditorial, photos, quotes };
+  const { data: poolRows } = await supabaseAdmin
+    .from("hotel_pools")
+    .select(
+      "id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, infinity_edge, heated, heating_status, heated_months, year_round, seasonal_dates, length_metres, approximate_size, saltwater, adults_only, children_allowed, day_pass, guest_access, opening_hours, view, fact_status, last_verified",
+    )
+    .eq("hotel_id", hotel.id as string)
+    .order("position", { ascending: true });
+
+  const pools = (poolRows ?? []) as unknown as PoolRecord[];
+
+  return { hotel: hotelWithEditorial, photos, quotes, pools };
 }
+
+export type PoolRecord = {
+  id: string;
+  pool_name: string | null;
+  pool_category:
+    | "shared_hotel_pool"
+    | "private_room_pool"
+    | "shared_swim_up"
+    | "spa_pool"
+    | "childrens_pool"
+    | "plunge_pool"
+    | "jacuzzi";
+  shared_or_private: string;
+  indoor: boolean | null;
+  outdoor: boolean | null;
+  rooftop: boolean | null;
+  infinity_edge: boolean | null;
+  heated: boolean | null;
+  heating_status: string | null;
+  heated_months: string | null;
+  year_round: boolean | null;
+  seasonal_dates: string | null;
+  length_metres: number | null;
+  approximate_size: string | null;
+  saltwater: boolean | null;
+  adults_only: boolean | null;
+  children_allowed: boolean | null;
+  day_pass: boolean | null;
+  guest_access: string | null;
+  opening_hours: string | null;
+  view: string | null;
+  fact_status: "research_pending" | "partially_verified" | "verified";
+  last_verified: string | null;
+};
 
 
 export type PoolQuote = {

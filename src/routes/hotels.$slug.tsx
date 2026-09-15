@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
+import { PoolRecordsPanel } from "@/components/PoolRecordsPanel";
 import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
 import { MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { VerificationBadge } from "@/components/VerificationBadge";
@@ -49,10 +50,15 @@ export const Route = createFileRoute("/hotels/$slug")({
     // Index control: only a fully verified, published profile may be indexed.
     // Everything else stays reachable for visitors but is kept out of search.
     const status = hotel.editorial_status;
+    const finished =
+      hotel.verification_status === "verified" &&
+      status === "published" &&
+      hotel.ranking_eligible !== false &&
+      hotel.pool_status === "active_pool";
     const robots =
       status === "draft" || status === "review"
         ? "noindex, nofollow"
-        : hotel.verification_status === "verified" && status === "published"
+        : finished
           ? "index, follow"
           : "noindex, follow";
     // No AggregateRating: the ratings shown here come from third parties and
@@ -137,7 +143,7 @@ export const Route = createFileRoute("/hotels/$slug")({
 });
 
 function HotelDetailPage() {
-  const { hotel, photos, quotes } = Route.useLoaderData() as NonNullable<
+  const { hotel, photos, quotes, pools } = Route.useLoaderData() as NonNullable<
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
@@ -302,7 +308,18 @@ function HotelDetailPage() {
                 />
               )}
               <div className="p-6 md:p-8">
-                <PoolFactsTable facts={hotel.pool_facts} />
+                <PoolRecordsPanel
+                  pools={pools}
+                  counts={{
+                    shared_pool_count: hotel.shared_pool_count,
+                    spa_pool_count: hotel.spa_pool_count,
+                    kids_pool_count: hotel.kids_pool_count,
+                    private_pool_count: hotel.private_pool_count,
+                    jacuzzi_count: hotel.jacuzzi_count,
+                  }}
+                  anyHeated={hotel.heated_pool}
+                />
+                {pools.length === 0 && <PoolFactsTable facts={hotel.pool_facts} />}
               </div>
             </div>
 

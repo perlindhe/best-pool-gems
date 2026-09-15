@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
  */
 
 export const CANONICAL_SELECT =
-  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, best_time_to_visit, qa_blocked";
+  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, documented_pool_areas, pool_status, ranking_eligible, score_version, score_updated_at, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, best_time_to_visit, qa_blocked";
 
 export type VerificationState = "verified" | "partially_verified" | "research_pending";
 
@@ -51,6 +51,16 @@ export type CanonicalHotel = {
   fact_verification: Record<string, any> | null;
   last_verified_date: string | null;
   pool_count: number | null;
+  shared_pool_count: number | null;
+  spa_pool_count: number | null;
+  kids_pool_count: number | null;
+  private_pool_count: number | null;
+  jacuzzi_count: number | null;
+  documented_pool_areas: number | null;
+  pool_status: "active_pool" | "no_pool" | "pool_closed" | "pool_construction" | "unknown";
+  ranking_eligible: boolean;
+  score_version: string | null;
+  score_updated_at: string | null;
   indoor: boolean | null;
   outdoor: boolean | null;
   infinity: boolean | null;
@@ -95,12 +105,51 @@ export function isIndexableHotel(h: {
   qa_blocked?: boolean | null;
   primary_source_url?: string | null;
   secondary_source_url?: string | null;
+  ranking_eligible?: boolean | null;
+  pool_status?: string | null;
+  pool_score_0_10?: number | null;
 }) {
+  const hasActivePool =
+    h.ranking_eligible !== false && (h.pool_status ?? "active_pool") === "active_pool";
+  const hasScore = h.pool_score_0_10 == null ? true : h.pool_score_0_10 > 0;
   return (
     h.verification_status === "verified" &&
     (h.editorial_status ?? "published") === "published" &&
-    h.qa_blocked !== true
+    h.qa_blocked !== true &&
+    hasActivePool &&
+    hasScore
   );
+}
+
+/**
+ * Plain-English pool summary built from the individual pool records, so a
+ * hotel never shows one blended number that mixes shared and private pools.
+ */
+export function describePoolMix(h: {
+  shared_pool_count?: number | null;
+  spa_pool_count?: number | null;
+  kids_pool_count?: number | null;
+  private_pool_count?: number | null;
+  jacuzzi_count?: number | null;
+}): string | null {
+  const parts: string[] = [];
+  const shared = h.shared_pool_count ?? 0;
+  const spa = h.spa_pool_count ?? 0;
+  const kids = h.kids_pool_count ?? 0;
+  const priv = h.private_pool_count ?? 0;
+  const jac = h.jacuzzi_count ?? 0;
+  if (shared > 0) parts.push(`${shared} shared pool${shared === 1 ? "" : "s"}`);
+  if (kids > 0) parts.push(`${kids} children's pool${kids === 1 ? "" : "s"}`);
+  if (spa > 0) parts.push(`${spa} spa pool${spa === 1 ? "" : "s"}`);
+  if (jac > 0) parts.push(`${jac} jacuzzi${jac === 1 ? "" : "s"}`);
+  if (parts.length === 0 && priv === 0) return null;
+  let text = parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}` : parts[0] ?? "";
+  if (priv > 0) {
+    text = text
+      ? `${text}, plus private pools in selected room categories`
+      : "Private pools in selected room categories";
+  }
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export type HotelFilters = {
@@ -159,6 +208,9 @@ export async function attachHeroPhotos<T extends { id: string; cover_image_url: 
 /** List canonical hotels with SQL-side filtering + pagination. */
 export async function listCanonicalHotels(filters: HotelFilters = {}) {
   let q = supabaseAdmin.from("public_hotels_view").select(CANONICAL_SELECT, { count: "exact" });
+
+  // A pool ranking only contains hotels with a confirmed active swimming pool.
+  q = q.eq("ranking_eligible", true);
 
   if (filters.city) q = q.eq("city_slug", filters.city);
   if (typeof filters.minScore === "number") q = q.gte("pool_score_0_10", filters.minScore);
@@ -335,6 +387,7 @@ export async function listCityHotels(citySlug: string) {
     .from("public_hotels_view")
     .select(CANONICAL_SELECT, { count: "exact" })
     .eq("city_slug", citySlug)
+    .eq("ranking_eligible", true)
     .order("pool_score_0_10", { ascending: false, nullsFirst: false })
     .order("meta_rating_0_100", { ascending: false, nullsFirst: false })
     .order("name", { ascending: true });

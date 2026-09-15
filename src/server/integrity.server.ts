@@ -390,6 +390,131 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     }
   }
 
+  // === Pool-record model checks =============================================
+  const { data: poolRows } = await supabaseAdmin
+    .from("hotel_pools")
+    .select("hotel_id, pool_name, pool_category, shared_or_private, indoor, outdoor, heated, year_round, seasonal_dates");
+  type PoolRow = {
+    hotel_id: string;
+    pool_name: string | null;
+    pool_category: string;
+    shared_or_private: string;
+    indoor: boolean | null;
+    outdoor: boolean | null;
+    heated: boolean | null;
+    year_round: boolean | null;
+    seasonal_dates: string | null;
+  };
+  const poolsByHotel = new Map<string, PoolRow[]>();
+  for (const p of (poolRows ?? []) as unknown as PoolRow[]) {
+    poolsByHotel.set(p.hotel_id, [...(poolsByHotel.get(p.hotel_id) ?? []), p]);
+  }
+
+  const { data: statusRows } = await supabaseAdmin
+    .from("hotels")
+    .select("id, pool_status, ranking_eligible");
+  const statusById = new Map(
+    ((statusRows ?? []) as Array<{ id: string; pool_status: string; ranking_eligible: boolean }>).map(
+      (s) => [s.id, s],
+    ),
+  );
+
+  const PLACEHOLDERS = /\b(unknown|n\/a|not discernible|cannot be determined|tbd|lorem ipsum)\b/i;
+
+  for (const r of rows) {
+    if (!r.is_published) continue;
+    const pools = poolsByHotel.get(r.id) ?? [];
+    const st = statusById.get(r.id);
+    const sharedCount = pools.filter(
+      (p) =>
+        p.shared_or_private === "shared" &&
+        ["shared_hotel_pool", "shared_swim_up", "plunge_pool"].includes(p.pool_category),
+    ).length;
+
+    if (pools.length === 0) {
+      push("No pool records", "warning", r, "No individual pool records exist for this hotel yet.");
+    } else if (r.pool_count != null && r.pool_count !== sharedCount) {
+      push(
+        "Pool count mismatch",
+        "critical",
+        r,
+        `Summary says ${r.pool_count} pool(s) but ${sharedCount} shared swimming pool record(s) exist.`,
+      );
+    }
+
+    for (const p of pools) {
+      const label = p.pool_name ?? p.pool_category;
+      if (p.indoor === true && p.outdoor === true) {
+        push("Pool contradiction", "critical", r, `${label} is marked both indoor and outdoor-only.`);
+      }
+      if (p.year_round === true && p.seasonal_dates) {
+        push(
+          "Pool contradiction",
+          "warning",
+          r,
+          `${label} is marked open year-round but also has seasonal dates (${p.seasonal_dates}).`,
+        );
+      }
+    }
+
+    const anyHeated = pools.some((p) => p.heated === true);
+    if (r.heated_pool === true && pools.length > 0 && !anyHeated) {
+      push(
+        "Heating conflict",
+        "critical",
+        r,
+        "The hotel is marked as having a heated pool but no individual pool is documented as heated.",
+      );
+    }
+
+    if (st && st.ranking_eligible && st.pool_status !== "active_pool") {
+      push(
+        "Ranking eligibility",
+        "critical",
+        r,
+        "Listed in the pool ranking without a confirmed active swimming pool.",
+      );
+    }
+    if (r.verification_status === "verified" && st && st.pool_status !== "active_pool") {
+      push(
+        "Verified without pool",
+        "critical",
+        r,
+        "Marked fully verified but no active swimming pool is confirmed.",
+      );
+    }
+
+    if (r.editorial_notes && PLACEHOLDERS.test(r.editorial_notes)) {
+      push(
+        "Placeholder text",
+        "critical",
+        r,
+        "Editorial text contains a placeholder such as “Unknown”, “N/A” or “Cannot be determined”.",
+      );
+    }
+  }
+
+  // Images on indexable profiles must have documented rights.
+  const { data: photoRights } = await supabaseAdmin
+    .from("hotel_photos")
+    .select("hotel_id, permission_status, image_license");
+  const rightsByHotel = new Map<string, number>();
+  for (const p of (photoRights ?? []) as Array<{
+    hotel_id: string;
+    permission_status: string | null;
+    image_license: string | null;
+  }>) {
+    if (!p.permission_status && !p.image_license) {
+      rightsByHotel.set(p.hotel_id, (rightsByHotel.get(p.hotel_id) ?? 0) + 1);
+    }
+  }
+  for (const r of rows) {
+    const missing = rightsByHotel.get(r.id) ?? 0;
+    if (missing > 0 && r.verification_status === "verified") {
+      push("Image rights", "warning", r, `${missing} image(s) have no documented licence or permission.`);
+    }
+  }
+
   const order: Record<IntegritySeverity, number> = { critical: 0, warning: 1, info: 2 };
   issues.sort((a, b) => order[a.severity] - order[b.severity] || a.check.localeCompare(b.check));
 

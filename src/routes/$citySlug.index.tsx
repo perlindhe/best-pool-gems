@@ -369,7 +369,7 @@ function CityHub() {
                             <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{[h.neighborhood, h.pool_type].filter(Boolean).join(" · ")}</p>
                           </div>
                           <span className="font-mono text-sm text-primary">
-                            {hasCompletePoolScore(h.pool_components, h.pool_score_0_10) ? h.pool_score_0_10!.toFixed(1) : "—"}
+                            {hasCompletePoolScore(h.pool_components, h.pool_score_0_10, h.verification_status) ? h.pool_score_0_10!.toFixed(1) : "—"}
                           </span>
                         </li>
                       ))}
@@ -414,7 +414,7 @@ function CityHub() {
                       <li key={h.id} className="flex justify-between gap-2">
                         <span className="truncate text-foreground/80">{h.name}</span>
                         <span className="font-mono text-xs text-primary">
-                          {hasCompletePoolScore(h.pool_components, h.pool_score_0_10) ? h.pool_score_0_10!.toFixed(1) : "—"}
+                          {hasCompletePoolScore(h.pool_components, h.pool_score_0_10, h.verification_status) ? h.pool_score_0_10!.toFixed(1) : "—"}
                         </span>
                       </li>
                     ))}
