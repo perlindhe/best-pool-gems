@@ -75,7 +75,7 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
         }
 
         const summary = {
-          candidates: (rows ?? []).length,
+          candidates: candidates.length,
           processed: results.length,
           verified: results.filter((r: any) => r.status === "verified").length,
           partially: results.filter((r: any) => r.status === "partially_verified").length,
