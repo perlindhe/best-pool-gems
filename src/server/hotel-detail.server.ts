@@ -97,8 +97,52 @@ export async function getHotelDetail(slug: string) {
     source_url: (q.source_url as string | null) ?? null,
   }));
 
-  return { hotel: hotelWithEditorial, photos, quotes };
+  const { data: poolRows } = await supabaseAdmin
+    .from("hotel_pools")
+    .select(
+      "id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, infinity_edge, heated, heating_status, heated_months, year_round, seasonal_dates, length_metres, approximate_size, saltwater, adults_only, children_allowed, day_pass, guest_access, opening_hours, view, fact_status, last_verified",
+    )
+    .eq("hotel_id", hotel.id as string)
+    .order("position", { ascending: true });
+
+  const pools = (poolRows ?? []) as unknown as PoolRecord[];
+
+  return { hotel: hotelWithEditorial, photos, quotes, pools };
 }
+
+export type PoolRecord = {
+  id: string;
+  pool_name: string | null;
+  pool_category:
+    | "shared_hotel_pool"
+    | "private_room_pool"
+    | "shared_swim_up"
+    | "spa_pool"
+    | "childrens_pool"
+    | "plunge_pool"
+    | "jacuzzi";
+  shared_or_private: string;
+  indoor: boolean | null;
+  outdoor: boolean | null;
+  rooftop: boolean | null;
+  infinity_edge: boolean | null;
+  heated: boolean | null;
+  heating_status: string | null;
+  heated_months: string | null;
+  year_round: boolean | null;
+  seasonal_dates: string | null;
+  length_metres: number | null;
+  approximate_size: string | null;
+  saltwater: boolean | null;
+  adults_only: boolean | null;
+  children_allowed: boolean | null;
+  day_pass: boolean | null;
+  guest_access: string | null;
+  opening_hours: string | null;
+  view: string | null;
+  fact_status: "research_pending" | "partially_verified" | "verified";
+  last_verified: string | null;
+};
 
 
 export type PoolQuote = {
