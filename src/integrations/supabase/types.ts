@@ -23,12 +23,17 @@ export type Database = {
           hotel_id: string
           id: string
           image_credit: string | null
+          image_license: string | null
+          image_owner: string | null
+          image_source: string | null
           is_outdoor: boolean | null
           is_pool: boolean | null
           license_source: string | null
+          permission_status: string | null
           pool_score: number | null
           position: number
           source: string
+          source_url: string | null
           url: string
           width: number | null
         }
@@ -40,12 +45,17 @@ export type Database = {
           hotel_id: string
           id?: string
           image_credit?: string | null
+          image_license?: string | null
+          image_owner?: string | null
+          image_source?: string | null
           is_outdoor?: boolean | null
           is_pool?: boolean | null
           license_source?: string | null
+          permission_status?: string | null
           pool_score?: number | null
           position?: number
           source: string
+          source_url?: string | null
           url: string
           width?: number | null
         }
@@ -57,12 +67,17 @@ export type Database = {
           hotel_id?: string
           id?: string
           image_credit?: string | null
+          image_license?: string | null
+          image_owner?: string | null
+          image_source?: string | null
           is_outdoor?: boolean | null
           is_pool?: boolean | null
           license_source?: string | null
+          permission_status?: string | null
           pool_score?: number | null
           position?: number
           source?: string
+          source_url?: string | null
           url?: string
           width?: number | null
         }
@@ -76,6 +91,120 @@ export type Database = {
           },
           {
             foreignKeyName: "hotel_photos_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hotel_pools: {
+        Row: {
+          adults_only: boolean | null
+          approximate_size: string | null
+          children_allowed: boolean | null
+          created_at: string
+          day_pass: boolean | null
+          evidence: Json
+          fact_status: Database["public"]["Enums"]["pool_fact_status"]
+          guest_access: string | null
+          heated: boolean | null
+          heated_months: string | null
+          heating_status: string | null
+          hotel_id: string
+          id: string
+          indoor: boolean | null
+          infinity_edge: boolean | null
+          last_verified: string | null
+          length_metres: number | null
+          opening_hours: string | null
+          outdoor: boolean | null
+          pool_category: Database["public"]["Enums"]["pool_category"]
+          pool_name: string | null
+          position: number
+          rooftop: boolean | null
+          saltwater: boolean | null
+          seasonal_dates: string | null
+          shared_or_private: string
+          source_urls: Json
+          updated_at: string
+          view: string | null
+          year_round: boolean | null
+        }
+        Insert: {
+          adults_only?: boolean | null
+          approximate_size?: string | null
+          children_allowed?: boolean | null
+          created_at?: string
+          day_pass?: boolean | null
+          evidence?: Json
+          fact_status?: Database["public"]["Enums"]["pool_fact_status"]
+          guest_access?: string | null
+          heated?: boolean | null
+          heated_months?: string | null
+          heating_status?: string | null
+          hotel_id: string
+          id?: string
+          indoor?: boolean | null
+          infinity_edge?: boolean | null
+          last_verified?: string | null
+          length_metres?: number | null
+          opening_hours?: string | null
+          outdoor?: boolean | null
+          pool_category?: Database["public"]["Enums"]["pool_category"]
+          pool_name?: string | null
+          position?: number
+          rooftop?: boolean | null
+          saltwater?: boolean | null
+          seasonal_dates?: string | null
+          shared_or_private?: string
+          source_urls?: Json
+          updated_at?: string
+          view?: string | null
+          year_round?: boolean | null
+        }
+        Update: {
+          adults_only?: boolean | null
+          approximate_size?: string | null
+          children_allowed?: boolean | null
+          created_at?: string
+          day_pass?: boolean | null
+          evidence?: Json
+          fact_status?: Database["public"]["Enums"]["pool_fact_status"]
+          guest_access?: string | null
+          heated?: boolean | null
+          heated_months?: string | null
+          heating_status?: string | null
+          hotel_id?: string
+          id?: string
+          indoor?: boolean | null
+          infinity_edge?: boolean | null
+          last_verified?: string | null
+          length_metres?: number | null
+          opening_hours?: string | null
+          outdoor?: boolean | null
+          pool_category?: Database["public"]["Enums"]["pool_category"]
+          pool_name?: string | null
+          position?: number
+          rooftop?: boolean | null
+          saltwater?: boolean | null
+          seasonal_dates?: string | null
+          shared_or_private?: string
+          source_urls?: Json
+          updated_at?: string
+          view?: string | null
+          year_round?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hotel_pools_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hotel_pools_hotel_id_fkey"
             columns: ["hotel_id"]
             isOneToOne: false
             referencedRelation: "public_hotels_view"
@@ -127,6 +256,7 @@ export type Database = {
           pool_opening_hours: string | null
           pool_setting: string | null
           pool_size: string | null
+          pool_status: Database["public"]["Enums"]["hotel_pool_status"]
           pool_type: string | null
           pool_verification_notes: string | null
           pool_verified_at: string | null
@@ -139,9 +269,12 @@ export type Database = {
           qa_checked_at: string | null
           quiet_party_level: number | null
           rank_position: number | null
+          ranking_eligible: boolean
           rooftop: boolean | null
           saltwater: boolean | null
           score_last_updated: string | null
+          score_updated_at: string | null
+          score_version: string | null
           scrape_website: boolean
           season: string | null
           secondary_source_url: string | null
@@ -205,6 +338,7 @@ export type Database = {
           pool_opening_hours?: string | null
           pool_setting?: string | null
           pool_size?: string | null
+          pool_status?: Database["public"]["Enums"]["hotel_pool_status"]
           pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
@@ -217,9 +351,12 @@ export type Database = {
           qa_checked_at?: string | null
           quiet_party_level?: number | null
           rank_position?: number | null
+          ranking_eligible?: boolean
           rooftop?: boolean | null
           saltwater?: boolean | null
           score_last_updated?: string | null
+          score_updated_at?: string | null
+          score_version?: string | null
           scrape_website?: boolean
           season?: string | null
           secondary_source_url?: string | null
@@ -283,6 +420,7 @@ export type Database = {
           pool_opening_hours?: string | null
           pool_setting?: string | null
           pool_size?: string | null
+          pool_status?: Database["public"]["Enums"]["hotel_pool_status"]
           pool_type?: string | null
           pool_verification_notes?: string | null
           pool_verified_at?: string | null
@@ -295,9 +433,12 @@ export type Database = {
           qa_checked_at?: string | null
           quiet_party_level?: number | null
           rank_position?: number | null
+          ranking_eligible?: boolean
           rooftop?: boolean | null
           saltwater?: boolean | null
           score_last_updated?: string | null
+          score_updated_at?: string | null
+          score_version?: string | null
           scrape_website?: boolean
           season?: string | null
           secondary_source_url?: string | null
@@ -737,6 +878,12 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user"
       editorial_status: "draft" | "review" | "published"
+      hotel_pool_status:
+        | "active_pool"
+        | "no_pool"
+        | "pool_closed"
+        | "pool_construction"
+        | "unknown"
       hotel_status:
         | "active"
         | "renamed"
@@ -744,6 +891,15 @@ export type Database = {
         | "permanently_closed"
         | "opening_soon"
         | "unverified"
+      pool_category:
+        | "shared_hotel_pool"
+        | "private_room_pool"
+        | "shared_swim_up"
+        | "spa_pool"
+        | "childrens_pool"
+        | "plunge_pool"
+        | "jacuzzi"
+      pool_fact_status: "research_pending" | "partially_verified" | "verified"
       rating_source: "google" | "tripadvisor" | "booking" | "hotels_com"
       snapshot_status: "ok" | "failed" | "missing_id"
       verification_status:
@@ -879,6 +1035,13 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user"],
       editorial_status: ["draft", "review", "published"],
+      hotel_pool_status: [
+        "active_pool",
+        "no_pool",
+        "pool_closed",
+        "pool_construction",
+        "unknown",
+      ],
       hotel_status: [
         "active",
         "renamed",
@@ -887,6 +1050,16 @@ export const Constants = {
         "opening_soon",
         "unverified",
       ],
+      pool_category: [
+        "shared_hotel_pool",
+        "private_room_pool",
+        "shared_swim_up",
+        "spa_pool",
+        "childrens_pool",
+        "plunge_pool",
+        "jacuzzi",
+      ],
+      pool_fact_status: ["research_pending", "partially_verified", "verified"],
       rating_source: ["google", "tripadvisor", "booking", "hotels_com"],
       snapshot_status: ["ok", "failed", "missing_id"],
       verification_status: [
