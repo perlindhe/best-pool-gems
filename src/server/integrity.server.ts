@@ -140,7 +140,18 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     if (r.hotel_status === "renamed" && r.canonical_hotel_id) continue;
     const nk = `${r.city_slug}:${normalizeName(r.name)}`;
     nameBuckets.set(nk, [...(nameBuckets.get(nk) ?? []), r]);
-    const h = host(r.official_url ?? r.website_url);
+    // Hotel chains legitimately share one domain, so only an identical
+    // property page (host + path, ignoring tracking parameters) is a signal.
+    const raw = r.official_url ?? r.website_url;
+    let h: string | null = null;
+    if (raw) {
+      try {
+        const u = new URL(raw);
+        h = `${u.host.replace(/^www\./, "")}${u.pathname.replace(/\/+$/, "")}`;
+      } catch {
+        h = null;
+      }
+    }
     if (h) hostBuckets.set(h, [...(hostBuckets.get(h) ?? []), r]);
   }
   for (const [, group] of nameBuckets) {
