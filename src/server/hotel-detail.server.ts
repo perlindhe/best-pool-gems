@@ -6,6 +6,8 @@ export type HotelPhoto = {
   height: number;
   attribution?: string;
   source?: string;
+  alt?: string;
+  owner?: string;
 };
 
 export type HotelSource = {
