@@ -105,12 +105,51 @@ export function isIndexableHotel(h: {
   qa_blocked?: boolean | null;
   primary_source_url?: string | null;
   secondary_source_url?: string | null;
+  ranking_eligible?: boolean | null;
+  pool_status?: string | null;
+  pool_score_0_10?: number | null;
 }) {
+  const hasActivePool =
+    h.ranking_eligible !== false && (h.pool_status ?? "active_pool") === "active_pool";
+  const hasScore = h.pool_score_0_10 == null ? true : h.pool_score_0_10 > 0;
   return (
     h.verification_status === "verified" &&
     (h.editorial_status ?? "published") === "published" &&
-    h.qa_blocked !== true
+    h.qa_blocked !== true &&
+    hasActivePool &&
+    hasScore
   );
+}
+
+/**
+ * Plain-English pool summary built from the individual pool records, so a
+ * hotel never shows one blended number that mixes shared and private pools.
+ */
+export function describePoolMix(h: {
+  shared_pool_count?: number | null;
+  spa_pool_count?: number | null;
+  kids_pool_count?: number | null;
+  private_pool_count?: number | null;
+  jacuzzi_count?: number | null;
+}): string | null {
+  const parts: string[] = [];
+  const shared = h.shared_pool_count ?? 0;
+  const spa = h.spa_pool_count ?? 0;
+  const kids = h.kids_pool_count ?? 0;
+  const priv = h.private_pool_count ?? 0;
+  const jac = h.jacuzzi_count ?? 0;
+  if (shared > 0) parts.push(`${shared} shared pool${shared === 1 ? "" : "s"}`);
+  if (kids > 0) parts.push(`${kids} children's pool${kids === 1 ? "" : "s"}`);
+  if (spa > 0) parts.push(`${spa} spa pool${spa === 1 ? "" : "s"}`);
+  if (jac > 0) parts.push(`${jac} jacuzzi${jac === 1 ? "" : "s"}`);
+  if (parts.length === 0 && priv === 0) return null;
+  let text = parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}` : parts[0] ?? "";
+  if (priv > 0) {
+    text = text
+      ? `${text}, plus private pools in selected room categories`
+      : "Private pools in selected room categories";
+  }
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export type HotelFilters = {
