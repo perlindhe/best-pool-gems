@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getHotelDetail, resolveCanonicalSlug, type HotelPhoto, type PoolQuote, type HotelSource } from "@/server/hotel-detail.server";
+import { getHotelDetail, resolveCanonicalSlug, type HotelPhoto, type PoolQuote, type HotelSource, type PoolRecord } from "@/server/hotel-detail.server";
 import type { PoolFacts } from "@/lib/rankings.functions";
 
 export type HotelDetail = {
