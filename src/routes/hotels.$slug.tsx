@@ -302,7 +302,18 @@ function HotelDetailPage() {
                 />
               )}
               <div className="p-6 md:p-8">
-                <PoolFactsTable facts={hotel.pool_facts} />
+                <PoolRecordsPanel
+                  pools={pools}
+                  counts={{
+                    shared_pool_count: hotel.shared_pool_count,
+                    spa_pool_count: hotel.spa_pool_count,
+                    kids_pool_count: hotel.kids_pool_count,
+                    private_pool_count: hotel.private_pool_count,
+                    jacuzzi_count: hotel.jacuzzi_count,
+                  }}
+                  anyHeated={hotel.heated_pool}
+                />
+                {pools.length === 0 && <PoolFactsTable facts={hotel.pool_facts} />}
               </div>
             </div>
 
