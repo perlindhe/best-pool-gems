@@ -80,7 +80,7 @@ export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
               </span>
             ) : (
               <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Not yet scored
+                Pool Score pending editorial review
               </span>
             )}
           </div>

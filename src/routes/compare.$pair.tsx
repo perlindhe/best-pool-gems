@@ -163,7 +163,7 @@ function ComparePage() {
               <p className="mt-3 text-sm text-muted-foreground">
                 Pool score{" "}
                 <span className="text-foreground">
-                  {h.pool_score_0_10 != null ? `${h.pool_score_0_10.toFixed(1)}/10` : "Not yet scored"}
+                  {h.pool_score_0_10 != null ? `${h.pool_score_0_10.toFixed(1)}/10` : "Pool Score pending editorial review"}
                 </span>
                 {" · "}
                 Meta{" "}
@@ -194,8 +194,8 @@ function ComparePage() {
             <tbody className="divide-y divide-border/40">
               <Row
                 label="Pool score"
-                a={a.pool_score_0_10 != null ? fmt(a.pool_score_0_10, "/10") : "Not yet scored"}
-                b={b.pool_score_0_10 != null ? fmt(b.pool_score_0_10, "/10") : "Not yet scored"}
+                a={a.pool_score_0_10 != null ? fmt(a.pool_score_0_10, "/10") : "Pool Score pending editorial review"}
+                b={b.pool_score_0_10 != null ? fmt(b.pool_score_0_10, "/10") : "Pool Score pending editorial review"}
               />
               <Row label="Meta rating" a={fmt(a.meta_rating_0_100, "/100", 0)} b={fmt(b.meta_rating_0_100, "/100", 0)} />
               <Row label="Pool type" a={a.pool_type ?? "—"} b={b.pool_type ?? "—"} />
