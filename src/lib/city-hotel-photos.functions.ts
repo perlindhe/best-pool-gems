@@ -22,6 +22,8 @@ export const getCityHotelPhotos = createServerFn({ method: "GET" })
       .from("hotel_photos")
       .select("hotel_id, url, position, is_pool, pool_score")
       .in("hotel_id", ids)
+      // Only imagery with documented publishing rights may appear publicly.
+      .eq("permission_status", "official_source")
       // Pool photos first (highest pool_score), then fall back to position.
       .order("is_pool", { ascending: false, nullsFirst: false })
       .order("pool_score", { ascending: false, nullsFirst: false })

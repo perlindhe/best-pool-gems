@@ -72,7 +72,9 @@ export async function getHotelDetail(slug: string) {
 
   const { data: photoRows } = await supabaseAdmin
     .from("hotel_photos")
-    .select("url, width, height, attribution, source")
+    .select("url, width, height, attribution, source, alt_text, image_owner")
+    // Only imagery with documented publishing rights may appear publicly.
+    .eq("permission_status", "official_source")
     .eq("hotel_id", hotel.id as string)
     .order("position", { ascending: true });
 
@@ -82,6 +84,8 @@ export async function getHotelDetail(slug: string) {
     height: (p.height as number) ?? 1067,
     attribution: (p.attribution as string) ?? undefined,
     source: (p.source as string) ?? undefined,
+    alt: (p.alt_text as string | null) ?? undefined,
+    owner: (p.image_owner as string | null) ?? undefined,
   }));
 
   const { data: quoteRows } = await supabaseAdmin
