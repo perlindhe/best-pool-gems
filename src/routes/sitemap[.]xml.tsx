@@ -75,6 +75,8 @@ export const Route = createFileRoute("/sitemap.xml")({
               .eq("verification_status", "verified")
               .eq("hotel_status", "active")
               .eq("qa_blocked", false)
+              .eq("ranking_eligible", true)
+              .eq("pool_status", "active_pool")
               .is("canonical_hotel_id", null)
               .order("slug")
               .range(offset, offset + pageSize - 1);
