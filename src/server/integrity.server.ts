@@ -178,7 +178,8 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
   for (const r of rows) {
     for (const prev of r.previous_names ?? []) {
       const match = rows.find((o) => o.id !== r.id && normalizeName(o.name) === normalizeName(prev));
-      if (match) {
+      // Already merged into this hotel (old slug redirects) — nothing to fix.
+      if (match && match.canonical_hotel_id !== r.id) {
         push(
           "Rename not linked",
           "critical",
