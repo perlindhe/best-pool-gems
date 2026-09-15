@@ -73,6 +73,7 @@ export type HotelDetailResult = {
   hotel: HotelDetail;
   photos: HotelPhoto[];
   quotes: PoolQuote[];
+  pools: PoolRecord[];
 } | null;
 
 export const getHotelBySlug = createServerFn({ method: "GET" })
