@@ -27,13 +27,16 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
         const city = url.searchParams.get("city_slug");
         const limit = Math.min(Number(url.searchParams.get("limit") ?? 20) || 20, 40);
         const onlyPending = url.searchParams.get("pending_only") === "1";
+        const missingPools = url.searchParams.get("missing_pools") === "1";
+        const offset = Math.max(Number(url.searchParams.get("offset") ?? 0) || 0, 0);
 
         let q = supabaseAdmin
           .from("hotels")
           .select("id, slug")
           .eq("is_published", true)
           .eq("hotel_status", "active")
-          .is("canonical_hotel_id", null);
+          .is("canonical_hotel_id", null)
+          .order("slug", { ascending: true });
 
         if (slug) q = q.eq("slug", slug);
         if (city) q = q.eq("city_slug", city);
@@ -44,7 +47,17 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
         const { data: rows, error } = await q.limit(400);
         if (error) return json({ error: error.message }, 500);
 
-        const targets = (rows ?? []).slice(0, limit);
+        let candidates = rows ?? [];
+        if (missingPools) {
+          const { data: withPools } = await supabaseAdmin
+            .from("hotel_pools")
+            .select("hotel_id")
+            .in("hotel_id", candidates.map((r) => r.id as string));
+          const has = new Set((withPools ?? []).map((p) => p.hotel_id as string));
+          candidates = candidates.filter((r) => !has.has(r.id as string));
+        }
+
+        const targets = candidates.slice(offset, offset + limit);
         const results: unknown[] = [];
 
         for (const t of targets) {
