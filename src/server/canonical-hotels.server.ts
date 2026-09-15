@@ -387,6 +387,7 @@ export async function listCityHotels(citySlug: string) {
     .from("public_hotels_view")
     .select(CANONICAL_SELECT, { count: "exact" })
     .eq("city_slug", citySlug)
+    .eq("ranking_eligible", true)
     .order("pool_score_0_10", { ascending: false, nullsFirst: false })
     .order("meta_rating_0_100", { ascending: false, nullsFirst: false })
     .order("name", { ascending: true });
