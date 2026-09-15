@@ -193,6 +193,8 @@ export async function attachHeroPhotos<T extends { id: string; cover_image_url: 
       .from("hotel_photos")
       .select("hotel_id, url, position")
       .in("hotel_id", ids)
+      // Only imagery with documented publishing rights may appear publicly.
+      .eq("permission_status", "official_source")
       .order("position", { ascending: true });
     for (const p of photos ?? []) {
       const hid = p.hotel_id as string;
