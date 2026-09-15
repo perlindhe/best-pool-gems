@@ -214,6 +214,21 @@ Rules:
     source explicitly confirms it. Absence of evidence = null, not false.
 
 Return via the update_hotel function with these fields:
+  pools               — one entry per individual pool or clearly defined pool category
+                        that a source explicitly describes. Never invent a pool.
+                        pool_category must be one of: shared_hotel_pool, private_room_pool,
+                        shared_swim_up, spa_pool, childrens_pool, plunge_pool, jacuzzi.
+                        Classification rules:
+                          - shared_hotel_pool: any swimming pool that hotel guests share,
+                            indoor or outdoor, INCLUDING an indoor pool inside the spa,
+                            wellness centre or health club that guests can swim in.
+                          - spa_pool: only small thermal, vitality or hydrotherapy pools
+                            that are not used for swimming.
+                          - private_room_pool: pools belonging to individual rooms, suites
+                            or villas. Use ONE entry for the whole category, and never use
+                            it for a pool the whole hotel shares.
+                        A jacuzzi or hot tub is never a swimming pool. Leave the array
+                        empty when no source describes individual pools.
   pool_count          — integer number of pools, or null if unknown
   indoor              — true if there is an indoor pool
   outdoor             — true if there is an outdoor pool
@@ -247,6 +262,44 @@ const ToolSchema = {
     parameters: {
       type: "object",
       properties: {
+        pools: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              pool_name: { type: ["string", "null"] },
+              pool_category: {
+                type: "string",
+                enum: [
+                  "shared_hotel_pool",
+                  "private_room_pool",
+                  "shared_swim_up",
+                  "spa_pool",
+                  "childrens_pool",
+                  "plunge_pool",
+                  "jacuzzi",
+                ],
+              },
+              indoor: { type: ["boolean", "null"] },
+              outdoor: { type: ["boolean", "null"] },
+              rooftop: { type: ["boolean", "null"] },
+              infinity_edge: { type: ["boolean", "null"] },
+              heated: { type: ["boolean", "null"] },
+              heated_months: { type: ["string", "null"] },
+              year_round: { type: ["boolean", "null"] },
+              seasonal_dates: { type: ["string", "null"] },
+              length_metres: { type: ["number", "null"] },
+              saltwater: { type: ["boolean", "null"] },
+              adults_only: { type: ["boolean", "null"] },
+              children_allowed: { type: ["boolean", "null"] },
+              day_pass: { type: ["boolean", "null"] },
+              opening_hours: { type: ["string", "null"] },
+              view: { type: ["string", "null"] },
+            },
+            required: ["pool_name", "pool_category"],
+            additionalProperties: false,
+          },
+        },
         pool_count: { type: ["integer", "null"] },
         indoor: { type: ["boolean", "null"] },
         outdoor: { type: ["boolean", "null"] },
@@ -272,6 +325,7 @@ const ToolSchema = {
         source_summary: { type: ["string", "null"] },
       },
       required: [
+        "pools",
         "pool_count", "indoor", "outdoor", "rooftop", "infinity", "heated_pool",
         "year_round", "season", "children_allowed", "adults_only", "guest_only",
         "day_pass_available", "pool_opening_hours", "pool_view", "why_included",
@@ -327,7 +381,7 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
   const { data: hotel, error } = await supabaseAdmin
     .from("hotels")
     .select(
-      "id, slug, name, city, country, neighborhood, website_url, official_url, primary_source_url, secondary_source_url, pool_count, pool_type, indoor, outdoor, rooftop, infinity, heated_pool, year_round, season, children_allowed, adults_only, guest_only, day_pass_available, pool_opening_hours, pool_view, why_included, why_not_higher, view_description, pool_size, lounging_space, best_time_to_visit, vibe, verification_status, verification_notes",
+      "id, slug, name, city, country, neighborhood, website_url, official_url, primary_source_url, secondary_source_url, pool_count, pool_type, indoor, outdoor, rooftop, infinity, heated_pool, year_round, season, children_allowed, adults_only, guest_only, day_pass_available, pool_opening_hours, pool_view, why_included, why_not_higher, view_description, pool_size, lounging_space, best_time_to_visit, vibe, verification_status, verification_notes, pool_status",
     )
     .eq("id", hotelId)
     .maybeSingle();
@@ -431,13 +485,68 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
   const mergeStr = (existing: unknown, extracted: unknown) =>
     clean((extracted as string | null) ?? (existing as string | null));
 
+  // --- Individual pool records: the single source of truth for the summary ---
+  const SHARED_SWIM = ["shared_hotel_pool", "shared_swim_up", "plunge_pool"];
+  type ExtractedPool = Record<string, unknown> & { pool_category?: string };
+  const extractedPools = Array.isArray(parsed.pools) ? (parsed.pools as ExtractedPool[]) : [];
+  const evidenceUrls = evidence.map((e) => e.url).filter(Boolean);
+
+  const { data: existingPools } = await supabaseAdmin
+    .from("hotel_pools")
+    .select("pool_category, heated")
+    .eq("hotel_id", hotelId);
+
+  let poolRows: ExtractedPool[] = (existingPools ?? []) as unknown as ExtractedPool[];
+  if (extractedPools.length > 0 && poolRows.length === 0) {
+    const rows = extractedPools
+      .filter((p) => typeof p.pool_category === "string")
+      .map((p, i) => ({
+        hotel_id: hotelId,
+        pool_name: clean(p.pool_name as string | null),
+        pool_category: p.pool_category as string,
+        shared_or_private: p.pool_category === "private_room_pool" ? "private" : "shared",
+        indoor: clean(p.indoor as boolean | null),
+        outdoor: clean(p.outdoor as boolean | null),
+        rooftop: clean(p.rooftop as boolean | null),
+        infinity_edge: clean(p.infinity_edge as boolean | null),
+        heated: clean(p.heated as boolean | null),
+        heated_months: clean(p.heated_months as string | null),
+        year_round: clean(p.year_round as boolean | null),
+        seasonal_dates: clean(p.seasonal_dates as string | null),
+        length_metres: clean(p.length_metres as number | null),
+        saltwater: clean(p.saltwater as boolean | null),
+        adults_only: clean(p.adults_only as boolean | null),
+        children_allowed: clean(p.children_allowed as boolean | null),
+        day_pass: clean(p.day_pass as boolean | null),
+        opening_hours: clean(p.opening_hours as string | null),
+        view: clean(p.view as string | null),
+        source_urls: evidenceUrls,
+        fact_status: official.length > 0 ? "partially_verified" : "research_pending",
+        last_verified: new Date().toISOString().slice(0, 10),
+        position: i,
+      }));
+    if (rows.length) {
+      const { error: poolErr } = await supabaseAdmin.from("hotel_pools").insert(rows as never);
+      if (!poolErr) poolRows = extractedPools;
+    }
+  }
+
+  const derivedSharedCount = poolRows.length
+    ? poolRows.filter((p) => SHARED_SWIM.includes(String(p.pool_category))).length
+    : null;
+  const derivedHeated = poolRows.length
+    ? poolRows.some((p) => p.heated === true)
+      ? true
+      : null
+    : null;
+
   const update: Record<string, unknown> = {
-    pool_count: mergeInt(hotel.pool_count, parsed.pool_count),
+    pool_count: derivedSharedCount ?? mergeInt(hotel.pool_count, parsed.pool_count),
     indoor: mergeBool(hotel.indoor, parsed.indoor),
     outdoor: mergeBool(hotel.outdoor, parsed.outdoor),
     rooftop: mergeBool(hotel.rooftop, parsed.rooftop),
     infinity: mergeBool(hotel.infinity, parsed.infinity),
-    heated_pool: mergeBool(hotel.heated_pool, parsed.heated_pool),
+    heated_pool: poolRows.length ? derivedHeated : mergeBool(hotel.heated_pool, parsed.heated_pool),
     year_round: mergeBool(hotel.year_round, parsed.year_round),
     season: mergeStr(hotel.season, parsed.season),
     children_allowed: mergeBool(hotel.children_allowed, parsed.children_allowed),
@@ -483,10 +592,20 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
       ? "verified"
       : "partially_verified";
 
+  // A confirmed shared swimming pool makes the hotel eligible for the ranking.
+  if (derivedSharedCount != null && derivedSharedCount > 0) {
+    update.pool_status = "active_pool";
+    update.ranking_eligible = true;
+  }
+  // Only hotels with a confirmed active swimming pool may be fully verified.
+  const poolConfirmed =
+    (derivedSharedCount != null && derivedSharedCount > 0) || hotel.pool_status === "active_pool";
+  const finalStatus = poolConfirmed ? verification_status : "partially_verified";
+
   update.primary_source_url = primary;
   update.secondary_source_url = secondary;
-  update.verification_status = verification_status;
-  update.verification_method = verification_status === "verified" ? "multiple_sources" : "research_pending";
+  update.verification_status = finalStatus;
+  update.verification_method = finalStatus === "verified" ? "multiple_sources" : "research_pending";
   update.verified_by = "Best Pool Hotels enhanced verification";
   update.last_verified_date = new Date().toISOString().slice(0, 10);
   update.editorial_status = "published";
