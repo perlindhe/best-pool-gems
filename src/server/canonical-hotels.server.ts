@@ -209,6 +209,9 @@ export async function attachHeroPhotos<T extends { id: string; cover_image_url: 
 export async function listCanonicalHotels(filters: HotelFilters = {}) {
   let q = supabaseAdmin.from("public_hotels_view").select(CANONICAL_SELECT, { count: "exact" });
 
+  // A pool ranking only contains hotels with a confirmed active swimming pool.
+  q = q.eq("ranking_eligible", true);
+
   if (filters.city) q = q.eq("city_slug", filters.city);
   if (typeof filters.minScore === "number") q = q.gte("pool_score_0_10", filters.minScore);
   if (filters.rooftop) q = q.eq("rooftop", true);
