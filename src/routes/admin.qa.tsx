@@ -1,0 +1,163 @@
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
+import { SiteHeader } from "@/components/SiteHeader";
+import { adminQaOverview, type QaRow } from "@/lib/qa.functions";
+
+installServerFnAuth();
+
+export const Route = createFileRoute("/admin/qa")({
+  head: () => ({
+    meta: [
+      { title: "Data QA – Best Pool Hotels" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: QaPage,
+});
+
+const TEST_GROUP = [
+  "sydney-hyatt-regency-sydney",
+  "sydney-park-hyatt-sydney",
+  "sydney-w-sydney",
+  "sydney-intercontinental-sydney",
+  "sydney-ace-hotel-sydney",
+  "sydney-qt-sydney",
+  "sydney-capella-sydney",
+  "barcelona-hotel-arts",
+  "barcelona-1898",
+  "los-angeles-hotel-june-west-la",
+  "mallorca-hotel-can-bordoy-grand-house-and-garden",
+  "los-angeles-the-maybourne-beverly-hills",
+  "mallorca-jumeirah-port-soller",
+  "bangkok-the-peninsula-bangkok",
+  "minos-palace-hotel-suites",
+  "london-shangri-la-the-shard",
+  "london-bvlgari-hotel-london",
+  "barcelona-grand-hotel-central",
+  "los-angeles-the-hollywood-roosevelt",
+  "porto-elounda-golf-spa-resort",
+];
+
+function QaPage() {
+  const [rows, setRows] = useState<QaRow[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [scope, setScope] = useState<"test" | "all" | "problems">("test");
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    adminQaOverview()
+      .then((r) => setRows(r.rows))
+      .catch((e) => setError((e as Error).message));
+  }, []);
+
+  const visible = useMemo(() => {
+    let list = rows;
+    if (scope === "test") list = list.filter((r) => TEST_GROUP.includes(r.slug));
+    if (scope === "problems")
+      list = list.filter((r) => r.qa_blocked || r.missing.length > 0);
+    if (query.trim())
+      list = list.filter((r) =>
+        `${r.name} ${r.city} ${r.slug}`.toLowerCase().includes(query.toLowerCase()),
+      );
+    return list;
+  }, [rows, scope, query]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="mx-auto max-w-[1400px] px-6 py-24">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="font-display text-4xl">Data QA</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Internal overview of pool data, verification and score status. Not indexed.
+            </p>
+          </div>
+          <Link to="/admin" className="text-xs uppercase tracking-[0.2em] text-primary">
+            ← Admin
+          </Link>
+        </div>
+
+        <div className="mt-8 flex flex-wrap items-center gap-3 text-xs">
+          {(["test", "problems", "all"] as const).map((k) => (
+            <button
+              key={k}
+              onClick={() => setScope(k)}
+              className={`rounded-full px-3 py-1 uppercase tracking-[0.2em] ${
+                scope === k ? "bg-primary text-primary-foreground" : "border border-border"
+              }`}
+            >
+              {k === "test" ? "Test group (20)" : k === "problems" ? "Needs work" : "All hotels"}
+            </button>
+          ))}
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search hotel"
+            className="rounded-full border border-border bg-background px-3 py-1"
+          />
+          <span className="text-muted-foreground">{visible.length} shown</span>
+        </div>
+
+        {error && <p className="mt-6 text-sm text-destructive">{error}</p>}
+
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="bg-surface text-muted-foreground">
+              <tr className="text-left">
+                <th className="p-2">Hotel</th>
+                <th className="p-2">Verification</th>
+                <th className="p-2">Pool status</th>
+                <th className="p-2">Shared</th>
+                <th className="p-2">Spa</th>
+                <th className="p-2">Kids</th>
+                <th className="p-2">Private</th>
+                <th className="p-2">Jacuzzi</th>
+                <th className="p-2">Heating</th>
+                <th className="p-2">Season</th>
+                <th className="p-2">Score</th>
+                <th className="p-2">Ranked</th>
+                <th className="p-2">Checked</th>
+                <th className="p-2">Missing</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visible.map((r) => (
+                <tr key={r.id} className="border-t border-border/40 align-top">
+                  <td className="p-2">
+                    <a
+                      href={`/hotels/${r.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline underline-offset-2"
+                    >
+                      {r.name}
+                    </a>
+                    <div className="text-muted-foreground">{r.city}</div>
+                  </td>
+                  <td className="p-2">{r.verification_status}</td>
+                  <td className="p-2">
+                    {r.pool_status}
+                    {r.qa_blocked ? " · blocked" : ""}
+                  </td>
+                  <td className="p-2">{r.shared_pools}</td>
+                  <td className="p-2">{r.spa_pools}</td>
+                  <td className="p-2">{r.kids_pools}</td>
+                  <td className="p-2">{r.private_pools}</td>
+                  <td className="p-2">{r.jacuzzis}</td>
+                  <td className="p-2">{r.heated_state}</td>
+                  <td className="p-2">{r.season_state}</td>
+                  <td className="p-2">{r.score != null ? r.score.toFixed(1) : "—"}</td>
+                  <td className="p-2">{r.ranking_eligible === false ? "no" : "yes"}</td>
+                  <td className="p-2">{r.last_verified_date ?? "—"}</td>
+                  <td className="p-2 text-muted-foreground">{r.missing.join(", ") || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
