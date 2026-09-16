@@ -30,6 +30,7 @@ import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
 import { Route as EditorsSlugRouteImport } from './routes/editors.$slug'
 import { Route as ComparePairRouteImport } from './routes/compare.$pair'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
+import { Route as AdminQaRouteImport } from './routes/admin.qa'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
@@ -152,6 +153,11 @@ const BarcelonaLuxuryPoolHotelsRoute =
     path: '/barcelona/luxury-pool-hotels',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminQaRoute = AdminQaRouteImport.update({
+  id: '/admin/qa',
+  path: '/admin/qa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/qa': typeof AdminQaRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
   '/editors/$slug': typeof EditorsSlugRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/qa': typeof AdminQaRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
   '/editors/$slug': typeof EditorsSlugRoute
@@ -333,6 +341,7 @@ export interface FileRoutesById {
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/qa': typeof AdminQaRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
   '/compare/$pair': typeof ComparePairRoute
   '/editors/$slug': typeof EditorsSlugRoute
@@ -373,6 +382,7 @@ export interface FileRouteTypes {
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
+    | '/admin/qa'
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
     | '/editors/$slug'
@@ -411,6 +421,7 @@ export interface FileRouteTypes {
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
+    | '/admin/qa'
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
     | '/editors/$slug'
@@ -449,6 +460,7 @@ export interface FileRouteTypes {
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
     | '/admin/login'
+    | '/admin/qa'
     | '/barcelona/luxury-pool-hotels'
     | '/compare/$pair'
     | '/editors/$slug'
@@ -488,6 +500,7 @@ export interface RootRouteChildren {
   VerificationStandardsRoute: typeof VerificationStandardsRoute
   CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminQaRoute: typeof AdminQaRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
   ComparePairRoute: typeof ComparePairRoute
   EditorsSlugRoute: typeof EditorsSlugRoute
@@ -658,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BarcelonaLuxuryPoolHotelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/qa': {
+      id: '/admin/qa'
+      path: '/admin/qa'
+      fullPath: '/admin/qa'
+      preLoaderRoute: typeof AdminQaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -795,6 +815,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificationStandardsRoute: VerificationStandardsRoute,
   CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminQaRoute: AdminQaRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
   ComparePairRoute: ComparePairRoute,
   EditorsSlugRoute: EditorsSlugRoute,
