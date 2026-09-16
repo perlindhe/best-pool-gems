@@ -98,7 +98,8 @@ const n = (v: number | null | undefined) => (typeof v === "number" ? v : 0);
 export function hasConfirmedSwimmingPool(h: StatusHotel): boolean {
   if (h.has_active_pool === false) return false;
   if (h.pool_status === "no_pool") return false;
-  return n(h.shared_pool_count) + n(h.swim_up_count) > 0;
+  // shared_pool_count already includes swim-up pools; swim_up_count is a subset.
+  return n(h.shared_pool_count) > 0;
 }
 
 /** Mandatory core facts, in the order they are reported to editors. */
