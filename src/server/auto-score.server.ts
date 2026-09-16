@@ -241,18 +241,22 @@ function reviewPoolSentences(reviews: ReviewItem[], perReview = 3, totalCap = 40
 const POOL_TYPES = ["outdoor", "indoor", "rooftop", "infinity", "plunge", "lap", "kids", "spa_pool", "jacuzzi"] as const;
 const SOURCE_TAGS = ["website", "google", "reviews"] as const;
 
+// Kept deliberately lean: every enum value, nullable union and long
+// description multiplies the model's structured-output constraint states,
+// and past runs failed with "schema produces a constraint that has too many
+// states for serving" on hotels with rich evidence.
 const PoolDescriptorSchema = {
   type: "object",
   properties: {
-    name: { type: ["string", "null"], description: "Short label (e.g. 'Rooftop infinity pool', 'Spa indoor pool')" },
-    type: { type: "string", enum: [...POOL_TYPES], description: "Primary category of this pool" },
+    name: { type: ["string", "null"] },
+    type: { type: "string", enum: [...POOL_TYPES] },
     indoor: { type: ["boolean", "null"] },
-    heated: { type: ["boolean", "null"], description: "Set true ONLY with explicit evidence; otherwise null" },
-    length_m: { type: ["number", "null"], minimum: 3, maximum: 200 },
+    heated: { type: ["boolean", "null"] },
+    length_m: { type: ["number", "null"] },
     adults_only: { type: ["boolean", "null"] },
-    season: { type: ["string", "null"], description: "e.g. 'May–October' or null for year-round" },
-    source: { type: "string", enum: [...SOURCE_TAGS], description: "Where this pool was confirmed" },
-    quote: { type: "string", description: "Short verbatim phrase from the source supporting this pool's existence" },
+    season: { type: ["string", "null"] },
+    source: { type: "string", enum: [...SOURCE_TAGS] },
+    quote: { type: "string" },
   },
   required: ["name", "type", "indoor", "heated", "length_m", "adults_only", "season", "source", "quote"],
   additionalProperties: false,
@@ -270,11 +274,9 @@ const CITED_BOOL_KEYS = [
 const citedSourceProp = {
   type: ["string", "null"],
   enum: [...SOURCE_TAGS, null],
-  description: "The single strongest source that explicitly supports this value, or null if none.",
 };
 const citedQuoteProp = {
   type: ["string", "null"],
-  description: "One short verbatim phrase (≤ 200 chars) from that source. Null if no evidence.",
 };
 
 const citedFact = (valueSchema: Record<string, unknown>) => ({
@@ -293,12 +295,12 @@ const CitedFactsProperties: Record<string, unknown> = {};
 for (const k of CITED_BOOL_KEYS) {
   CitedFactsProperties[k] = citedFact({ type: ["boolean", "null"] });
 }
-CitedFactsProperties.pool_count = citedFact({ type: ["integer", "null"], minimum: 1, maximum: 30 });
+CitedFactsProperties.pool_count = citedFact({ type: ["integer", "null"] });
 CitedFactsProperties.size_estimate = citedFact({
   type: ["string", "null"],
   enum: ["small", "medium", "large", "very_large", null],
 });
-CitedFactsProperties.length_m = citedFact({ type: ["number", "null"], minimum: 3, maximum: 200 });
+CitedFactsProperties.length_m = citedFact({ type: ["number", "null"] });
 CitedFactsProperties.view = citedFact({ type: ["string", "null"] });
 CitedFactsProperties.season = citedFact({ type: ["string", "null"] });
 
@@ -370,8 +372,7 @@ const AiToolSchema = {
           type: "array",
           items: PoolDescriptorSchema,
           minItems: 0,
-          maxItems: 6,
-          description: "One entry per distinct pool you can confirm with a source quote.",
+          maxItems: 4,
         },
         cited_facts: {
           type: "object",
