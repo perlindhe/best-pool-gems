@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
-import { hasCompletePoolScore, toCanonicalComponents, POOL_CRITERIA } from "@/lib/scoring";
+import { toCanonicalComponents, POOL_CRITERIA } from "@/lib/scoring";
+import { calculatePoolScore } from "@/lib/hotel-status";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GuideMeta } from "@/components/GuideMeta";
@@ -108,10 +109,8 @@ export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
     const ranked = hotels
       .filter(
         (h) =>
-          h.verification_status === "verified" &&
           (h.editorial_status ?? "published") === "published" &&
-          h.qa_blocked !== true &&
-          hasCompletePoolScore(h.pool_components, h.pool_score_0_10),
+          calculatePoolScore(h) != null,
       )
       .slice(0, 10);
     return { ranked };
