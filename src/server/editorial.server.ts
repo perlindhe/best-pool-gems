@@ -186,7 +186,7 @@ export async function writeHotelEditorial(hotelId: string): Promise<EditorialRes
   const { data: hotel, error } = await supabaseAdmin
     .from("hotels")
     .select(
-      "id, slug, name, city, country, neighborhood, website_url, official_url, primary_source_url, secondary_source_url, pool_count, pool_type, indoor, outdoor, rooftop, infinity, heated_pool, year_round, season, children_allowed, adults_only, guest_only, day_pass_available, pool_opening_hours, pool_view",
+      "id, slug, name, city, country, neighborhood, website_url, official_url, primary_source_url, secondary_source_url, pool_count, has_active_pool, pool_type, indoor, outdoor, rooftop, infinity, heated_pool, year_round, season, children_allowed, adults_only, guest_only, day_pass_available, pool_opening_hours, pool_view",
     )
     .eq("id", hotelId)
     .maybeSingle();
@@ -274,8 +274,13 @@ export async function writeHotelEditorial(hotelId: string): Promise<EditorialRes
     hotel.outdoor != null;
 
   const hasOfficialEvidence = websiteEvidence.length > 0 || !!hotel.primary_source_url;
+  // A hotel can never be "fully verified" while its pool is undocumented:
+  // verification here covers the editorial text, not the existence of a pool.
+  const hasDocumentedPool =
+    (hotel as { has_active_pool?: boolean | null }).has_active_pool === true &&
+    (hotel.pool_count ?? 0) > 0;
   const verification_status: "verified" | "partially_verified" =
-    coreFactsKnown && hasOfficialEvidence && !!primary && !!secondary
+    coreFactsKnown && hasOfficialEvidence && hasDocumentedPool && !!primary && !!secondary
       ? "verified"
       : "partially_verified";
 
