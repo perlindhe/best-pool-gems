@@ -20,7 +20,7 @@ export async function getHotelDetail(slug: string) {
   const { data: hotel, error } = await supabaseAdmin
     .from("public_hotels_view")
     .select(
-      "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at, verification_status, verification_method, affiliate_url, official_url, pool_count, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, documented_pool_areas, pool_status, ranking_eligible, score_version, score_updated_at, rooftop, infinity, heated_pool, indoor, outdoor, adults_only, family_friendly, beachfront, saltwater, year_round, pool_size, pool_view",
+      "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, cover_image_url, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, meta_rating_0_100, confidence_0_100, sources_used, pool_score_updated_at, meta_computed_at, verification_status, verification_method, affiliate_url, official_url, pool_count, shared_pool_count, spa_pool_count, kids_pool_count, plunge_pool_count, swim_up_count, private_pool_count, jacuzzi_count, documented_pool_areas, pool_status, ranking_eligible, has_active_pool, score_approved_by, score_approved_at, score_version, score_updated_at, rooftop, infinity, heated_pool, heated_state, season_state, indoor, outdoor, adults_only, family_friendly, beachfront, saltwater, year_round, pool_size, pool_view",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -106,7 +106,7 @@ export async function getHotelDetail(slug: string) {
   const { data: poolRows } = await supabaseAdmin
     .from("hotel_pools")
     .select(
-      "id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, infinity_edge, heated, heating_status, heated_months, year_round, seasonal_dates, length_metres, approximate_size, saltwater, adults_only, children_allowed, day_pass, guest_access, opening_hours, view, fact_status, last_verified",
+      "id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, infinity_edge, heated, heating_status, heating_state, season_state, existence_state, heated_months, year_round, seasonal_dates, length_metres, approximate_size, saltwater, adults_only, children_allowed, day_pass, guest_access, opening_hours, view, fact_status, last_verified",
     )
     .eq("hotel_id", hotel.id as string)
     .order("position", { ascending: true });
@@ -134,6 +134,9 @@ export type PoolRecord = {
   infinity_edge: boolean | null;
   heated: boolean | null;
   heating_status: string | null;
+  heating_state: "confirmed_heated" | "confirmed_not_heated" | "unknown";
+  season_state: "year_round" | "seasonal" | "unknown";
+  existence_state: "confirmed_official" | "confirmed_two_sources" | "provisional" | "unknown";
   heated_months: string | null;
   year_round: boolean | null;
   seasonal_dates: string | null;
