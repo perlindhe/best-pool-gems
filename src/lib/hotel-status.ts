@@ -98,7 +98,8 @@ const n = (v: number | null | undefined) => (typeof v === "number" ? v : 0);
 export function hasConfirmedSwimmingPool(h: StatusHotel): boolean {
   if (h.has_active_pool === false) return false;
   if (h.pool_status === "no_pool") return false;
-  return n(h.shared_pool_count) + n(h.swim_up_count) > 0;
+  // shared_pool_count already includes swim-up pools; swim_up_count is a subset.
+  return n(h.shared_pool_count) > 0;
 }
 
 /** Mandatory core facts, in the order they are reported to editors. */
@@ -135,7 +136,7 @@ function hasApprovedSubscores(h: StatusHotel): boolean {
 /** Two published values that cannot both be true. */
 export function detectConflicts(h: StatusHotel): string[] {
   const conflicts: string[] = [];
-  const shared = n(h.shared_pool_count) + n(h.swim_up_count);
+  const shared = n(h.shared_pool_count);
   if (!hasConfirmedSwimmingPool(h) && (n(h.pool_count) > 0 || shared > 0))
     conflicts.push("No confirmed swimming pool but a pool count above zero");
   if (h.heated_state === "not_heated" && h.heated_pool === true)
@@ -292,8 +293,18 @@ export function describePoolCounts(h: StatusHotel): string | null {
   const add = (count: number, one: string, many: string) => {
     if (count > 0) parts.push(`${count} ${count === 1 ? one : many}`);
   };
-  add(n(h.shared_pool_count), "shared swimming pool", "shared swimming pools");
-  add(n(h.swim_up_count), "swim-up pool", "swim-up pools");
+  const sharedTotal = n(h.shared_pool_count);
+  const swimUp = Math.min(n(h.swim_up_count), sharedTotal);
+  if (sharedTotal > 0) {
+    // swim-up pools are part of the shared total, never an extra pool
+    const suffix =
+      swimUp > 0
+        ? ` (${swimUp === sharedTotal ? (swimUp === 1 ? "a swim-up pool" : "all swim-up pools") : `${swimUp} of them swim-up`})`
+        : "";
+    parts.push(
+      `${sharedTotal} ${sharedTotal === 1 ? "shared swimming pool" : "shared swimming pools"}${suffix}`,
+    );
+  }
   add(n(h.kids_pool_count), "children's pool", "children's pools");
   add(n(h.plunge_pool_count), "plunge pool", "plunge pools");
   add(n(h.spa_pool_count), "spa pool", "spa pools");
