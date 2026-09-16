@@ -54,6 +54,7 @@ export const Route = createFileRoute("/hotels/$slug")({
       hotel.verification_status === "verified" &&
       status === "published" &&
       hotel.ranking_eligible !== false &&
+      hotel.has_active_pool === true &&
       hotel.pool_status === "active_pool";
     const robots =
       status === "draft" || status === "review"
@@ -147,11 +148,12 @@ function HotelDetailPage() {
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const hero = photos[0]?.url || hotel.cover_image_url;
+  const noPool = hotel.has_active_pool === false;
   const keyFacts: string[] = [
     hotel.rooftop ? "Rooftop" : null,
     hotel.infinity ? "Infinity edge" : null,
-    hotel.heated_pool ? "Heated" : null,
-    hotel.year_round ? "Year-round" : null,
+    hotel.heated_state === "heated" ? "Heated" : null,
+    hotel.season_state === "year_round" ? "Year-round" : null,
     hotel.indoor && hotel.outdoor
       ? "Indoor + outdoor"
       : hotel.indoor
@@ -239,6 +241,74 @@ function HotelDetailPage() {
         </div>
       </section>
 
+      {/* Data status box — what we know and how well it is documented */}
+      <section className="mx-auto max-w-6xl px-6 pt-10">
+        <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">Data status</p>
+          <dl className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+            <PracticalFact
+              label="Verification"
+              value={
+                hotel.verification_status === "verified"
+                  ? "Fully verified"
+                  : hotel.verification_status === "partially_verified"
+                    ? "Partially verified"
+                    : "Research pending"
+              }
+            />
+            <PracticalFact
+              label="Swimming pools documented"
+              value={noPool ? "No pool found" : (hotel.shared_pool_count ?? 0).toString()}
+            />
+            <PracticalFact
+              label="Heating"
+              value={
+                hotel.heated_state === "heated"
+                  ? "Confirmed heated"
+                  : hotel.heated_state === "not_heated"
+                    ? "Confirmed not heated"
+                    : null
+              }
+            />
+            <PracticalFact
+              label="Season"
+              value={
+                hotel.season_state === "year_round"
+                  ? "Year-round"
+                  : hotel.season_state === "seasonal"
+                    ? "Seasonal"
+                    : null
+              }
+            />
+            <PracticalFact label="Last checked" value={hotel.last_verified_date} />
+            <PracticalFact label="Checked by" value={hotel.verified_by} />
+            <PracticalFact
+              label="Pool Score"
+              value={
+                hasCompletePoolScore(
+                  hotel.pool_components,
+                  hotel.pool_score_0_10,
+                  hotel.verification_status,
+                  hotel.has_active_pool,
+                )
+                  ? `${hotel.pool_score_0_10?.toFixed(1)} / 10`
+                  : "Pending editorial review"
+              }
+            />
+            <PracticalFact
+              label="Included in rankings"
+              value={hotel.ranking_eligible === false ? "No — pool not confirmed" : "Yes"}
+            />
+          </dl>
+          {noPool && (
+            <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
+              We have found no swimming pool at this hotel. The profile stays online for
+              transparency, but it is excluded from rankings and from search results.
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* Scores at-a-glance */}
       <section className="mx-auto max-w-6xl px-6 py-12">
         <div className="grid gap-4 rounded-lg border border-border/60 bg-surface/50 p-6 md:grid-cols-2 md:p-8">
@@ -314,12 +384,25 @@ function HotelDetailPage() {
                     shared_pool_count: hotel.shared_pool_count,
                     spa_pool_count: hotel.spa_pool_count,
                     kids_pool_count: hotel.kids_pool_count,
+                    plunge_pool_count: hotel.plunge_pool_count,
                     private_pool_count: hotel.private_pool_count,
                     jacuzzi_count: hotel.jacuzzi_count,
                   }}
-                  anyHeated={hotel.heated_pool}
+                  heatedState={hotel.heated_state}
                 />
-                {pools.length === 0 && <PoolFactsTable facts={hotel.pool_facts} />}
+                {pools.length === 0 && noPool && (
+                  <p className="text-sm text-muted-foreground">
+                    We have found no swimming pool at this hotel. It is therefore not ranked and
+                    carries no Pool Score.
+                  </p>
+                )}
+                {pools.length === 0 && !noPool && (
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    We have not yet documented the individual pools at this hotel. Nothing below is
+                    estimated — missing details are shown as not confirmed.
+                  </p>
+                )}
+                {pools.length === 0 && !noPool && <PoolFactsTable facts={hotel.pool_facts} />}
               </div>
             </div>
 
@@ -337,16 +420,22 @@ function HotelDetailPage() {
                   <PracticalFact
                     label="Heating"
                     value={
-                      hotel.heated_pool === true
-                        ? "Heated"
-                        : hotel.heated_pool === false
+                      hotel.heated_state === "heated"
+                        ? "At least one heated pool"
+                        : hotel.heated_state === "not_heated"
                           ? "Not heated"
                           : null
                     }
                   />
                   <PracticalFact
                     label="Season"
-                    value={hotel.season ?? (hotel.year_round ? "Open year-round" : null)}
+                    value={
+                      hotel.season_state === "year_round"
+                        ? "Open year-round"
+                        : hotel.season_state === "seasonal"
+                          ? (hotel.season ?? "Seasonal opening")
+                          : null
+                    }
                   />
                   <PracticalFact label="Opening hours" value={hotel.pool_opening_hours} />
                   <PracticalFact

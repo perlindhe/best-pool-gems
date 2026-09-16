@@ -171,15 +171,20 @@ export function hasCompletePoolScore(
   components: Record<string, number> | null | undefined,
   total: number | null | undefined,
   verificationStatus?: string | null,
+  hasActivePool?: boolean | null,
 ): boolean {
   if (total == null || !components) return false;
   // An unverified profile never shows a final Pool Score.
   if (verificationStatus != null && verificationStatus !== "verified") return false;
+  // A hotel without a confirmed swimming pool is never scored.
+  if (hasActivePool === false) return false;
   const c = toCanonicalComponents(components as AnyComponents);
-  return POOL_CRITERIA.every(({ key }) => {
+  const complete = POOL_CRITERIA.every(({ key }) => {
     const v = Number(c[key]);
     return Number.isFinite(v) && v > 0;
   });
+  // Five identical criteria are a placeholder, not an editorial judgement.
+  return complete && !hasIdenticalSubscores(components);
 }
 
 /** True when several criteria carry the same value — an editorial warning, not a block. */

@@ -61,7 +61,14 @@ export type HotelDetail = {
   kids_pool_count: number | null;
   private_pool_count: number | null;
   jacuzzi_count: number | null;
+  plunge_pool_count: number | null;
+  swim_up_count: number | null;
   documented_pool_areas: number | null;
+  heated_state: "heated" | "not_heated" | "unknown" | null;
+  season_state: "year_round" | "seasonal" | "unknown" | null;
+  has_active_pool: boolean | null;
+  score_approved_by: string | null;
+  score_approved_at: string | null;
   pool_status: "active_pool" | "no_pool" | "pool_closed" | "pool_construction" | "unknown";
   ranking_eligible: boolean;
   score_version: string | null;

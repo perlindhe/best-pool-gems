@@ -106,10 +106,12 @@ export type Database = {
           created_at: string
           day_pass: boolean | null
           evidence: Json
+          existence_state: string
           fact_status: Database["public"]["Enums"]["pool_fact_status"]
           guest_access: string | null
           heated: boolean | null
           heated_months: string | null
+          heating_state: string
           heating_status: string | null
           hotel_id: string
           id: string
@@ -124,6 +126,7 @@ export type Database = {
           position: number
           rooftop: boolean | null
           saltwater: boolean | null
+          season_state: string
           seasonal_dates: string | null
           shared_or_private: string
           source_urls: Json
@@ -138,10 +141,12 @@ export type Database = {
           created_at?: string
           day_pass?: boolean | null
           evidence?: Json
+          existence_state?: string
           fact_status?: Database["public"]["Enums"]["pool_fact_status"]
           guest_access?: string | null
           heated?: boolean | null
           heated_months?: string | null
+          heating_state?: string
           heating_status?: string | null
           hotel_id: string
           id?: string
@@ -156,6 +161,7 @@ export type Database = {
           position?: number
           rooftop?: boolean | null
           saltwater?: boolean | null
+          season_state?: string
           seasonal_dates?: string | null
           shared_or_private?: string
           source_urls?: Json
@@ -170,10 +176,12 @@ export type Database = {
           created_at?: string
           day_pass?: boolean | null
           evidence?: Json
+          existence_state?: string
           fact_status?: Database["public"]["Enums"]["pool_fact_status"]
           guest_access?: string | null
           heated?: boolean | null
           heated_months?: string | null
+          heating_state?: string
           heating_status?: string | null
           hotel_id?: string
           id?: string
@@ -188,6 +196,7 @@ export type Database = {
           position?: number
           rooftop?: boolean | null
           saltwater?: boolean | null
+          season_state?: string
           seasonal_dates?: string | null
           shared_or_private?: string
           source_urls?: Json
@@ -235,6 +244,7 @@ export type Database = {
           fact_verification: Json | null
           family_friendly: boolean | null
           guest_only: boolean | null
+          has_active_pool: boolean | null
           has_pool: boolean | null
           heated_pool: boolean | null
           hotel_status: Database["public"]["Enums"]["hotel_status"]
@@ -272,6 +282,8 @@ export type Database = {
           ranking_eligible: boolean
           rooftop: boolean | null
           saltwater: boolean | null
+          score_approved_at: string | null
+          score_approved_by: string | null
           score_last_updated: string | null
           score_updated_at: string | null
           score_version: string | null
@@ -317,6 +329,7 @@ export type Database = {
           fact_verification?: Json | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
+          has_active_pool?: boolean | null
           has_pool?: boolean | null
           heated_pool?: boolean | null
           hotel_status?: Database["public"]["Enums"]["hotel_status"]
@@ -354,6 +367,8 @@ export type Database = {
           ranking_eligible?: boolean
           rooftop?: boolean | null
           saltwater?: boolean | null
+          score_approved_at?: string | null
+          score_approved_by?: string | null
           score_last_updated?: string | null
           score_updated_at?: string | null
           score_version?: string | null
@@ -399,6 +414,7 @@ export type Database = {
           fact_verification?: Json | null
           family_friendly?: boolean | null
           guest_only?: boolean | null
+          has_active_pool?: boolean | null
           has_pool?: boolean | null
           heated_pool?: boolean | null
           hotel_status?: Database["public"]["Enums"]["hotel_status"]
@@ -436,6 +452,8 @@ export type Database = {
           ranking_eligible?: boolean
           rooftop?: boolean | null
           saltwater?: boolean | null
+          score_approved_at?: string | null
+          score_approved_by?: string | null
           score_last_updated?: string | null
           score_updated_at?: string | null
           score_version?: string | null
@@ -771,7 +789,7 @@ export type Database = {
     Views: {
       hotel_pool_summary: {
         Row: {
-          any_adults_only: boolean | null
+          all_adults_only: boolean | null
           any_children_allowed: boolean | null
           any_day_pass: boolean | null
           any_heated: boolean | null
@@ -782,13 +800,17 @@ export type Database = {
           any_saltwater: boolean | null
           any_year_round: boolean | null
           documented_pool_areas: number | null
+          heated_state: string | null
           hotel_id: string | null
           jacuzzi_count: number | null
           kids_pool_count: number | null
+          plunge_pool_count: number | null
           pools_last_verified: string | null
           private_pool_count: number | null
+          season_state: string | null
           shared_pool_count: number | null
           spa_pool_count: number | null
+          swim_up_count: number | null
         }
         Relationships: [
           {
@@ -832,8 +854,10 @@ export type Database = {
           fact_verification: Json | null
           family_friendly: boolean | null
           guest_only: boolean | null
+          has_active_pool: boolean | null
           has_pool: boolean | null
           heated_pool: boolean | null
+          heated_state: string | null
           hotel_status: Database["public"]["Enums"]["hotel_status"] | null
           id: string | null
           indoor: boolean | null
@@ -848,6 +872,7 @@ export type Database = {
           neighborhood: string | null
           official_url: string | null
           outdoor: boolean | null
+          plunge_pool_count: number | null
           pool_components: Json | null
           pool_count: number | null
           pool_facts: Json | null
@@ -871,14 +896,18 @@ export type Database = {
           ranking_eligible: boolean | null
           rooftop: boolean | null
           saltwater: boolean | null
+          score_approved_at: string | null
+          score_approved_by: string | null
           score_updated_at: string | null
           score_version: string | null
           season: string | null
+          season_state: string | null
           secondary_source_url: string | null
           shared_pool_count: number | null
           slug: string | null
           sources_used: Json | null
           spa_pool_count: number | null
+          swim_up_count: number | null
           tags: string[] | null
           verification_method: string | null
           verification_notes: string | null

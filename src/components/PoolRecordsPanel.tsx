@@ -19,6 +19,7 @@ export type PoolMixCounts = {
   kids_pool_count: number | null;
   private_pool_count: number | null;
   jacuzzi_count: number | null;
+  plunge_pool_count?: number | null;
 };
 
 /** Plain-English summary built only from the individual pool records. */
@@ -28,9 +29,11 @@ export function poolMixSentence(c: PoolMixCounts): string | null {
   const kids = c.kids_pool_count ?? 0;
   const spa = c.spa_pool_count ?? 0;
   const jac = c.jacuzzi_count ?? 0;
+  const plunge = c.plunge_pool_count ?? 0;
   const priv = c.private_pool_count ?? 0;
   if (shared > 0) parts.push(`${shared} shared pool${shared === 1 ? "" : "s"}`);
   if (kids > 0) parts.push(`${kids} children's pool${kids === 1 ? "" : "s"}`);
+  if (plunge > 0) parts.push(`${plunge} plunge pool${plunge === 1 ? "" : "s"}`);
   if (spa > 0) parts.push(`${spa} spa pool${spa === 1 ? "" : "s"}`);
   if (jac > 0) parts.push(`${jac} jacuzzi${jac === 1 ? "" : "s"}`);
   if (parts.length === 0 && priv === 0) return null;
@@ -50,26 +53,38 @@ function poolLine(p: PoolRecord): string {
   const bits: string[] = [CATEGORY_LABEL[p.pool_category]];
   if (p.indoor === true) bits.push("Indoor");
   else if (p.outdoor === true) bits.push("Outdoor");
+  else bits.push("Indoor or outdoor not confirmed");
   if (p.rooftop === true) bits.push("Rooftop");
   if (p.infinity_edge === true) bits.push("Infinity edge");
-  if (p.heated === true) bits.push(p.heated_months ? `Heated (${p.heated_months})` : "Heated");
+  if (p.heating_state === "confirmed_heated")
+    bits.push(p.heated_months ? `Heated (${p.heated_months})` : "Heated");
+  else if (p.heating_state === "confirmed_not_heated") bits.push("Not heated");
+  else bits.push("Heating not confirmed");
   if (p.length_metres != null) bits.push(`${p.length_metres} m`);
   if (p.saltwater === true) bits.push("Saltwater");
   if (p.adults_only === true) bits.push("Adults only");
-  if (p.year_round === true) bits.push("Open year-round");
-  else if (p.seasonal_dates) bits.push(p.seasonal_dates);
+  if (p.season_state === "year_round") bits.push("Open year-round");
+  else if (p.season_state === "seasonal")
+    bits.push(p.seasonal_dates ? `Seasonal (${p.seasonal_dates})` : "Seasonal");
+  else bits.push("Season not confirmed");
   if (p.day_pass === true) bits.push("Day pass available");
   return bits.join(" · ");
 }
 
+const HEATING_SUMMARY: Record<string, string> = {
+  heated: "At least one pool is confirmed heated — heating does not apply to every pool below.",
+  not_heated: "No pool at this hotel is heated, according to the hotel's own information.",
+  unknown: "Heating has not been confirmed for any pool here.",
+};
+
 export function PoolRecordsPanel({
   pools,
   counts,
-  anyHeated,
+  heatedState,
 }: {
   pools: PoolRecord[];
   counts: PoolMixCounts;
-  anyHeated: boolean | null;
+  heatedState: string | null;
 }) {
   if (!pools.length) return null;
   const summary = poolMixSentence(counts);
@@ -82,9 +97,7 @@ export function PoolRecordsPanel({
 
       {summary && <p className="px-3 pt-3 text-sm text-foreground/90">{summary}</p>}
       <p className="px-3 pb-3 pt-1 text-xs text-muted-foreground">
-        {anyHeated === true
-          ? "Heated pools available — heating does not apply to every pool listed below."
-          : "Heating not confirmed."}
+        {HEATING_SUMMARY[heatedState ?? "unknown"] ?? HEATING_SUMMARY.unknown}
       </p>
 
       <ul className="divide-y divide-border/30 border-t border-border/30">
