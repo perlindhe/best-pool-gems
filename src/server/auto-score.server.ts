@@ -295,12 +295,12 @@ const CitedFactsProperties: Record<string, unknown> = {};
 for (const k of CITED_BOOL_KEYS) {
   CitedFactsProperties[k] = citedFact({ type: ["boolean", "null"] });
 }
-CitedFactsProperties.pool_count = citedFact({ type: ["integer", "null"], minimum: 1, maximum: 30 });
+CitedFactsProperties.pool_count = citedFact({ type: ["integer", "null"] });
 CitedFactsProperties.size_estimate = citedFact({
   type: ["string", "null"],
   enum: ["small", "medium", "large", "very_large", null],
 });
-CitedFactsProperties.length_m = citedFact({ type: ["number", "null"], minimum: 3, maximum: 200 });
+CitedFactsProperties.length_m = citedFact({ type: ["number", "null"] });
 CitedFactsProperties.view = citedFact({ type: ["string", "null"] });
 CitedFactsProperties.season = citedFact({ type: ["string", "null"] });
 
@@ -372,8 +372,7 @@ const AiToolSchema = {
           type: "array",
           items: PoolDescriptorSchema,
           minItems: 0,
-          maxItems: 6,
-          description: "One entry per distinct pool you can confirm with a source quote.",
+          maxItems: 4,
         },
         cited_facts: {
           type: "object",
