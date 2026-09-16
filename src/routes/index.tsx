@@ -177,11 +177,7 @@ function Home() {
                     <h3 className="mt-2 font-display text-2xl tracking-wide group-hover:text-primary">
                       {h.name}
                     </h3>
-                    <VerificationBadge
-                      className="mt-4"
-                      status={h.verification_status}
-                      date={h.last_verified_date}
-                    />
+                    <VerificationBadge className="mt-4" hotel={h} />
                   </div>
                 </Link>
               ))}
