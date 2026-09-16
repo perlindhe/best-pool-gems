@@ -294,7 +294,7 @@ export function describePoolCounts(h: StatusHotel): string | null {
     if (count > 0) parts.push(`${count} ${count === 1 ? one : many}`);
   };
   add(n(h.shared_pool_count), "shared swimming pool", "shared swimming pools");
-  add(n(h.swim_up_count), "swim-up pool", "swim-up pools");
+  
   add(n(h.kids_pool_count), "children's pool", "children's pools");
   add(n(h.plunge_pool_count), "plunge pool", "plunge pools");
   add(n(h.spa_pool_count), "spa pool", "spa pools");
