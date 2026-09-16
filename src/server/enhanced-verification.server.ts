@@ -493,8 +493,49 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
 
   const { data: existingPools } = await supabaseAdmin
     .from("hotel_pools")
-    .select("pool_category, heated")
+    .select(
+      "id, pool_name, pool_category, heated, heating_state, season_state, year_round, source_urls",
+    )
     .eq("hotel_id", hotelId);
+
+  // When pool records already exist, fill only the gaps: heating and season
+  // states that are still unknown and for which research produced evidence.
+  if ((existingPools ?? []).length > 0 && extractedPools.length > 0) {
+    const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
+    for (const row of existingPools ?? []) {
+      const byName = extractedPools.find(
+        (p) => norm(p.pool_name) && norm(p.pool_name) === norm(row.pool_name),
+      );
+      const sameCategory = extractedPools.filter(
+        (p) => String(p.pool_category) === String(row.pool_category),
+      );
+      const match = byName ?? (sameCategory.length === 1 ? sameCategory[0] : undefined);
+      if (!match) continue;
+
+      const patch: Record<string, unknown> = {};
+      const heated = clean(match.heated as boolean | null);
+      if (row.heating_state === "unknown" && (heated === true || heated === false)) {
+        patch.heated = heated;
+        patch.heating_state = heated ? "confirmed_heated" : "confirmed_not_heated";
+        const months = clean(match.heated_months as string | null);
+        if (months) patch.heated_months = months;
+      }
+      const yearRound = clean(match.year_round as boolean | null);
+      const seasonal = clean(match.seasonal_dates as string | null);
+      if (row.season_state === "unknown" && (yearRound === true || yearRound === false)) {
+        patch.year_round = yearRound;
+        patch.season_state = yearRound ? "year_round" : "seasonal";
+        if (seasonal) patch.seasonal_dates = seasonal;
+      }
+      if (Object.keys(patch).length === 0) continue;
+
+      patch.source_urls = Array.from(
+        new Set([...(((row.source_urls as string[] | null) ?? []) as string[]), ...evidenceUrls]),
+      );
+      patch.last_verified = new Date().toISOString().slice(0, 10);
+      await supabaseAdmin.from("hotel_pools").update(patch as never).eq("id", row.id as string);
+    }
+  }
 
   let poolRows: ExtractedPool[] = (existingPools ?? []) as unknown as ExtractedPool[];
   if (extractedPools.length > 0 && poolRows.length === 0) {
@@ -540,19 +581,47 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
       : null
     : null;
 
+  // The normalised pool records are the single source of truth: once a hotel
+  // has them, every structural pool fact on the hotel row is derived from the
+  // freshly recalculated summary rather than from AI text.
+  const { data: summary } = await supabaseAdmin
+    .from("hotel_pool_summary")
+    .select("*")
+    .eq("hotel_id", hotelId)
+    .maybeSingle();
+  const s = summary as Record<string, unknown> | null;
+  const hasRecords = !!s && poolRows.length > 0;
+  const tri = (v: unknown, yes: string, no: string) =>
+    v === yes ? true : v === no ? false : null;
+
   const update: Record<string, unknown> = {
-    pool_count: derivedSharedCount ?? mergeInt(hotel.pool_count, parsed.pool_count),
-    indoor: mergeBool(hotel.indoor, parsed.indoor),
-    outdoor: mergeBool(hotel.outdoor, parsed.outdoor),
-    rooftop: mergeBool(hotel.rooftop, parsed.rooftop),
-    infinity: mergeBool(hotel.infinity, parsed.infinity),
-    heated_pool: poolRows.length ? derivedHeated : mergeBool(hotel.heated_pool, parsed.heated_pool),
-    year_round: mergeBool(hotel.year_round, parsed.year_round),
+    pool_count: hasRecords
+      ? (s!.shared_pool_count as number)
+      : (derivedSharedCount ?? mergeInt(hotel.pool_count, parsed.pool_count)),
+    indoor: hasRecords ? !!s!.any_indoor : mergeBool(hotel.indoor, parsed.indoor),
+    outdoor: hasRecords ? !!s!.any_outdoor : mergeBool(hotel.outdoor, parsed.outdoor),
+    rooftop: hasRecords ? !!s!.any_rooftop : mergeBool(hotel.rooftop, parsed.rooftop),
+    infinity: hasRecords ? !!s!.any_infinity : mergeBool(hotel.infinity, parsed.infinity),
+    heated_pool: hasRecords
+      ? tri(s!.heated_state, "confirmed_heated", "confirmed_not_heated")
+      : poolRows.length
+        ? derivedHeated
+        : mergeBool(hotel.heated_pool, parsed.heated_pool),
+    year_round: hasRecords
+      ? tri(s!.season_state, "year_round", "seasonal")
+      : mergeBool(hotel.year_round, parsed.year_round),
     season: mergeStr(hotel.season, parsed.season),
-    children_allowed: mergeBool(hotel.children_allowed, parsed.children_allowed),
-    adults_only: mergeBool(hotel.adults_only, parsed.adults_only),
+    children_allowed: hasRecords
+      ? !!s!.any_children_allowed
+      : mergeBool(hotel.children_allowed, parsed.children_allowed),
+    adults_only: hasRecords ? !!s!.all_adults_only : mergeBool(hotel.adults_only, parsed.adults_only),
+    ...(hasRecords
+      ? { family_friendly: !s!.all_adults_only && !!s!.any_children_allowed }
+      : {}),
     guest_only: mergeBool(hotel.guest_only, parsed.guest_only),
-    day_pass_available: mergeBool(hotel.day_pass_available, parsed.day_pass_available),
+    day_pass_available: hasRecords
+      ? !!s!.any_day_pass
+      : mergeBool(hotel.day_pass_available, parsed.day_pass_available),
     pool_opening_hours: mergeStr(hotel.pool_opening_hours, parsed.pool_opening_hours),
     pool_view: mergeStr(hotel.pool_view, parsed.pool_view),
     why_included: whyIncluded,
@@ -594,17 +663,21 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
       : "partially_verified";
 
   // A confirmed shared swimming pool makes the hotel eligible for the ranking.
-  if (derivedSharedCount != null && derivedSharedCount > 0) {
+  const sharedCount = hasRecords
+    ? ((s!.shared_pool_count as number) ?? 0)
+    : derivedSharedCount;
+  if (sharedCount != null && sharedCount > 0) {
     update.pool_status = "active_pool";
     update.ranking_eligible = true;
-  } else if (derivedSharedCount === 0) {
+    update.has_active_pool = true;
+  } else if (sharedCount === 0) {
     // Research found no shared swimming pool: never keep the hotel in ranking.
     update.ranking_eligible = false;
     update.has_active_pool = false;
   }
   // Only hotels with a confirmed active swimming pool may be fully verified.
   const poolConfirmed =
-    (derivedSharedCount != null && derivedSharedCount > 0) || hotel.pool_status === "active_pool";
+    (sharedCount != null && sharedCount > 0) || hotel.pool_status === "active_pool";
   const finalStatus = poolConfirmed ? verification_status : "partially_verified";
 
   update.primary_source_url = primary;
