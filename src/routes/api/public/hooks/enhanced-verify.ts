@@ -28,6 +28,9 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
         const limit = Math.min(Number(url.searchParams.get("limit") ?? 20) || 20, 40);
         const onlyPending = url.searchParams.get("pending_only") === "1";
         const missingPools = url.searchParams.get("missing_pools") === "1";
+        // Hotels whose pools are documented but where heating or season is
+        // still unknown — the biggest remaining gap in the published data.
+        const missingFacts = url.searchParams.get("missing_facts") === "1";
         const offset = Math.max(Number(url.searchParams.get("offset") ?? 0) || 0, 0);
 
         let q = supabaseAdmin
