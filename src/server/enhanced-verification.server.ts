@@ -493,8 +493,49 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
 
   const { data: existingPools } = await supabaseAdmin
     .from("hotel_pools")
-    .select("pool_category, heated")
+    .select(
+      "id, pool_name, pool_category, heated, heating_state, season_state, year_round, source_urls",
+    )
     .eq("hotel_id", hotelId);
+
+  // When pool records already exist, fill only the gaps: heating and season
+  // states that are still unknown and for which research produced evidence.
+  if ((existingPools ?? []).length > 0 && extractedPools.length > 0) {
+    const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
+    for (const row of existingPools ?? []) {
+      const byName = extractedPools.find(
+        (p) => norm(p.pool_name) && norm(p.pool_name) === norm(row.pool_name),
+      );
+      const sameCategory = extractedPools.filter(
+        (p) => String(p.pool_category) === String(row.pool_category),
+      );
+      const match = byName ?? (sameCategory.length === 1 ? sameCategory[0] : undefined);
+      if (!match) continue;
+
+      const patch: Record<string, unknown> = {};
+      const heated = clean(match.heated as boolean | null);
+      if (row.heating_state === "unknown" && (heated === true || heated === false)) {
+        patch.heated = heated;
+        patch.heating_state = heated ? "confirmed_heated" : "confirmed_not_heated";
+        const months = clean(match.heated_months as string | null);
+        if (months) patch.heated_months = months;
+      }
+      const yearRound = clean(match.year_round as boolean | null);
+      const seasonal = clean(match.seasonal_dates as string | null);
+      if (row.season_state === "unknown" && (yearRound === true || yearRound === false)) {
+        patch.year_round = yearRound;
+        patch.season_state = yearRound ? "year_round" : "seasonal";
+        if (seasonal) patch.seasonal_dates = seasonal;
+      }
+      if (Object.keys(patch).length === 0) continue;
+
+      patch.source_urls = Array.from(
+        new Set([...(((row.source_urls as string[] | null) ?? []) as string[]), ...evidenceUrls]),
+      );
+      patch.last_verified = new Date().toISOString().slice(0, 10);
+      await supabaseAdmin.from("hotel_pools").update(patch as never).eq("id", row.id as string);
+    }
+  }
 
   let poolRows: ExtractedPool[] = (existingPools ?? []) as unknown as ExtractedPool[];
   if (extractedPools.length > 0 && poolRows.length === 0) {
