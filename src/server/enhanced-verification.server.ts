@@ -581,19 +581,47 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
       : null
     : null;
 
+  // The normalised pool records are the single source of truth: once a hotel
+  // has them, every structural pool fact on the hotel row is derived from the
+  // freshly recalculated summary rather than from AI text.
+  const { data: summary } = await supabaseAdmin
+    .from("hotel_pool_summary")
+    .select("*")
+    .eq("hotel_id", hotelId)
+    .maybeSingle();
+  const s = summary as Record<string, unknown> | null;
+  const hasRecords = !!s && poolRows.length > 0;
+  const tri = (v: unknown, yes: string, no: string) =>
+    v === yes ? true : v === no ? false : null;
+
   const update: Record<string, unknown> = {
-    pool_count: derivedSharedCount ?? mergeInt(hotel.pool_count, parsed.pool_count),
-    indoor: mergeBool(hotel.indoor, parsed.indoor),
-    outdoor: mergeBool(hotel.outdoor, parsed.outdoor),
-    rooftop: mergeBool(hotel.rooftop, parsed.rooftop),
-    infinity: mergeBool(hotel.infinity, parsed.infinity),
-    heated_pool: poolRows.length ? derivedHeated : mergeBool(hotel.heated_pool, parsed.heated_pool),
-    year_round: mergeBool(hotel.year_round, parsed.year_round),
+    pool_count: hasRecords
+      ? (s!.shared_pool_count as number)
+      : (derivedSharedCount ?? mergeInt(hotel.pool_count, parsed.pool_count)),
+    indoor: hasRecords ? !!s!.any_indoor : mergeBool(hotel.indoor, parsed.indoor),
+    outdoor: hasRecords ? !!s!.any_outdoor : mergeBool(hotel.outdoor, parsed.outdoor),
+    rooftop: hasRecords ? !!s!.any_rooftop : mergeBool(hotel.rooftop, parsed.rooftop),
+    infinity: hasRecords ? !!s!.any_infinity : mergeBool(hotel.infinity, parsed.infinity),
+    heated_pool: hasRecords
+      ? tri(s!.heated_state, "confirmed_heated", "confirmed_not_heated")
+      : poolRows.length
+        ? derivedHeated
+        : mergeBool(hotel.heated_pool, parsed.heated_pool),
+    year_round: hasRecords
+      ? tri(s!.season_state, "year_round", "seasonal")
+      : mergeBool(hotel.year_round, parsed.year_round),
     season: mergeStr(hotel.season, parsed.season),
-    children_allowed: mergeBool(hotel.children_allowed, parsed.children_allowed),
-    adults_only: mergeBool(hotel.adults_only, parsed.adults_only),
+    children_allowed: hasRecords
+      ? !!s!.any_children_allowed
+      : mergeBool(hotel.children_allowed, parsed.children_allowed),
+    adults_only: hasRecords ? !!s!.all_adults_only : mergeBool(hotel.adults_only, parsed.adults_only),
+    family_friendly: hasRecords
+      ? !s!.all_adults_only && !!s!.any_children_allowed
+      : mergeBool(hotel.family_friendly, parsed.children_allowed),
     guest_only: mergeBool(hotel.guest_only, parsed.guest_only),
-    day_pass_available: mergeBool(hotel.day_pass_available, parsed.day_pass_available),
+    day_pass_available: hasRecords
+      ? !!s!.any_day_pass
+      : mergeBool(hotel.day_pass_available, parsed.day_pass_available),
     pool_opening_hours: mergeStr(hotel.pool_opening_hours, parsed.pool_opening_hours),
     pool_view: mergeStr(hotel.pool_view, parsed.pool_view),
     why_included: whyIncluded,
