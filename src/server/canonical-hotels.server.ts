@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { validateHotelForPublication, type StatusHotel } from "@/lib/hotel-status";
 
 /**
  * The single place that reads canonical hotel + score data.
