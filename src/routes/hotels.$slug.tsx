@@ -154,9 +154,15 @@ function HotelDetailPage() {
   const { hotel, photos, quotes, pools } = Route.useLoaderData() as NonNullable<
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
-  const hero = photos[0]?.url || hotel.cover_image_url;
-  const noPool = hotel.has_active_pool === false;
-  const keyFacts: string[] = [
+  const gate = validateHotelForPublication(hotel);
+  const status = gate.status;
+  const score = gate.score;
+  const hasPool = hasConfirmedSwimmingPool(hotel);
+  const noPool = status === "no_active_pool" || !hasPool;
+  // A hotel with no confirmed pool never shows pool imagery.
+  const hero = noPool ? null : (photos[0]?.url ?? hotel.cover_image_url);
+  const poolSummary = describePoolCounts(hotel);
+  const keyFacts: string[] = noPool ? [] : [
     hotel.rooftop ? "Rooftop" : null,
     hotel.infinity ? "Infinity edge" : null,
     hotel.heated_state === "heated" ? "Heated" : null,
