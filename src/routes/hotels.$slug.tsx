@@ -385,30 +385,11 @@ function HotelDetailPage() {
                   Practical pool information
                 </p>
                 <dl className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-                  <PracticalFact label="Number of pools" value={hotel.pool_count ?? null} />
-                  <PracticalFact label="Pool type" value={hotel.pool_type} />
-                  <PracticalFact label="Pool size" value={hotel.pool_size} />
-                  <PracticalFact label="Pool depth" value={null} />
-                  <PracticalFact
-                    label="Heating"
-                    value={
-                      hotel.heated_state === "heated"
-                        ? "At least one heated pool"
-                        : hotel.heated_state === "not_heated"
-                          ? "Not heated"
-                          : null
-                    }
-                  />
-                  <PracticalFact
-                    label="Season"
-                    value={
-                      hotel.season_state === "year_round"
-                        ? "Open year-round"
-                        : hotel.season_state === "seasonal"
-                          ? (hotel.season ?? "Seasonal opening")
-                          : null
-                    }
-                  />
+                  <PracticalFact label="Pools" value={poolSummary} />
+                  <PracticalFact label="Pool type" value={publicValue(hotel.pool_type)} />
+                  <PracticalFact label="Pool size" value={publicValue(hotel.pool_size)} />
+                  <PracticalFact label="Heating" value={heatingLabel(hotel.heated_state)} />
+                  <PracticalFact label="Season" value={seasonLabel(hotel.season_state)} />
                   <PracticalFact label="Opening hours" value={hotel.pool_opening_hours} />
                   <PracticalFact
                     label="Who can use the pool"
