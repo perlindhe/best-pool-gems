@@ -60,6 +60,22 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
           candidates = candidates.filter((r) => !has.has(r.id as string));
         }
 
+        if (missingFacts) {
+          const { data: gaps } = await supabaseAdmin
+            .from("hotel_pools")
+            .select("hotel_id, heating_state, season_state");
+          const needs = new Set(
+            (gaps ?? [])
+              .filter(
+                (p) =>
+                  (p.heating_state as string) === "unknown" ||
+                  (p.season_state as string) === "unknown",
+              )
+              .map((p) => p.hotel_id as string),
+          );
+          candidates = candidates.filter((r) => needs.has(r.id as string));
+        }
+
         const targets = candidates.slice(offset, offset + limit);
         const results: unknown[] = [];
 
