@@ -71,6 +71,23 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
           try {
             const r = await autoScoreHotelById(h.id);
             const score = computePoolScore(r.components);
+            // Never persist an empty or placeholder score: a 0 total, or five
+            // identical criteria, means the evidence was not good enough to
+            // rate. Those hotels must stay "pending editorial review" instead
+            // of showing a fabricated number.
+            const values = Object.values(r.components ?? {}).map(Number);
+            const isPlaceholder =
+              !(score > 0) || (values.length > 1 && new Set(values).size === 1);
+            if (isPlaceholder) {
+              results.push({
+                id: h.id,
+                name: h.name,
+                ok: false,
+                error: "insufficient_evidence_for_score",
+              });
+              await new Promise((res) => setTimeout(res, 400));
+              continue;
+            }
             const { error: upErr } = await supabaseAdmin
               .from("pool_scores")
               .upsert(
