@@ -254,68 +254,29 @@ function HotelDetailPage() {
       {/* Data status box — what we know and how well it is documented */}
       <section className="mx-auto max-w-6xl px-6 pt-10">
         <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">Data status</p>
-          <dl className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
-            <PracticalFact
-              label="Verification"
-              value={
-                hotel.verification_status === "verified"
-                  ? "Fully verified"
-                  : hotel.verification_status === "partially_verified"
-                    ? "Partially verified"
-                    : "Research pending"
-              }
-            />
-            <PracticalFact
-              label="Swimming pools documented"
-              value={noPool ? "No pool found" : (hotel.shared_pool_count ?? 0).toString()}
-            />
-            <PracticalFact
-              label="Heating"
-              value={
-                hotel.heated_state === "heated"
-                  ? "Confirmed heated"
-                  : hotel.heated_state === "not_heated"
-                    ? "Confirmed not heated"
-                    : null
-              }
-            />
-            <PracticalFact
-              label="Season"
-              value={
-                hotel.season_state === "year_round"
-                  ? "Year-round"
-                  : hotel.season_state === "seasonal"
-                    ? "Seasonal"
-                    : null
-              }
-            />
-            <PracticalFact label="Last checked" value={hotel.last_verified_date} />
-            <PracticalFact label="Checked by" value={hotel.verified_by} />
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">
+            {STATUS_COPY[status].label}
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-foreground/90">
+            {STATUS_COPY[status].sentence}
+          </p>
+          <dl className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+            {!noPool && (
+              <PracticalFact label="Pools documented" value={poolSummary} />
+            )}
+            {!noPool && <PracticalFact label="Heating" value={heatingLabel(hotel.heated_state)} />}
+            {!noPool && <PracticalFact label="Season" value={seasonLabel(hotel.season_state)} />}
+            <PracticalFact label="Last checked" value={publicValue(hotel.last_verified_date)} />
+            <PracticalFact label="Checked by" value={publicValue(hotel.verified_by)} />
             <PracticalFact
               label="Pool Score"
-              value={
-                hasCompletePoolScore(
-                  hotel.pool_components,
-                  hotel.pool_score_0_10,
-                  hotel.verification_status,
-                  hotel.has_active_pool,
-                )
-                  ? `${hotel.pool_score_0_10?.toFixed(1)} / 10`
-                  : "Pending editorial review"
-              }
+              value={score != null ? `${score.toFixed(1)} / 10` : SCORE_PENDING_LABEL}
             />
             <PracticalFact
               label="Included in rankings"
-              value={hotel.ranking_eligible === false ? "No — pool not confirmed" : "Yes"}
+              value={gate.can_rank ? "Yes" : "No"}
             />
           </dl>
-          {noPool && (
-            <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-              We have found no swimming pool at this hotel. The profile stays online for
-              transparency, but it is excluded from rankings and from search results.
-            </p>
-          )}
         </div>
       </section>
 
