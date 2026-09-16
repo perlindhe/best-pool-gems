@@ -36,7 +36,7 @@ const summary = (h: CardHotel) => {
 export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
   const photoUrl = hotel.hero_photo_url ?? hotel.cover_image_url ?? null;
   const bookingUrl = hotel.affiliate_url ?? hotel.booking_url ?? null;
-  const scored = hasCompletePoolScore(hotel.pool_components, hotel.pool_score_0_10, hotel.verification_status);
+  const score = calculatePoolScore(hotel);
   const blurb = summary(hotel);
 
   return (
@@ -74,13 +74,11 @@ export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
                 {hotel.name}
               </Link>
             </h3>
-            {scored ? (
-              <span className="font-display text-2xl text-primary">
-                {hotel.pool_score_0_10!.toFixed(1)}
-              </span>
+            {score != null ? (
+              <span className="font-display text-2xl text-primary">{score.toFixed(1)}</span>
             ) : (
               <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Pool Score pending editorial review
+                {SCORE_PENDING_LABEL}
               </span>
             )}
           </div>
