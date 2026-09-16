@@ -3,16 +3,7 @@
  * Usage: bun scripts/qa-testgroup.mjs
  * Requires SUPABASE env vars from .env (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY).
  */
-import { readFileSync } from "node:fs";
-
-const env = Object.fromEntries(
-  readFileSync(".env", "utf8")
-    .split("\n")
-    .filter((l) => l.includes("="))
-    .map((l) => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim().replace(/^["']|["']$/g, "")]),
-);
-const URL_ = env.VITE_SUPABASE_URL;
-const KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY;
+import { execFileSync } from "node:child_process";
 
 const SLUGS = [
   "sydney-hyatt-regency-sydney","sydney-park-hyatt-sydney","sydney-w-sydney","sydney-intercontinental-sydney",
@@ -22,18 +13,20 @@ const SLUGS = [
   "london-bvlgari-hotel-london","barcelona-grand-hotel-central","los-angeles-the-hollywood-roosevelt","porto-elounda-golf-spa-resort",
 ];
 
-const rest = async (path) => {
-  const res = await fetch(`${URL_}/rest/v1/${path}`, {
-    headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
-  });
-  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
-  return res.json();
-};
+const sql = (q) =>
+  JSON.parse(
+    execFileSync("psql", ["-tAc", `select coalesce(json_agg(t),'[]') from (${q}) t`], {
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+    }).trim(),
+  );
 
-const inList = `in.(${SLUGS.join(",")})`;
-const hotels = await rest(`public_hotels_view?slug=${inList}&select=*`);
-const ids = hotels.map((h) => h.id);
-const pools = await rest(`hotel_pools?hotel_id=in.(${ids.join(",")})&select=*`);
+const list = SLUGS.map((s) => `'${s}'`).join(",");
+const hotels = sql(`select * from public.public_hotels_view where slug in (${list})`);
+const ids = hotels.map((h) => `'${h.id}'`).join(",");
+const pools = ids.length
+  ? sql(`select * from public.hotel_pools where hotel_id in (${ids})`)
+  : [];
 const poolsOf = (id) => pools.filter((p) => p.hotel_id === id);
 
 let failed = 0;
