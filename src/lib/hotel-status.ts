@@ -136,7 +136,7 @@ function hasApprovedSubscores(h: StatusHotel): boolean {
 /** Two published values that cannot both be true. */
 export function detectConflicts(h: StatusHotel): string[] {
   const conflicts: string[] = [];
-  const shared = n(h.shared_pool_count) + n(h.swim_up_count);
+  const shared = n(h.shared_pool_count);
   if (!hasConfirmedSwimmingPool(h) && (n(h.pool_count) > 0 || shared > 0))
     conflicts.push("No confirmed swimming pool but a pool count above zero");
   if (h.heated_state === "not_heated" && h.heated_pool === true)
