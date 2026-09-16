@@ -597,6 +597,10 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
   if (derivedSharedCount != null && derivedSharedCount > 0) {
     update.pool_status = "active_pool";
     update.ranking_eligible = true;
+  } else if (derivedSharedCount === 0) {
+    // Research found no shared swimming pool: never keep the hotel in ranking.
+    update.ranking_eligible = false;
+    update.has_active_pool = false;
   }
   // Only hotels with a confirmed active swimming pool may be fully verified.
   const poolConfirmed =
