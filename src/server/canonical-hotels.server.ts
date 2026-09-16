@@ -99,26 +99,9 @@ export type CanonicalHotel = {
  * QA and with a complete five-criteria Pool Score. Used for indexing, sitemap,
  * ranking lists and the verified counter — so every page agrees.
  */
-export function isIndexableHotel(h: {
-  verification_status: string;
-  editorial_status?: string | null;
-  qa_blocked?: boolean | null;
-  primary_source_url?: string | null;
-  secondary_source_url?: string | null;
-  ranking_eligible?: boolean | null;
-  pool_status?: string | null;
-  pool_score_0_10?: number | null;
-}) {
-  const hasActivePool =
-    h.ranking_eligible !== false && (h.pool_status ?? "active_pool") === "active_pool";
-  const hasScore = h.pool_score_0_10 == null ? true : h.pool_score_0_10 > 0;
-  return (
-    h.verification_status === "verified" &&
-    (h.editorial_status ?? "published") === "published" &&
-    h.qa_blocked !== true &&
-    hasActivePool &&
-    hasScore
-  );
+export function isIndexableHotel(h: StatusHotel & { editorial_status?: string | null }) {
+  if ((h.editorial_status ?? "published") !== "published") return false;
+  return validateHotelForPublication(h).can_index;
 }
 
 /**

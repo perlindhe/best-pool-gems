@@ -180,7 +180,7 @@ function HotelDetailPage() {
     hotel.pool_view ? `${hotel.pool_view} view` : null,
     hotel.pool_count && hotel.pool_count > 1 ? `${hotel.pool_count} pools` : null,
   ].filter((f): f is string => Boolean(f));
-  const gallery = photos.slice(1, 19);
+  const gallery = noPool ? [] : photos.slice(1, 19);
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
   const tripadvisor = sources.find((s) => s.source === "tripadvisor");
@@ -588,7 +588,7 @@ function HotelDetailPage() {
                     })
                   : "Not yet verified — we are still checking this property."}
               </p>
-              {hotel.why_included && (
+              {!noPool && hotel.why_included && (
                 <>
                   <p className="mt-5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                     Why it's on the list
