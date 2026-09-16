@@ -615,9 +615,9 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
       ? !!s!.any_children_allowed
       : mergeBool(hotel.children_allowed, parsed.children_allowed),
     adults_only: hasRecords ? !!s!.all_adults_only : mergeBool(hotel.adults_only, parsed.adults_only),
-    family_friendly: hasRecords
-      ? !s!.all_adults_only && !!s!.any_children_allowed
-      : mergeBool(hotel.family_friendly, parsed.children_allowed),
+    ...(hasRecords
+      ? { family_friendly: !s!.all_adults_only && !!s!.any_children_allowed }
+      : {}),
     guest_only: mergeBool(hotel.guest_only, parsed.guest_only),
     day_pass_available: hasRecords
       ? !!s!.any_day_pass
