@@ -147,16 +147,9 @@ export function detectConflicts(h: StatusHotel): string[] {
     conflicting(conflicts, "Marked both adults only and family friendly");
   if (h.indoor === false && h.outdoor === false && shared > 0)
     conflicting(conflicts, "A pool is recorded as neither indoor nor outdoor");
-  if (
-    h.pool_count != null &&
-    h.pool_count !==
-      n(h.shared_pool_count) +
-        n(h.swim_up_count) +
-        n(h.spa_pool_count) +
-        n(h.kids_pool_count) +
-        n(h.plunge_pool_count) +
-        n(h.private_pool_count)
-  )
+  // pool_count is the number of shared swimming pools only — spa, children's,
+  // plunge, private pools and jacuzzis are always counted separately.
+  if (h.pool_count != null && h.pool_count !== shared)
     conflicting(conflicts, "The pool count cannot be explained by the pool records");
   return conflicts;
 }

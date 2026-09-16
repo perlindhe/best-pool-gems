@@ -75,12 +75,9 @@ test("12. Scores are not five identical criteria", (h) => {
   return v.length < 2 || new Set(v).size > 1;
 });
 
-test("13. Pool count is explained by the category records", (h) => {
-  const sum =
-    (h.shared_pool_count ?? 0) + (h.swim_up_count ?? 0) + (h.spa_pool_count ?? 0) +
-    (h.kids_pool_count ?? 0) + (h.plunge_pool_count ?? 0) + (h.private_pool_count ?? 0);
-  return h.pool_count == null || h.pool_count === sum;
-});
+test("13. Pool count equals the shared swimming pool records only", (h) =>
+  h.pool_count == null ||
+  h.pool_count === (h.shared_pool_count ?? 0) + (h.swim_up_count ?? 0));
 test("14. A fully verified profile has an official source", (h) =>
   h.verification_status !== "verified" || Boolean(h.official_url || h.primary_source_url));
 test("15. A fully verified profile has a verification date", (h) =>
