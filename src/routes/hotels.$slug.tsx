@@ -308,7 +308,8 @@ function HotelDetailPage() {
         </div>
       </section>
 
-      {/* Heated pool spotlight */}
+      {/* Heated pool spotlight — never shown without a confirmed pool */}
+      {!noPool && (
       <HeatedPoolPanel
         hotelName={hotel.name}
         heated={hotel.heated_pool}
@@ -323,6 +324,7 @@ function HotelDetailPage() {
         lastVerifiedDate={hotel.last_verified_date}
         officialUrl={hotel.official_url ?? hotel.website_url}
       />
+      )}
 
       {/* Facts + text on the left, gallery on the right */}
       <section className="mx-auto max-w-7xl px-6 pb-16">
@@ -361,10 +363,9 @@ function HotelDetailPage() {
                   }}
                   heatedState={hotel.heated_state}
                 />
-                {pools.length === 0 && noPool && (
+                {noPool && (
                   <p className="text-sm text-muted-foreground">
-                    We have found no swimming pool at this hotel. It is therefore not ranked and
-                    carries no Pool Score.
+                    {STATUS_COPY.no_active_pool.sentence}
                   </p>
                 )}
                 {pools.length === 0 && !noPool && (
