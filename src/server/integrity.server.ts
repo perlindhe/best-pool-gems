@@ -440,8 +440,28 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
     const sharedCount = pools.filter(
       (p) =>
         p.shared_or_private === "shared" &&
-        ["shared_hotel_pool", "shared_swim_up", "plunge_pool"].includes(p.pool_category),
+        ["shared_hotel_pool", "shared_swim_up"].includes(p.pool_category),
     ).length;
+
+    // A hotel with no shared swimming pool must never be ranked or scored.
+    if (sharedCount === 0 && st?.ranking_eligible) {
+      push(
+        "No confirmed pool but ranked",
+        "critical",
+        r,
+        "No shared swimming pool is documented, yet the hotel is still ranking eligible.",
+      );
+    }
+    // Generic or foreign pool names are a sign of bad imports.
+    for (const p of pools) {
+      const nm = (p.pool_name ?? "").trim();
+      if (/^outdoor pool \d+$|^pool \d+$/i.test(nm)) {
+        push("Generic pool name", "warning", r, `Pool record "${nm}" has no real name.`);
+      }
+      if (nm && !nm.toLowerCase().includes("pool") && nm.length < 3) {
+        push("Generic pool name", "warning", r, `Pool record "${nm}" looks incomplete.`);
+      }
+    }
 
     if (pools.length === 0) {
       push("No pool records", "warning", r, "No individual pool records exist for this hotel yet.");
