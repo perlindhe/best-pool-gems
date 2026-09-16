@@ -39,10 +39,33 @@ const TEST_GROUP = [
   "porto-elounda-golf-spa-resort",
 ];
 
+type Scope =
+  | "test"
+  | "all"
+  | "errors"
+  | "conflicting"
+  | "partial"
+  | "pending"
+  | "no_pool"
+  | "hidden_score"
+  | "no_source";
+
+const SCOPES: Array<{ key: Scope; label: string }> = [
+  { key: "test", label: "Test group (20)" },
+  { key: "errors", label: "Blocking errors" },
+  { key: "conflicting", label: "Conflicting" },
+  { key: "partial", label: "Partially verified" },
+  { key: "pending", label: "Research pending" },
+  { key: "no_pool", label: "No pool" },
+  { key: "hidden_score", label: "Score hidden" },
+  { key: "no_source", label: "Missing official source" },
+  { key: "all", label: "All hotels" },
+];
+
 function QaPage() {
   const [rows, setRows] = useState<QaRow[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [scope, setScope] = useState<"test" | "all" | "problems">("test");
+  const [scope, setScope] = useState<Scope>("test");
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -54,8 +77,13 @@ function QaPage() {
   const visible = useMemo(() => {
     let list = rows;
     if (scope === "test") list = list.filter((r) => TEST_GROUP.includes(r.slug));
-    if (scope === "problems")
-      list = list.filter((r) => r.qa_blocked || r.missing.length > 0);
+    if (scope === "errors") list = list.filter((r) => r.errors.length > 0);
+    if (scope === "conflicting") list = list.filter((r) => r.status === "conflicting_data");
+    if (scope === "partial") list = list.filter((r) => r.status === "partially_verified");
+    if (scope === "pending") list = list.filter((r) => r.status === "research_pending");
+    if (scope === "no_pool") list = list.filter((r) => r.status === "no_active_pool");
+    if (scope === "hidden_score") list = list.filter((r) => r.score == null);
+    if (scope === "no_source") list = list.filter((r) => !r.official_url);
     if (query.trim())
       list = list.filter((r) =>
         `${r.name} ${r.city} ${r.slug}`.toLowerCase().includes(query.toLowerCase()),
@@ -80,7 +108,7 @@ function QaPage() {
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-3 text-xs">
-          {(["test", "problems", "all"] as const).map((k) => (
+          {SCOPES.map(({ key: k, label }) => (
             <button
               key={k}
               onClick={() => setScope(k)}
@@ -88,7 +116,7 @@ function QaPage() {
                 scope === k ? "bg-primary text-primary-foreground" : "border border-border"
               }`}
             >
-              {k === "test" ? "Test group (20)" : k === "problems" ? "Needs work" : "All hotels"}
+              {label}
             </button>
           ))}
           <input
@@ -107,7 +135,7 @@ function QaPage() {
             <thead className="bg-surface text-muted-foreground">
               <tr className="text-left">
                 <th className="p-2">Hotel</th>
-                <th className="p-2">Verification</th>
+                <th className="p-2">Status</th>
                 <th className="p-2">Pool status</th>
                 <th className="p-2">Shared</th>
                 <th className="p-2">Spa</th>
@@ -119,7 +147,10 @@ function QaPage() {
                 <th className="p-2">Score</th>
                 <th className="p-2">Ranked</th>
                 <th className="p-2">Checked</th>
+                <th className="p-2">Sources</th>
+                <th className="p-2">Index</th>
                 <th className="p-2">Missing</th>
+                <th className="p-2">Blocking errors</th>
               </tr>
             </thead>
             <tbody>
@@ -136,7 +167,7 @@ function QaPage() {
                     </a>
                     <div className="text-muted-foreground">{r.city}</div>
                   </td>
-                  <td className="p-2">{r.verification_status}</td>
+                  <td className="p-2">{r.status.replace(/_/g, " ")}</td>
                   <td className="p-2">
                     {r.pool_status}
                     {r.qa_blocked ? " · blocked" : ""}
@@ -151,7 +182,16 @@ function QaPage() {
                   <td className="p-2">{r.score != null ? r.score.toFixed(1) : "—"}</td>
                   <td className="p-2">{r.ranking_eligible === false ? "no" : "yes"}</td>
                   <td className="p-2">{r.last_verified_date ?? "—"}</td>
+                  <td className="p-2">
+                    {r.official_url ? "official" : "—"}
+                    {r.secondary_source_url ? " + second" : ""}
+                  </td>
+                  <td className="p-2">
+                    {r.can_index ? "index" : "noindex"}
+                    {r.in_sitemap ? " · sitemap" : ""}
+                  </td>
                   <td className="p-2 text-muted-foreground">{r.missing.join(", ") || "—"}</td>
+                  <td className="p-2 text-destructive">{r.errors.join("; ") || "—"}</td>
                 </tr>
               ))}
             </tbody>
