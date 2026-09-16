@@ -10,7 +10,18 @@ import { VerificationMethodBadge, verificationMethodDetail } from "@/components/
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
 import { PoolSentimentPanel } from "@/components/PoolSentimentPanel";
 import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
-import { hasCompletePoolScore } from "@/lib/scoring";
+import {
+  validateHotelForPublication,
+  calculateVerificationStatus,
+  calculatePoolScore,
+  describePoolCounts,
+  hasConfirmedSwimmingPool,
+  heatingLabel,
+  seasonLabel,
+  publicValue,
+  STATUS_COPY,
+  SCORE_PENDING_LABEL,
+} from "@/lib/hotel-status";
 import { SectionHeading, SectionIcon } from "@/components/SectionHeading";
 import {
   Waves,
