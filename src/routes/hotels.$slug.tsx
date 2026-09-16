@@ -214,10 +214,7 @@ function HotelDetailPage() {
 
           {/* Trust + key pool facts, above the fold */}
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <VerificationBadge
-              status={hotel.verification_status}
-              date={hotel.last_verified_date}
-            />
+            <VerificationBadge hotel={hotel} />
             {hotel.verification_method && hotel.verification_method !== "research_pending" && (
               <VerificationMethodBadge method={hotel.verification_method} />
             )}

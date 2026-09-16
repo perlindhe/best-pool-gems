@@ -89,10 +89,7 @@ export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-foreground/90">{blurb}</p>
           )}
           <div className="mt-5 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em]">
-            <VerificationBadge
-              status={hotel.verification_status}
-              date={hotel.last_verified_date}
-            />
+            <VerificationBadge hotel={hotel} />
             {hotel.meta_rating_0_100 != null && (
               <span className="text-muted-foreground">
                 Meta rating {(hotel.meta_rating_0_100 / 10).toFixed(1)}/10
