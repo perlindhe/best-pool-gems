@@ -663,17 +663,21 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
       : "partially_verified";
 
   // A confirmed shared swimming pool makes the hotel eligible for the ranking.
-  if (derivedSharedCount != null && derivedSharedCount > 0) {
+  const sharedCount = hasRecords
+    ? ((s!.shared_pool_count as number) ?? 0)
+    : derivedSharedCount;
+  if (sharedCount != null && sharedCount > 0) {
     update.pool_status = "active_pool";
     update.ranking_eligible = true;
-  } else if (derivedSharedCount === 0) {
+    update.has_active_pool = true;
+  } else if (sharedCount === 0) {
     // Research found no shared swimming pool: never keep the hotel in ranking.
     update.ranking_eligible = false;
     update.has_active_pool = false;
   }
   // Only hotels with a confirmed active swimming pool may be fully verified.
   const poolConfirmed =
-    (derivedSharedCount != null && derivedSharedCount > 0) || hotel.pool_status === "active_pool";
+    (sharedCount != null && sharedCount > 0) || hotel.pool_status === "active_pool";
   const finalStatus = poolConfirmed ? verification_status : "partially_verified";
 
   update.primary_source_url = primary;
