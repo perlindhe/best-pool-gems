@@ -489,6 +489,17 @@ export async function runIntegrityChecks(options: { checkLinks?: boolean } = {})
       }
     }
 
+    if (pools.length > 0) {
+      const anyIndoor = pools.some((p) => p.indoor === true);
+      const anyOutdoor = pools.some((p) => p.outdoor === true);
+      if (r.indoor === true && !anyIndoor) {
+        push("Indoor conflict", "critical", r, "Marked as having an indoor pool, but no pool record is indoor.");
+      }
+      if (r.outdoor === true && !anyOutdoor) {
+        push("Outdoor conflict", "critical", r, "Marked as having an outdoor pool, but no pool record is outdoor.");
+      }
+    }
+
     const anyHeated = pools.some((p) => p.heated === true);
     if (r.heated_pool === true && pools.length > 0 && !anyHeated) {
       push(
