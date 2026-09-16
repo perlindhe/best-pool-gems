@@ -293,8 +293,18 @@ export function describePoolCounts(h: StatusHotel): string | null {
   const add = (count: number, one: string, many: string) => {
     if (count > 0) parts.push(`${count} ${count === 1 ? one : many}`);
   };
-  add(n(h.shared_pool_count), "shared swimming pool", "shared swimming pools");
-  
+  const sharedTotal = n(h.shared_pool_count);
+  const swimUp = Math.min(n(h.swim_up_count), sharedTotal);
+  if (sharedTotal > 0) {
+    // swim-up pools are part of the shared total, never an extra pool
+    const suffix =
+      swimUp > 0
+        ? ` (${swimUp === sharedTotal ? (swimUp === 1 ? "a swim-up pool" : "all swim-up pools") : `${swimUp} of them swim-up`})`
+        : "";
+    parts.push(
+      `${sharedTotal} ${sharedTotal === 1 ? "shared swimming pool" : "shared swimming pools"}${suffix}`,
+    );
+  }
   add(n(h.kids_pool_count), "children's pool", "children's pools");
   add(n(h.plunge_pool_count), "plunge pool", "plunge pools");
   add(n(h.spa_pool_count), "spa pool", "spa pools");
