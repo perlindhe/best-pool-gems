@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { automationBlockedReason } from "@/lib/automation-pause";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { verifyHotelHasPool } from "@/server/pool-verification.server";
 
@@ -26,6 +27,8 @@ export const Route = createFileRoute("/api/public/hooks/verify-pool-existence")(
         }
 
         const url = new URL(request.url);
+        const blocked = automationBlockedReason(url.searchParams.get("hotel_slug"));
+        if (blocked) return json({ error: blocked, paused: true }, 423);
         const force = url.searchParams.get("force") === "1";
         const onlyHotelId = url.searchParams.get("hotel_id");
 
