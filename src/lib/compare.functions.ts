@@ -39,7 +39,7 @@ export const getHotelsForCompare = createServerFn({ method: "GET" })
       .from("public_hotels_view")
       .select("*")
       .in("slug", data.slugs)
-      .eq("is_published", true);
+      ;
     if (error) throw new Error(error.message);
 
     const ids = (rows ?? []).map((r) => r.id as string);
