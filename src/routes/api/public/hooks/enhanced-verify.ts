@@ -28,6 +28,9 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
         const limit = Math.min(Number(url.searchParams.get("limit") ?? 20) || 20, 40);
         const onlyPending = url.searchParams.get("pending_only") === "1";
         const missingPools = url.searchParams.get("missing_pools") === "1";
+        // Hotels whose pools are documented but where heating or season is
+        // still unknown — the biggest remaining gap in the published data.
+        const missingFacts = url.searchParams.get("missing_facts") === "1";
         const offset = Math.max(Number(url.searchParams.get("offset") ?? 0) || 0, 0);
 
         let q = supabaseAdmin
@@ -55,6 +58,22 @@ export const Route = createFileRoute("/api/public/hooks/enhanced-verify")({
             .in("hotel_id", candidates.map((r) => r.id as string));
           const has = new Set((withPools ?? []).map((p) => p.hotel_id as string));
           candidates = candidates.filter((r) => !has.has(r.id as string));
+        }
+
+        if (missingFacts) {
+          const { data: gaps } = await supabaseAdmin
+            .from("hotel_pools")
+            .select("hotel_id, heating_state, season_state");
+          const needs = new Set(
+            (gaps ?? [])
+              .filter(
+                (p) =>
+                  (p.heating_state as string) === "unknown" ||
+                  (p.season_state as string) === "unknown",
+              )
+              .map((p) => p.hotel_id as string),
+          );
+          candidates = candidates.filter((r) => needs.has(r.id as string));
         }
 
         const targets = candidates.slice(offset, offset + limit);
