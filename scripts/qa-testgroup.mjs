@@ -1,7 +1,8 @@
 /**
- * Acceptance tests for the data-correction test group (20 hotels).
- * Usage: bun scripts/qa-testgroup.mjs
- * Requires SUPABASE env vars from .env (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY).
+ * Acceptance tests for the pool-data correction.
+ * Usage: bun scripts/qa-testgroup.mjs            (20-hotel test group)
+ *        bun scripts/qa-testgroup.mjs --all      (every published hotel)
+ * Reads the database directly via psql.
  */
 import { execFileSync } from "node:child_process";
 
@@ -21,12 +22,19 @@ const sql = (q) =>
     }).trim(),
   );
 
+const ALL = process.argv.includes("--all");
 const list = SLUGS.map((s) => `'${s}'`).join(",");
-const hotels = sql(`select * from public.public_hotels_view where slug in (${list})`);
+const hotels = sql(
+  ALL
+    ? `select * from public.public_hotels_view`
+    : `select * from public.public_hotels_view where slug in (${list})`,
+);
 const ids = hotels.map((h) => `'${h.id}'`).join(",");
-const pools = ids.length
-  ? sql(`select * from public.hotel_pools where hotel_id in (${ids})`)
-  : [];
+const pools = ALL
+  ? sql(`select * from public.hotel_pools`)
+  : ids.length
+    ? sql(`select * from public.hotel_pools where hotel_id in (${ids})`)
+    : [];
 const poolsOf = (id) => pools.filter((p) => p.hotel_id === id);
 
 let failed = 0;
@@ -40,10 +48,10 @@ const test = (name, fn) => {
     }
   }
   if (bad.length) failed++;
-  console.log(`${bad.length ? "FAIL" : "ok  "} ${name}${bad.length ? " → " + bad.join(", ") : ""}`);
+  console.log(`${bad.length ? "FAIL" : "ok  "} ${name}${bad.length ? ` (${bad.length}) → ` + bad.slice(0, 12).join(", ") : ""}`);
 };
 
-test("1. All 20 hotels resolve", () => hotels.length === SLUGS.length);
+test("1. All hotels resolve", () => (ALL ? hotels.length > 0 : hotels.length === SLUGS.length));
 test("2. Pool count equals shared swimming pool records", (h, p) =>
   h.shared_pool_count === p.filter((x) => x.shared_or_private === "shared" && ["shared_hotel_pool","shared_swim_up"].includes(x.pool_category)).length);
 test("3. Jacuzzis never counted as swimming pools", (h, p) =>
