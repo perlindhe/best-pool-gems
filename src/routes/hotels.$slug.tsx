@@ -61,17 +61,12 @@ export const Route = createFileRoute("/hotels/$slug")({
     const url = `https://bestpoolhotels.com/hotels/${params.slug}`;
     // Index control: only a fully verified, published profile may be indexed.
     // Everything else stays reachable for visitors but is kept out of search.
-    const status = hotel.editorial_status;
-    const finished =
-      hotel.verification_status === "verified" &&
-      status === "published" &&
-      hotel.ranking_eligible !== false &&
-      hotel.has_active_pool === true &&
-      hotel.pool_status === "active_pool";
+    const editorial = hotel.editorial_status;
+    const gate = validateHotelForPublication(hotel);
     const robots =
-      status === "draft" || status === "review"
+      editorial === "draft" || editorial === "review"
         ? "noindex, nofollow"
-        : finished
+        : gate.can_index
           ? "index, follow"
           : "noindex, follow";
     // No AggregateRating: the ratings shown here come from third parties and
