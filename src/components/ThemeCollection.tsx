@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { CheckAvailability } from "@/components/BookingCTA";
-import { hasCompletePoolScore } from "@/lib/scoring";
+import { calculatePoolScore } from "@/lib/hotel-status";
 import type { RankedHotel } from "@/lib/rankings.functions";
 import type { PoolTheme } from "@/lib/pool-themes";
 
@@ -47,9 +47,7 @@ export function ThemeCollection({
           </p>
         ) : (
           hotels.map((h, i) => {
-            const score = hasCompletePoolScore(h.pool_components, h.pool_score_0_10, h.verification_status)
-              ? h.pool_score_0_10
-              : null;
+            const score = calculatePoolScore(h);
             return (
               <article
                 key={h.id}
@@ -76,7 +74,7 @@ export function ThemeCollection({
                 </p>
                 <div className="mt-4">
                   <VerificationBadge
-                    status={h.verification_status}
+                    hotel={h}
                     date={h.last_verified_date ?? h.pool_score_updated_at}
                   />
                 </div>

@@ -36,12 +36,10 @@ export const getHotelsForCompare = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabaseAdmin
-      .from("hotels")
-      .select(
-        "id, slug, name, city, city_slug, neighborhood, cover_image_url, pool_type, pool_setting, view_type, pool_size, best_time_to_visit, heated_pool, year_round, season, guest_only, day_pass_available, price_from_eur, vibe, tags, editorial_notes, website_url, booking_url",
-      )
+      .from("public_hotels_view")
+      .select("*")
       .in("slug", data.slugs)
-      .eq("is_published", true);
+      ;
     if (error) throw new Error(error.message);
 
     const ids = (rows ?? []).map((r) => r.id as string);
@@ -49,17 +47,17 @@ export const getHotelsForCompare = createServerFn({ method: "GET" })
       supabaseAdmin.from("pool_scores").select("hotel_id, pool_score_0_10, components").in("hotel_id", ids),
       supabaseAdmin.from("meta_scores").select("hotel_id, meta_rating_0_100").in("hotel_id", ids),
     ]);
-    const { hasCompletePoolScore } = await import("@/lib/scoring");
-    // Only surface a Pool Score when all five criteria are individually scored.
+    const { calculatePoolScore } = await import("@/lib/hotel-status");
+    // One gate: the score shown here is the same one the profile shows.
+    const byId = new Map((rows ?? []).map((r) => [r.id as string, r]));
     const poolMap = new Map(
       (pool ?? []).map((p) => [
         p.hotel_id as string,
-        hasCompletePoolScore(
-          p.components as Record<string, number> | null,
-          p.pool_score_0_10 as number | null,
-        )
-          ? (p.pool_score_0_10 as number | null)
-          : null,
+        calculatePoolScore({
+          ...(byId.get(p.hotel_id as string) as Record<string, unknown>),
+          pool_components: p.components as Record<string, number> | null,
+          pool_score_0_10: p.pool_score_0_10 as number | null,
+        }),
       ]),
     );
     const metaMap = new Map((meta ?? []).map((m) => [m.hotel_id as string, m.meta_rating_0_100 as number | null]));

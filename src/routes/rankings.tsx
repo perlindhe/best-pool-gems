@@ -5,7 +5,7 @@ import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { listRankedHotels, listRankingFacets, type RankedHotel } from "@/lib/rankings.functions";
-import { hasCompletePoolScore } from "@/lib/scoring";
+import { calculatePoolScore } from "@/lib/hotel-status";
 
 const PAGE_SIZE = 24;
 
@@ -283,9 +283,7 @@ function RankingsPage() {
 
 function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) {
   // A score only shows when all five criteria are individually assessed.
-  const pool = hasCompletePoolScore(hotel.pool_components, hotel.pool_score_0_10, hotel.verification_status)
-    ? hotel.pool_score_0_10
-    : null;
+  const pool = calculatePoolScore(hotel);
   const meta = hotel.meta_rating_0_100;
   const sources = hotel.sources_used ?? [];
   const google = sources.find((s) => s.source === "google");
@@ -371,7 +369,7 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
         </div>
 
         <VerificationBadge
-          status={hotel.verification_status}
+          hotel={hotel}
           date={hotel.last_verified_date ?? hotel.pool_score_updated_at}
         />
 

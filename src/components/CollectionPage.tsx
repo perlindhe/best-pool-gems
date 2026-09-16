@@ -115,10 +115,7 @@ export function CollectionPage({
                       </p>
                     )}
                     <div className="mt-4 flex flex-wrap items-center gap-3">
-                      <VerificationBadge
-                        status={h.verification_status}
-                        date={h.last_verified_date}
-                      />
+                      <VerificationBadge hotel={h} date={h.last_verified_date} />
                       {h.season && (
                         <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                           {h.season}

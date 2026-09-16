@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { automationBlockedReason } from "@/lib/automation-pause";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { autoScoreHotelById } from "@/server/auto-score.server";
 import { computePoolScore } from "@/lib/scoring";
@@ -27,6 +28,8 @@ export const Route = createFileRoute("/api/public/hooks/auto-score-all")({
         }
 
         const url = new URL(request.url);
+        const blocked = automationBlockedReason(url.searchParams.get("hotel_slug"));
+        if (blocked) return json({ error: blocked, paused: true }, 423);
         const limit = Math.min(
           Math.max(parseInt(url.searchParams.get("limit") ?? "10", 10) || 10, 1),
           50,

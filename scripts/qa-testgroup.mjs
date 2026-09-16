@@ -75,5 +75,19 @@ test("12. Scores are not five identical criteria", (h) => {
   return v.length < 2 || new Set(v).size > 1;
 });
 
-console.log(`\n${12 - failed}/12 checks passed`);
+test("13. Pool count equals the shared swimming pool records only", (h) =>
+  h.pool_count == null ||
+  h.pool_count === (h.shared_pool_count ?? 0) + (h.swim_up_count ?? 0));
+test("14. A fully verified profile has an official source", (h) =>
+  h.verification_status !== "verified" || Boolean(h.official_url || h.primary_source_url));
+test("15. A fully verified profile has a verification date", (h) =>
+  h.verification_status !== "verified" || Boolean(h.last_verified_date));
+test("16. Verification dates are never in the future", (h) =>
+  !h.last_verified_date || h.last_verified_date <= new Date().toISOString().slice(0, 10));
+test("17. Adults-only and family-friendly are never both true", (h) =>
+  !(h.adults_only === true && h.family_friendly === true));
+test("18. No pool → excluded from index and score", (h) =>
+  h.has_active_pool !== false || (h.ranking_eligible === false && h.pool_score_0_10 == null));
+
+console.log(`\n${18 - failed}/18 checks passed`);
 process.exit(failed ? 1 : 0);

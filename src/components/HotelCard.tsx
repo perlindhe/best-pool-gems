@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { HotelImage } from "@/components/HotelImage";
 import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
-import { hasCompletePoolScore } from "@/lib/scoring";
+import { calculatePoolScore, SCORE_PENDING_LABEL, type StatusHotel } from "@/lib/hotel-status";
 
 /** Canonical record fields a listing card needs. One hotel = one record. */
-export type CardHotel = {
+export type CardHotel = StatusHotel & {
   id: string;
   slug: string;
   name: string;
@@ -36,7 +36,7 @@ const summary = (h: CardHotel) => {
 export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
   const photoUrl = hotel.hero_photo_url ?? hotel.cover_image_url ?? null;
   const bookingUrl = hotel.affiliate_url ?? hotel.booking_url ?? null;
-  const scored = hasCompletePoolScore(hotel.pool_components, hotel.pool_score_0_10, hotel.verification_status);
+  const score = calculatePoolScore(hotel);
   const blurb = summary(hotel);
 
   return (
@@ -74,13 +74,11 @@ export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
                 {hotel.name}
               </Link>
             </h3>
-            {scored ? (
-              <span className="font-display text-2xl text-primary">
-                {hotel.pool_score_0_10!.toFixed(1)}
-              </span>
+            {score != null ? (
+              <span className="font-display text-2xl text-primary">{score.toFixed(1)}</span>
             ) : (
               <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Pool Score pending editorial review
+                {SCORE_PENDING_LABEL}
               </span>
             )}
           </div>
@@ -91,10 +89,7 @@ export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-foreground/90">{blurb}</p>
           )}
           <div className="mt-5 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em]">
-            <VerificationBadge
-              status={hotel.verification_status}
-              date={hotel.last_verified_date}
-            />
+            <VerificationBadge hotel={hotel} />
             {hotel.meta_rating_0_100 != null && (
               <span className="text-muted-foreground">
                 Meta rating {(hotel.meta_rating_0_100 / 10).toFixed(1)}/10

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { automationBlockedReason } from "@/lib/automation-pause";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { writeHotelEditorial } from "@/server/editorial.server";
 
@@ -23,6 +24,8 @@ export const Route = createFileRoute("/api/public/hooks/write-editorial")({
         if (!expected || apikey !== expected) return json({ error: "Unauthorized" }, 401);
 
         const url = new URL(request.url);
+        const blocked = automationBlockedReason(url.searchParams.get("hotel_slug"));
+        if (blocked) return json({ error: blocked, paused: true }, 423);
         const slug = url.searchParams.get("hotel_slug");
         const city = url.searchParams.get("city_slug");
         const limit = Math.min(Number(url.searchParams.get("limit") ?? 10) || 10, 40);

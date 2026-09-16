@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  validateHotelForPublication,
+  describePoolCounts,
+  type HotelStatus,
+  type StatusHotel,
+} from "@/lib/hotel-status";
 
 export type QaRow = {
   id: string;
@@ -24,6 +30,15 @@ export type QaRow = {
   qa_blocked: boolean | null;
   qa_checked_at: string | null;
   missing: string[];
+  status: HotelStatus;
+  pool_summary: string | null;
+  official_url: string | null;
+  secondary_source_url: string | null;
+  errors: string[];
+  warnings: string[];
+  can_index: boolean;
+  can_rank: boolean;
+  in_sitemap: boolean;
 };
 
 async function ensureAdmin(userId: string) {
@@ -45,22 +60,17 @@ export const adminQaOverview = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin
       .from("public_hotels_view")
       .select(
-        "id, slug, name, city, verification_status, editorial_status, pool_status, has_active_pool, ranking_eligible, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, heated_state, season_state, pool_score_0_10, last_verified_date, qa_blocked, qa_checked_at, primary_source_url, secondary_source_url, official_url",
+        "*, id, slug, name, city, verification_status, editorial_status, pool_status, has_active_pool, ranking_eligible, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, heated_state, season_state, pool_score_0_10, last_verified_date, qa_blocked, qa_checked_at, primary_source_url, secondary_source_url, official_url",
       )
       .order("city")
       .order("name");
     if (error) throw new Error(error.message);
 
     const rows: QaRow[] = (data ?? []).map((h) => {
-      const missing: string[] = [];
-      if (!h.official_url) missing.push("official URL");
-      if (!h.primary_source_url) missing.push("primary source");
-      if (!h.secondary_source_url) missing.push("second source");
-      if (!h.last_verified_date) missing.push("verification date");
-      if ((h.shared_pool_count ?? 0) === 0) missing.push("confirmed pool");
-      if (h.heated_state === "unknown") missing.push("heating");
-      if (h.season_state === "unknown") missing.push("season");
-      if (h.pool_score_0_10 == null) missing.push("Pool Score");
+      // Same gate as the public site — the QA page can never disagree with it.
+      const gate = validateHotelForPublication(h as StatusHotel);
+      const missing = [...gate.missing];
+      if (gate.score == null) missing.push("Pool Score");
       return {
         id: h.id as string,
         slug: h.slug as string,
@@ -78,11 +88,20 @@ export const adminQaOverview = createServerFn({ method: "GET" })
         jacuzzis: (h.jacuzzi_count as number) ?? 0,
         heated_state: (h.heated_state as string) ?? "unknown",
         season_state: (h.season_state as string) ?? "unknown",
-        score: (h.pool_score_0_10 as number | null) ?? null,
+        score: gate.score,
         last_verified_date: (h.last_verified_date as string | null) ?? null,
         qa_blocked: (h.qa_blocked as boolean | null) ?? null,
         qa_checked_at: (h.qa_checked_at as string | null) ?? null,
         missing,
+        status: gate.status,
+        pool_summary: describePoolCounts(h as StatusHotel),
+        official_url: (h.official_url as string | null) ?? null,
+        secondary_source_url: (h.secondary_source_url as string | null) ?? null,
+        errors: gate.errors,
+        warnings: gate.warnings,
+        can_index: gate.can_index,
+        can_rank: gate.can_rank,
+        in_sitemap: gate.in_sitemap,
       };
     });
 

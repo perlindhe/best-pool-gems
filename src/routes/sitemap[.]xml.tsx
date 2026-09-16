@@ -3,6 +3,7 @@ import { cities, guides } from "@/data/hotels";
 import { collections } from "@/data/collections";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { validateHotelForPublication, type StatusHotel } from "@/lib/hotel-status";
 
 const BASE_URL = "https://bestpoolhotels.com";
 
@@ -68,22 +69,19 @@ export const Route = createFileRoute("/sitemap.xml")({
           const pageSize = 1000;
           for (let offset = 0; ; ) {
             const { data, error } = await supabaseAdmin
-              .from("hotels")
-              .select("slug, updated_at")
-              .eq("is_published", true)
+              .from("public_hotels_view")
+              .select("*")
               .eq("editorial_status", "published")
-              .eq("verification_status", "verified")
               .eq("hotel_status", "active")
-              .eq("qa_blocked", false)
-              .eq("ranking_eligible", true)
-              .eq("pool_status", "active_pool")
               .is("canonical_hotel_id", null)
               .order("slug")
               .range(offset, offset + pageSize - 1);
             if (error) throw error;
             if (!data || data.length === 0) break;
-            for (const h of data as Array<{ slug: string | null; updated_at: string | null }>) {
-              if (!h.slug) continue;
+            for (const row of data as Array<Record<string, unknown>>) {
+              const h = row as { slug: string | null; updated_at: string | null };
+              // One gate decides indexing, ranking and sitemap membership.
+              if (!h.slug || !validateHotelForPublication(row as StatusHotel).in_sitemap) continue;
               entries.push({
                 path: `/hotels/${h.slug}`,
                 lastmod: h.updated_at ? h.updated_at.slice(0, 10) : undefined,
