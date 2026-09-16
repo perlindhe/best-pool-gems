@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { HotelImage } from "@/components/HotelImage";
 import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
-import { hasCompletePoolScore } from "@/lib/scoring";
+import { calculatePoolScore, SCORE_PENDING_LABEL, type StatusHotel } from "@/lib/hotel-status";
 
 /** Canonical record fields a listing card needs. One hotel = one record. */
-export type CardHotel = {
+export type CardHotel = StatusHotel & {
   id: string;
   slug: string;
   name: string;
