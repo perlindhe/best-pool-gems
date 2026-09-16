@@ -579,10 +579,11 @@ export async function runEnhancedVerification(hotelId: string): Promise<Enhanced
   const secondary = secondaryUrl as string | null;
 
   // Verification decision.
+  // Heating and season are shown as "not confirmed" when no source states them.
+  // They are a fact gap, not an evidence failure, so they do not block full
+  // verification — pool existence, location and sourcing do.
   const coreFactsKnown =
-    update.pool_count != null &&
-    update.heated_pool != null &&
-    (update.indoor === true || update.outdoor === true);
+    update.pool_count != null && (update.indoor === true || update.outdoor === true);
 
   const hasOfficialEvidence = official.length > 0 || !!hotel.primary_source_url;
   const hasIndependentEvidence = google.length > 0 || tripadvisor.length > 0 || web.length > 0;
