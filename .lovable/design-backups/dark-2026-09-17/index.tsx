@@ -79,14 +79,22 @@ function Home() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Edition 01 · 2026</p>
-          <h1 className="mt-6 max-w-2xl font-display text-6xl leading-[0.95] text-balance md:text-8xl">
-            The best <em className="font-normal text-primary">hotel pools</em>, ranked.
+      <section className="relative isolate overflow-hidden">
+        <img
+          src={heroImg}
+          alt="Rooftop pool at sunset"
+          width={1920}
+          height={1280}
+          fetchPriority="high"
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-hero" />
+        <div className="mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-20 pt-32 md:pb-28">
+          <p className="text-xs uppercase tracking-[0.4em] text-primary">Edition 01 · 2026</p>
+          <h1 className="mt-6 max-w-5xl font-display text-[clamp(3.5rem,11vw,9rem)] leading-[0.85] tracking-tight text-balance">
+            The best <span className="text-primary">hotel pools</span>, ranked.
           </h1>
-          <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground">
+          <p className="mt-6 max-w-2xl text-lg text-foreground/85 md:text-xl">
             Independent rankings and guides to the world's most beautiful hotel pools — in Barcelona,
             Paris, London and New York. No sponsored placements.
           </p>
@@ -94,38 +102,27 @@ function Home() {
             <Link
               to="/$citySlug"
               params={{ citySlug: "barcelona" }}
-              className="rounded-sm bg-foreground px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-background transition hover:opacity-80"
+              className="rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
             >
               Top 10 Barcelona
             </Link>
             <Link
               to="/about"
-              className="rounded-sm border border-border px-7 py-3.5 text-xs uppercase tracking-[0.18em] transition hover:border-foreground"
+              className="rounded-full border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.2em] backdrop-blur transition hover:border-primary hover:bg-primary/10"
             >
               How we rank
             </Link>
-          </div>
-          </div>
-          <div className="overflow-hidden bg-surface lg:col-span-7">
-            <img
-              src={heroImg}
-              alt="Rooftop pool at sunset"
-              width={1920}
-              height={1280}
-              fetchPriority="high"
-              className="aspect-[3/2] h-full w-full object-cover"
-            />
           </div>
         </div>
       </section>
 
       {/* Discovery — live from the pool database */}
-      <section className="border-y border-border bg-surface/40">
+      <section className="border-b border-border/50 bg-surface/30">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Start exploring</p>
-               <h2 className="mt-3 font-display text-5xl md:text-6xl">
+              <h2 className="mt-3 font-display text-5xl tracking-wide md:text-6xl">
                 {total} verified hotel profiles
               </h2>
               <p className="mt-4 max-w-xl text-sm text-muted-foreground">
@@ -161,7 +158,7 @@ function Home() {
                   key={h.id}
                   to="/hotels/$slug"
                   params={{ slug: h.slug }}
-                  className="group overflow-hidden rounded-sm border border-border bg-background transition hover:border-primary/60"
+                  className="group overflow-hidden rounded-xl border border-border/60 bg-surface/50 transition hover:border-primary/60"
                 >
                   {(h.hero_photo_url || h.cover_image_url) && (
                     <HotelImage
@@ -229,7 +226,7 @@ function Home() {
           <Link
             to="/$citySlug/$articleSlug"
             params={{ citySlug: latestGuides[0].citySlug, articleSlug: latestGuides[0].articleSlug }}
-            className="group relative col-span-12 overflow-hidden rounded-sm shadow-card lg:col-span-7"
+            className="group relative col-span-12 overflow-hidden rounded-xl shadow-card lg:col-span-7"
           >
             <img
               src={latestGuides[0].image}
@@ -244,10 +241,10 @@ function Home() {
               <p className="text-xs uppercase tracking-[0.3em] text-primary">
                 {latestGuides[0].city} · {latestGuides[0].category}
               </p>
-               <h3 className="mt-3 font-display text-5xl leading-tight text-on-image md:text-6xl">
+              <h3 className="mt-3 font-display text-5xl leading-tight tracking-wide md:text-6xl">
                 {latestGuides[0].title}
               </h3>
-               <p className="mt-4 max-w-lg text-base text-on-image/90">{latestGuides[0].excerpt}</p>
+              <p className="mt-4 max-w-lg text-base text-foreground/90">{latestGuides[0].excerpt}</p>
               <span className="mt-6 inline-flex w-fit items-center gap-2 text-sm uppercase tracking-[0.25em] text-primary">
                 Read the guide <span aria-hidden>→</span>
               </span>
@@ -260,7 +257,7 @@ function Home() {
                 key={g.slug}
                 to="/$citySlug/$articleSlug"
                 params={{ citySlug: g.citySlug, articleSlug: g.articleSlug }}
-                className="group border-t border-border bg-background py-6 transition hover:border-primary/60"
+                className="group rounded-xl border border-border/60 bg-surface/60 p-6 transition hover:border-primary/60"
               >
                 <p className="text-[10px] uppercase tracking-[0.3em] text-primary">
                   {g.city} · {g.category} · {g.readingTime}
@@ -276,7 +273,7 @@ function Home() {
       </section>
 
       {/* Cities row */}
-      <section className="border-y border-border bg-surface/40">
+      <section className="border-y border-border/50 bg-surface/40">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Destinations</p>
           <h2 className="mt-3 font-display text-5xl tracking-wide">Explore by city</h2>
@@ -286,7 +283,7 @@ function Home() {
                 key={c.slug}
                 to="/$citySlug"
                 params={{ citySlug: c.slug }}
-                className="group relative overflow-hidden rounded-sm shadow-card"
+                className="group relative overflow-hidden rounded-xl shadow-card"
               >
                 <img
                   src={c.image}
@@ -299,7 +296,7 @@ function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-primary">{c.country}</p>
-                   <h3 className="font-display text-3xl text-on-image">{c.name}</h3>
+                  <h3 className="font-display text-3xl tracking-wide">{c.name}</h3>
                 </div>
               </Link>
             ))}
