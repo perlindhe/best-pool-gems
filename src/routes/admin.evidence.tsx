@@ -53,7 +53,19 @@ function num(v: unknown): number | null {
   return typeof v === "number" ? v : null;
 }
 
+function errText(e: unknown): string {
+  if (e instanceof Response) {
+    return e.status === 401 || e.status === 403
+      ? "You need to be signed in as an admin."
+      : `Request failed (${e.status}).`;
+  }
+  const msg = e instanceof Error ? e.message : String(e);
+  return msg === "[object Response]" ? "Request failed. Please sign in again." : msg;
+}
+
 function EvidencePage() {
+  const navigate = useNavigate();
+  const [ready, setReady] = useState(false);
   const [reports, setReports] = useState<Report[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -62,12 +74,29 @@ function EvidencePage() {
 
   const load = () =>
     getEvidenceOverview()
-      .then((r) => setReports(r.reports as Report[]))
-      .catch((e) => setError((e as Error).message));
+      .then((r) => setReports((r?.reports as Report[]) ?? []))
+      .catch((e) => {
+        setReports([]);
+        setError(errText(e));
+      });
 
   useEffect(() => {
-    load();
-  }, []);
+    let unsub: (() => void) | undefined;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate({ to: "/admin/login" });
+        return;
+      }
+      setReady(true);
+      load();
+      const sub = supabase.auth.onAuthStateChange((_e, sess) => {
+        if (!sess) navigate({ to: "/admin/login" });
+      });
+      unsub = () => sub.data.subscription.unsubscribe();
+    });
+    return () => unsub?.();
+  }, [navigate]);
+
 
   const run = async (id: string, fn: () => Promise<unknown>) => {
     setBusy(id);
