@@ -388,7 +388,9 @@ export async function listCityHotels(citySlug: string) {
     .order("meta_rating_0_100", { ascending: false, nullsFirst: false })
     .order("name", { ascending: true });
   if (error) throw new Error(error.message);
-  const rows = (data ?? []) as unknown as CanonicalHotel[];
+  const all = (data ?? []) as unknown as CanonicalHotel[];
+  const approved = await getApprovedEvidenceSlugs();
+  const rows = all.filter((r) => passesEvidenceGate(r.slug, approved));
   const withPhotos = await attachHeroPhotos(rows);
-  return { hotels: sortHotels(withPhotos as CanonicalHotel[]), total: count ?? withPhotos.length };
+  return { hotels: sortHotels(withPhotos as CanonicalHotel[]), total: rows.length };
 }

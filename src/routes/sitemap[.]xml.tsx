@@ -66,6 +66,10 @@ export const Route = createFileRoute("/sitemap.xml")({
         // Partially verified and research-pending profiles stay reachable for
         // visitors but are noindex, so they must never be submitted to Google.
         {
+          const { getApprovedEvidenceSlugs, passesEvidenceGate } = await import(
+            "@/server/evidence-gate.server"
+          );
+          const approvedEvidence = await getApprovedEvidenceSlugs();
           const pageSize = 1000;
           for (let offset = 0; ; ) {
             const { data, error } = await supabaseAdmin
