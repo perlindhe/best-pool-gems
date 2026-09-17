@@ -2,11 +2,11 @@ import { Link } from "@tanstack/react-router";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-32 border-t border-border/40 bg-surface/40">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-4">
+    <footer className="mt-32 border-t border-border bg-background">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-display text-3xl tracking-wider">
-            Best Pool <span className="text-primary">Hotels</span>
+          <p className="font-display text-3xl font-semibold">
+            Best Pool Hotels
           </p>
           <p className="mt-3 max-w-md text-sm text-muted-foreground">
             Independent rankings of the world's most beautiful hotel pools. No sponsored placements.
