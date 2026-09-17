@@ -617,6 +617,11 @@ export async function buildEvidenceReport(hotelId: string): Promise<EvidenceRepo
     blockingReasons: total.blockingReasons,
     approvedBy,
     approvedAt,
+    autoApproved: isAutoApprover(approvedBy),
+    autoBlockers,
+    autoEligible: autoBlockers.length === 0,
+    hasOfficialSource,
+    independentSourceCount,
     scoreVersion: SCORE_VERSION,
   };
 }
