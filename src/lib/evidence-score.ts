@@ -661,3 +661,53 @@ export function evidenceQaErrors(q: QaInput): string[] {
     errors.push("The 0–10 score does not match the total points");
   return errors;
 }
+
+/* ------------------------------------------------------------------ */
+/* Automatic approval (evidence-v1)                                    */
+/* ------------------------------------------------------------------ */
+
+/** The signature stored as approved_by when the system approves a score itself. */
+export const AUTO_APPROVER = "auto:evidence-v1";
+
+export function isAutoApprover(approvedBy: string | null | undefined): boolean {
+  return approvedBy === AUTO_APPROVER;
+}
+
+export type AutoApprovalInput = {
+  /** QA errors with the "No editorial approval" item removed. */
+  qaErrors: string[];
+  blockingReasons: string[];
+  confidenceLevel: ConfidenceLevel;
+  totalPoints: number | null;
+  scoreOutOfTen: number | null;
+  relevantComments: number;
+  independentSourceCount: number;
+  hasOfficialSource: boolean;
+  hasConflicts: boolean;
+  qaBlocked: boolean;
+};
+
+/**
+ * Reasons the system may NOT approve this score by itself.
+ * An empty array means every factor is evidence-backed and the score can be
+ * published automatically; anything else stays pending for a human.
+ */
+export function autoApprovalBlockers(input: AutoApprovalInput): string[] {
+  const reasons: string[] = [];
+  for (const e of input.qaErrors) if (e !== "No editorial approval") reasons.push(e);
+  reasons.push(...input.blockingReasons);
+  if (input.confidenceLevel === "low") reasons.push("Confidence too low for automatic approval");
+  if (input.totalPoints == null || input.scoreOutOfTen == null)
+    reasons.push("No complete score");
+  if (input.relevantComments < MIN_RELEVANT_COMMENTS)
+    reasons.push("Fewer than three relevant pool comments");
+  if (!input.hasOfficialSource) reasons.push("No official source");
+  if (input.independentSourceCount < 1) reasons.push("No independent source");
+  if (input.hasConflicts) reasons.push("Conflicting data");
+  if (input.qaBlocked) reasons.push("Hotel is QA blocked");
+  return [...new Set(reasons)];
+}
+
+export function canAutoApprove(input: AutoApprovalInput): boolean {
+  return autoApprovalBlockers(input).length === 0;
+}
