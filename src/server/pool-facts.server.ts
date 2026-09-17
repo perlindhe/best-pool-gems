@@ -286,6 +286,7 @@ export async function ingestPoolFacts(hotelId: string) {
       if (length != null) update.length_metres = length;
       if (area != null) update.area_sqm = area;
       update.size_verified = true;
+      update.size_source_url = f.source_url;
       confirmedSize += 1;
     }
     if (f.heated === true && pool.heating_state !== "confirmed_heated") {
@@ -299,7 +300,7 @@ export async function ingestPoolFacts(hotelId: string) {
 
     const existingUrls = Array.isArray(pool.source_urls) ? (pool.source_urls as string[]) : [];
     update.source_urls = [...new Set([...existingUrls, f.source_url])];
-    update.verified_at = new Date().toISOString();
+    update.last_verified = new Date().toISOString().slice(0, 10);
 
     const { error: upErr } = await supabaseAdmin
       .from("hotel_pools")
