@@ -3,9 +3,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   validateHotelForPublication,
-  describePoolCounts,
+  calculatePoolCounts,
+  calculateHeatingStatus,
+  calculateSeasonStatus,
+  describePoolMix,
+  HEATING_COPY,
   type HotelStatus,
   type StatusHotel,
+  type StatusPool,
 } from "@/lib/hotel-status";
 
 export type QaRow = {
@@ -38,7 +43,13 @@ export type QaRow = {
   warnings: string[];
   can_index: boolean;
   can_rank: boolean;
+  can_publish: boolean;
   in_sitemap: boolean;
+  /** Raw pool records, so an editor can see where a conflict comes from. */
+  pools: StatusPool[];
+  derived_heating: string;
+  derived_season: string;
+  derived_counts: ReturnType<typeof calculatePoolCounts>;
 };
 
 async function ensureAdmin(userId: string) {
@@ -66,9 +77,24 @@ export const adminQaOverview = createServerFn({ method: "GET" })
       .order("name");
     if (error) throw new Error(error.message);
 
+    // Raw pool records: every derived value on this page comes from these.
+    const { data: poolData, error: poolError } = await supabaseAdmin
+      .from("hotel_pools")
+      .select(
+        "id, hotel_id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, heated, heating_state, season_state, seasonal_dates, year_round",
+      );
+    if (poolError) throw new Error(poolError.message);
+    const poolsByHotel = new Map<string, StatusPool[]>();
+    for (const p of poolData ?? []) {
+      const list = poolsByHotel.get(p.hotel_id as string) ?? [];
+      list.push(p as unknown as StatusPool);
+      poolsByHotel.set(p.hotel_id as string, list);
+    }
+
     const rows: QaRow[] = (data ?? []).map((h) => {
+      const pools = poolsByHotel.get(h.id as string) ?? [];
       // Same gate as the public site — the QA page can never disagree with it.
-      const gate = validateHotelForPublication(h as StatusHotel);
+      const gate = validateHotelForPublication(h as StatusHotel, pools);
       const missing = [...gate.missing];
       if (gate.score == null) missing.push("Pool Score");
       return {
@@ -94,14 +120,19 @@ export const adminQaOverview = createServerFn({ method: "GET" })
         qa_checked_at: (h.qa_checked_at as string | null) ?? null,
         missing,
         status: gate.status,
-        pool_summary: describePoolCounts(h as StatusHotel),
+        pool_summary: describePoolMix(calculatePoolCounts(pools)),
         official_url: (h.official_url as string | null) ?? null,
         secondary_source_url: (h.secondary_source_url as string | null) ?? null,
         errors: gate.errors,
         warnings: gate.warnings,
         can_index: gate.can_index,
         can_rank: gate.can_rank,
+        can_publish: gate.can_publish,
         in_sitemap: gate.in_sitemap,
+        pools,
+        derived_heating: HEATING_COPY[calculateHeatingStatus(pools)],
+        derived_season: calculateSeasonStatus(pools).sentence,
+        derived_counts: calculatePoolCounts(pools),
       };
     });
 

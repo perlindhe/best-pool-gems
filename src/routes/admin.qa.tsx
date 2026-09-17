@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -17,26 +17,11 @@ export const Route = createFileRoute("/admin/qa")({
 });
 
 const TEST_GROUP = [
-  "sydney-hyatt-regency-sydney",
-  "sydney-park-hyatt-sydney",
-  "sydney-w-sydney",
-  "sydney-intercontinental-sydney",
-  "sydney-ace-hotel-sydney",
-  "sydney-qt-sydney",
-  "sydney-capella-sydney",
-  "barcelona-hotel-arts",
-  "barcelona-1898",
+  "bangkok-the-siam",
   "los-angeles-hotel-june-west-la",
+  "barcelona-1898",
   "mallorca-hotel-can-bordoy-grand-house-and-garden",
-  "los-angeles-the-maybourne-beverly-hills",
-  "mallorca-jumeirah-port-soller",
-  "bangkok-the-peninsula-bangkok",
-  "minos-palace-hotel-suites",
-  "london-shangri-la-the-shard",
-  "london-bvlgari-hotel-london",
-  "barcelona-grand-hotel-central",
-  "los-angeles-the-hollywood-roosevelt",
-  "porto-elounda-golf-spa-resort",
+  "sydney-park-hyatt-sydney",
 ];
 
 type Scope =
@@ -51,7 +36,7 @@ type Scope =
   | "no_source";
 
 const SCOPES: Array<{ key: Scope; label: string }> = [
-  { key: "test", label: "Test group (20)" },
+  { key: "test", label: "Test group (5)" },
   { key: "errors", label: "Blocking errors" },
   { key: "conflicting", label: "Conflicting" },
   { key: "partial", label: "Partially verified" },
@@ -155,7 +140,8 @@ function QaPage() {
             </thead>
             <tbody>
               {visible.map((r) => (
-                <tr key={r.id} className="border-t border-border/40 align-top">
+                <Fragment key={r.id}>
+                <tr className="border-t border-border/40 align-top">
                   <td className="p-2">
                     <a
                       href={`/hotels/${r.slug}`}
@@ -172,27 +158,42 @@ function QaPage() {
                     {r.pool_status}
                     {r.qa_blocked ? " · blocked" : ""}
                   </td>
-                  <td className="p-2">{r.shared_pools}</td>
-                  <td className="p-2">{r.spa_pools}</td>
-                  <td className="p-2">{r.kids_pools}</td>
-                  <td className="p-2">{r.private_pools}</td>
-                  <td className="p-2">{r.jacuzzis}</td>
-                  <td className="p-2">{r.heated_state}</td>
-                  <td className="p-2">{r.season_state}</td>
-                  <td className="p-2">{r.score != null ? r.score.toFixed(1) : "—"}</td>
-                  <td className="p-2">{r.ranking_eligible === false ? "no" : "yes"}</td>
+                  <td className="p-2">{r.derived_counts.sharedSwimmingPools}</td>
+                  <td className="p-2">{r.derived_counts.spaPools}</td>
+                  <td className="p-2">{r.derived_counts.childrenPools}</td>
+                  <td className="p-2">{r.derived_counts.privatePoolCategories}</td>
+                  <td className="p-2">{r.derived_counts.jacuzzis}</td>
+                  <td className="p-2">{r.derived_heating}</td>
+                  <td className="p-2">{r.derived_season}</td>
+                  <td className="p-2">{r.score != null ? r.score.toFixed(1) : "pending"}</td>
+                  <td className="p-2">{r.can_rank ? "yes" : "no"}</td>
                   <td className="p-2">{r.last_verified_date ?? "—"}</td>
                   <td className="p-2">
                     {r.official_url ? "official" : "—"}
                     {r.secondary_source_url ? " + second" : ""}
                   </td>
                   <td className="p-2">
-                    {r.can_index ? "index" : "noindex"}
+                    {r.can_index ? "index" : "noindex, follow"}
                     {r.in_sitemap ? " · sitemap" : ""}
+                    {r.can_publish ? "" : " · publish blocked"}
                   </td>
                   <td className="p-2 text-muted-foreground">{r.missing.join(", ") || "—"}</td>
                   <td className="p-2 text-destructive">{r.errors.join("; ") || "—"}</td>
                 </tr>
+                {/* Raw pool records, so a conflict can be traced to its source */}
+                <tr className="border-t border-border/20 bg-surface/40">
+                  <td className="p-2 text-muted-foreground" colSpan={17}>
+                    {r.pools.length === 0
+                      ? "No pool records"
+                      : r.pools
+                          .map(
+                            (p) =>
+                              `${p.pool_name || "(unnamed)"} · ${p.pool_category} · ${p.shared_or_private ?? "?"} · ${p.indoor ? "indoor" : p.outdoor ? "outdoor" : "location ?"} · heating ${p.heating_state ?? "?"} · season ${p.season_state ?? "?"}`,
+                          )
+                          .join("   |   ")}
+                  </td>
+                </tr>
+                </Fragment>
               ))}
             </tbody>
           </table>
