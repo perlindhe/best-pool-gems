@@ -3,6 +3,7 @@ import {
   STATUS_COPY,
   type HotelStatus,
   type StatusHotel,
+  type StatusPool,
 } from "@/lib/hotel-status";
 
 function formatDate(date?: string | null) {
@@ -27,14 +28,17 @@ const TONE: Record<HotelStatus, { icon: string; tone: string }> = {
  */
 export function VerificationBadge({
   hotel,
+  pools,
   date,
   className = "",
 }: {
   hotel: StatusHotel;
+  /** Pool records, when the page has them — the status is derived from them. */
+  pools?: StatusPool[];
   date?: string | null;
   className?: string;
 }) {
-  const status = calculateVerificationStatus(hotel);
+  const status = calculateVerificationStatus(hotel, pools);
   const when = formatDate(date ?? hotel.last_verified_date);
   const { icon, tone } = TONE[status];
   const label =
@@ -44,6 +48,8 @@ export function VerificationBadge({
 
   return (
     <span
+      data-derived="status"
+      data-status={status}
       className={`inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${tone} ${className}`}
     >
       <span aria-hidden>{icon}</span>

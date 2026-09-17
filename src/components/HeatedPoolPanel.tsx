@@ -73,12 +73,18 @@ export function HeatedPoolPanel({
             <SectionIcon icon={Thermometer} />
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Heated pool check</p>
-              <h2 className="mt-2 font-display text-3xl tracking-wide md:text-4xl">
+              <h2
+                data-derived="heating"
+                data-heating={heating}
+                className="mt-2 font-display text-3xl tracking-wide md:text-4xl"
+              >
                 {HEATING_COPY[heating]}
               </h2>
             </div>
           </div>
           <span
+            data-derived="heating"
+            data-heating={heating}
             className={`rounded-sm border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${
               heating === "heated_pool_available"
                 ? "border-primary/60 text-primary"
@@ -118,7 +124,6 @@ export function HeatedPoolPanel({
           {when
             ? `Heating details last checked ${when}.`
             : "Heating details have not been re-checked recently."}{" "}
-          {STATUS_COPY[status].sentence}{" "}
           {officialUrl && (
             <a
               href={officialUrl}
