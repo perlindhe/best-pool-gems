@@ -210,6 +210,19 @@ function EvidencePage() {
                       {String(r.duplicateCount ?? 0)}
                     </p>
 
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {r.approvedBy
+                        ? r.autoApproved
+                          ? "Approved automatically by the evidence engine"
+                          : `Approved by ${String(r.approvedBy)}`
+                        : r.autoEligible
+                          ? "Ready for automatic approval — run the automation"
+                          : "Not auto-approvable yet"}
+                      {Array.isArray(r.autoBlockers) && (r.autoBlockers as string[]).length > 0
+                        ? `: ${(r.autoBlockers as string[]).join(", ")}`
+                        : ""}
+                    </p>
+
                     {(blockers.length > 0 || qa.length > 0) && (
                       <ul className="mt-2 list-disc pl-5 text-xs text-muted-foreground">
                         {[...qa, ...blockers].map((b) => (
