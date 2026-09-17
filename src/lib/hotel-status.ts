@@ -482,15 +482,20 @@ export const STATUS_COPY: Record<HotelStatus, { label: string; sentence: string 
 
 export const SCORE_PENDING_LABEL = "Pool Score pending editorial review";
 
-/** Heating, derived from the pool records only — never guessed. */
-export function heatingLabel(state?: string | null): string | null {
-  if (state === "heated") return "Heated pool available";
-  if (state === "not_heated") return "No heated pool";
-  if (state === "conflicting") return "Heating information conflicting";
-  return "Heating not confirmed";
+/** The summary heating state (from the pool records) mapped to the one status. */
+export function heatingStatusFromState(state?: string | null): HeatingStatus {
+  if (state === "heated") return "heated_pool_available";
+  if (state === "not_heated") return "no_heated_pool";
+  if (state === "conflicting") return "conflicting_heating_information";
+  return "heating_not_confirmed";
 }
 
-export function seasonLabel(state?: string | null): string | null {
+/** Heating, derived from the pool records only — never guessed. */
+export function heatingLabel(state?: string | null): string {
+  return HEATING_COPY[heatingStatusFromState(state)];
+}
+
+export function seasonLabel(state?: string | null): string {
   if (state === "year_round") return "Open year-round";
   if (state === "seasonal") return "Seasonal opening";
   if (state === "conflicting") return "Season information conflicting";

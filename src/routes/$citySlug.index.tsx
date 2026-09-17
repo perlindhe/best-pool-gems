@@ -342,7 +342,7 @@ function CityHub() {
           { key: "rooftop", label: "Best rooftop pools", intro: "Skyline views, sunset DJs, plunge pools above the city.", pick: (h) => h.rooftop === true },
           { key: "resort", label: "Resort & beachfront", intro: "Big-water, full-cabana hotels — closest thing to a beach resort in town.", pick: (h) => h.beachfront === true },
           { key: "quiet", label: "Adults only", intro: "Low-key crowd, no party soundtrack, real swimming space.", pick: (h) => h.adults_only === true },
-          { key: "spa", label: "Heated & indoor", intro: "Where the pool works outside high summer.", pick: (h) => h.heated_pool === true || h.indoor === true },
+          { key: "spa", label: "Heated & indoor", intro: "Where the pool works outside high summer.", pick: (h) => h.heated_state === "heated" || h.indoor === true },
         ];
         const slices = themes
           .map((t) => ({ ...t, items: hotels.filter(t.pick).slice(0, 3) }))

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getHotelsForCompare, type CompareHotel } from "@/lib/compare.functions";
+import { heatingLabel, seasonLabel } from "@/lib/hotel-status";
 
 // Whitelist of allowed comparison pairs. Each entry has friendly URL slug
 // and the two DB slugs to load. New pairs require unique editorial copy.
@@ -203,9 +204,8 @@ function ComparePage() {
               <Row label="View" a={a.view_type ?? "—"} b={b.view_type ?? "—"} />
               <Row label="Size" a={a.pool_size ?? "—"} b={b.pool_size ?? "—"} />
               <Row label="Best time" a={a.best_time_to_visit ?? "—"} b={b.best_time_to_visit ?? "—"} />
-              <Row label="Heated" a={yesNo(a.heated_pool)} b={yesNo(b.heated_pool)} />
-              <Row label="Year-round" a={yesNo(a.year_round)} b={yesNo(b.year_round)} />
-              <Row label="Season" a={a.season ?? "—"} b={b.season ?? "—"} />
+              <Row label="Heating" a={heatingLabel(a.heated_state)} b={heatingLabel(b.heated_state)} />
+              <Row label="Season" a={seasonLabel(a.season_state)} b={seasonLabel(b.season_state)} />
               <Row label="Guest only" a={yesNo(a.guest_only)} b={yesNo(b.guest_only)} />
               <Row label="Day pass" a={yesNo(a.day_pass_available)} b={yesNo(b.day_pass_available)} />
               <Row label="Vibe" a={a.vibe ?? "—"} b={b.vibe ?? "—"} />

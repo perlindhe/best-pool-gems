@@ -943,6 +943,7 @@ export type Database = {
       }
     }
     Functions: {
+      derive_hotel_heating: { Args: { _hotel_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

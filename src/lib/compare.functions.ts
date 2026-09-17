@@ -17,9 +17,9 @@ export type CompareHotel = {
   view_type: string | null;
   pool_size: string | null;
   best_time_to_visit: string | null;
-  heated_pool: boolean | null;
-  year_round: boolean | null;
-  season: string | null;
+  /** Derived from the pool records in hotel_pool_summary — no manual heating field. */
+  heated_state: string | null;
+  season_state: string | null;
   guest_only: boolean | null;
   day_pass_available: boolean | null;
   price_from_eur: number | null;

@@ -8,7 +8,7 @@ import { validateHotelForPublication, type StatusHotel } from "@/lib/hotel-statu
  */
 
 export const CANONICAL_SELECT =
-  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, documented_pool_areas, pool_status, ranking_eligible, score_version, score_updated_at, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_pool, year_round, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, best_time_to_visit, qa_blocked";
+  "id, slug, name, city, city_slug, country, neighborhood, website_url, booking_url, official_url, affiliate_url, cover_image_url, rank_position, pool_score_0_10, pool_components, best_time, pool_type, pool_facts, editorial_notes, pool_score_updated_at, meta_rating_0_100, confidence_0_100, sources_used, meta_computed_at, has_pool, pool_verified_at, hotel_status, previous_names, canonical_hotel_id, verification_status, verification_method, verification_sources, fact_verification, last_verified_date, pool_count, shared_pool_count, spa_pool_count, kids_pool_count, private_pool_count, jacuzzi_count, documented_pool_areas, pool_status, ranking_eligible, score_version, score_updated_at, indoor, outdoor, infinity, saltwater, adults_only, children_allowed, pool_view, rooftop, heated_state, season_state, season, beachfront, family_friendly, distance_to_beach_m, pool_size, view_type, pool_setting, tags, why_included, why_not_higher, price_from_eur, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, best_time_to_visit, qa_blocked";
 
 export type VerificationState = "verified" | "partially_verified" | "research_pending";
 
@@ -70,8 +70,9 @@ export type CanonicalHotel = {
   children_allowed: boolean | null;
   pool_view: string | null;
   rooftop: boolean | null;
-  heated_pool: boolean | null;
-  year_round: boolean | null;
+  /** Derived from the pool records only. */
+  heated_state: string | null;
+  season_state: string | null;
   season: string | null;
   beachfront: boolean | null;
   family_friendly: boolean | null;
@@ -207,8 +208,8 @@ export async function listCanonicalHotels(filters: HotelFilters = {}) {
   if (typeof filters.minScore === "number") q = q.gte("pool_score_0_10", filters.minScore);
   if (filters.rooftop) q = q.eq("rooftop", true);
   if (filters.infinity) q = q.eq("infinity", true);
-  if (filters.heated) q = q.eq("heated_pool", true);
-  if (filters.yearRound) q = q.eq("year_round", true);
+  if (filters.heated) q = q.eq("heated_state", "heated");
+  if (filters.yearRound) q = q.eq("season_state", "year_round");
   if (filters.indoor) q = q.eq("indoor", true);
   if (filters.outdoor) q = q.eq("outdoor", true);
   if (filters.adultsOnly) q = q.eq("adults_only", true);
@@ -320,11 +321,11 @@ export type CityHubSummary = {
   features: CityFeatureCount[];
 };
 
-const FEATURE_DEFS: Array<{ key: string; label: string; column: keyof CanonicalHotel }> = [
+const FEATURE_DEFS: Array<{ key: string; label: string; column: keyof CanonicalHotel; value?: unknown }> = [
   { key: "rooftop", label: "Rooftop pools", column: "rooftop" },
   { key: "infinity", label: "Infinity pools", column: "infinity" },
-  { key: "heated", label: "Heated pools", column: "heated_pool" },
-  { key: "yearRound", label: "Open year-round", column: "year_round" },
+  { key: "heated", label: "Heated pools", column: "heated_state", value: "heated" },
+  { key: "yearRound", label: "Open year-round", column: "season_state", value: "year_round" },
   { key: "indoor", label: "Indoor pools", column: "indoor" },
   { key: "outdoor", label: "Outdoor pools", column: "outdoor" },
   { key: "beachfront", label: "Beachfront", column: "beachfront" },
@@ -338,7 +339,7 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
   const { data, error } = await supabaseAdmin
     .from("public_hotels_view")
     .select(
-      "pool_score_0_10, verification_status, editorial_status, qa_blocked, last_verified_date, rooftop, infinity, heated_pool, year_round, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
+      "pool_score_0_10, verification_status, editorial_status, qa_blocked, last_verified_date, rooftop, infinity, heated_state, season_state, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
     )
     .eq("city_slug", citySlug);
   if (error) throw new Error(error.message);
@@ -364,7 +365,7 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
     features: FEATURE_DEFS.map((f) => ({
       key: f.key,
       label: f.label,
-      count: rows.filter((r) => r[f.column] === true).length,
+      count: rows.filter((r) => r[f.column] === (f.value ?? true)).length,
     })).filter((f) => f.count > 0),
   };
 }

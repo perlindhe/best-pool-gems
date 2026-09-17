@@ -233,7 +233,7 @@ function HotelDetailPage() {
 
           {/* Trust + key pool facts, above the fold */}
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <VerificationBadge hotel={hotel} />
+            <VerificationBadge hotel={hotel} pools={poolRecords} />
             {hotel.verification_method && hotel.verification_method !== "research_pending" && (
               <VerificationMethodBadge method={hotel.verification_method} />
             )}
@@ -261,7 +261,11 @@ function HotelDetailPage() {
       {/* Data status box — what we know and how well it is documented */}
       <section className="mx-auto max-w-6xl px-6 pt-10">
         <div className="rounded-lg border border-border/60 bg-surface/40 p-6 md:p-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">
+          <p
+            data-derived="status"
+            data-status={status}
+            className="text-xs uppercase tracking-[0.3em] text-primary"
+          >
             {STATUS_COPY[status].label}
           </p>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-foreground/90">
@@ -271,7 +275,14 @@ function HotelDetailPage() {
             {!noPool && (
               <PracticalFact label="Pools documented" value={poolSummary} />
             )}
-            {!noPool && <PracticalFact label="Heating" value={HEATING_COPY[heating]} />}
+            {!noPool && (
+              <PracticalFact
+                label="Heating"
+                value={HEATING_COPY[heating]}
+                data-derived="heating"
+                data-heating={heating}
+              />
+            )}
             {!noPool && <PracticalFact label="Season" value={season.sentence} />}
             <PracticalFact label="Last checked" value={publicValue(hotel.last_verified_date)} />
             <PracticalFact label="Checked by" value={publicValue(hotel.verified_by)} />
@@ -772,10 +783,17 @@ function ComparedWith({ slug }: { slug: string }) {
 
 
 /** One practical fact. Shows "Not confirmed" instead of guessing. */
-function PracticalFact({ label, value }: { label: string; value: string | number | null }) {
+function PracticalFact({
+  label,
+  value,
+  ...rest
+}: {
+  label: string;
+  value: string | number | null;
+} & React.HTMLAttributes<HTMLDivElement>) {
   const confirmed = value !== null && value !== undefined && `${value}`.trim() !== "";
   return (
-    <div className="border-b border-border/40 pb-3">
+    <div className="border-b border-border/40 pb-3" {...rest}>
       <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</dt>
       <dd className={confirmed ? "mt-1 text-sm text-foreground" : "mt-1 text-sm text-muted-foreground/70"}>
         {confirmed ? value : "Not confirmed"}

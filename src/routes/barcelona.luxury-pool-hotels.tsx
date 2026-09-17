@@ -144,7 +144,7 @@ const FILTERS: { key: FilterKey; label: string; pick: (h: CityHotel) => boolean 
   { key: "rooftop", label: "Rooftop", pick: (h) => h.rooftop === true },
   { key: "beachfront", label: "Beachfront", pick: (h) => h.beachfront === true },
   { key: "adults", label: "Adults only", pick: (h) => h.adults_only === true },
-  { key: "heated", label: "Heated", pick: (h) => h.heated_pool === true },
+  { key: "heated", label: "Heated", pick: (h) => h.heated_state === "heated" },
 ];
 
 const NEIGHBORHOODS = [
@@ -335,7 +335,7 @@ function LuxuryPoolHotels() {
           const badges = [
             h.rooftop === true ? "Rooftop" : null,
             h.beachfront === true ? "Beachfront" : null,
-            h.heated_pool === true ? "Heated" : null,
+            h.heated_state === "heated" ? "Heated" : null,
             h.adults_only === true ? "Adults only" : null,
             h.family_friendly === true ? "Family friendly" : null,
           ].filter(Boolean) as string[];
