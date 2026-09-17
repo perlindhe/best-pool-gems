@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getHotelsForCompare, type CompareHotel } from "@/lib/compare.functions";
+import { heatingLabel, seasonLabel } from "@/lib/hotel-status";
 
 // Whitelist of allowed comparison pairs. Each entry has friendly URL slug
 // and the two DB slugs to load. New pairs require unique editorial copy.
