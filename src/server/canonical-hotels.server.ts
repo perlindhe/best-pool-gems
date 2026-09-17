@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getApprovedEvidenceSlugs, passesEvidenceGate } from "@/server/evidence-gate.server";
 import { validateHotelForPublication, type StatusHotel } from "@/lib/hotel-status";
 
 /**
@@ -238,9 +239,12 @@ export async function listCanonicalHotels(filters: HotelFilters = {}) {
   const { data, error, count } = await q;
   if (error) throw new Error(error.message);
 
-  const rows = (data ?? []) as unknown as CanonicalHotel[];
+  const all = (data ?? []) as unknown as CanonicalHotel[];
+  // Evidence-based Pool Score test group: no approved score, no ranking place.
+  const approved = await getApprovedEvidenceSlugs();
+  const rows = all.filter((r) => passesEvidenceGate(r.slug, approved));
   const withPhotos = await attachHeroPhotos(rows);
-  return { hotels: sortHotels(withPhotos as CanonicalHotel[]), total: count ?? withPhotos.length };
+  return { hotels: sortHotels(withPhotos as CanonicalHotel[]), total: rows.length };
 }
 
 /** Single canonical hotel by slug. Follows renames to the canonical record. */
