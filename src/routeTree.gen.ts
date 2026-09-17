@@ -32,6 +32,7 @@ import { Route as ComparePairRouteImport } from './routes/compare.$pair'
 import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
 import { Route as AdminQaRouteImport } from './routes/admin.qa'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminEvidenceRouteImport } from './routes/admin.evidence'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
@@ -163,6 +164,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEvidenceRoute = AdminEvidenceRouteImport.update({
+  id: '/admin/evidence',
+  path: '/admin/evidence',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
   id: '/$citySlug/$articleSlug',
   path: '/$citySlug/$articleSlug',
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
+  '/admin/evidence': typeof AdminEvidenceRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/qa': typeof AdminQaRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -300,6 +307,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
+  '/admin/evidence': typeof AdminEvidenceRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/qa': typeof AdminQaRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -340,6 +348,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verification-standards': typeof VerificationStandardsRoute
   '/$citySlug/$articleSlug': typeof CitySlugArticleSlugRoute
+  '/admin/evidence': typeof AdminEvidenceRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/qa': typeof AdminQaRoute
   '/barcelona/luxury-pool-hotels': typeof BarcelonaLuxuryPoolHotelsRoute
@@ -381,6 +390,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
+    | '/admin/evidence'
     | '/admin/login'
     | '/admin/qa'
     | '/barcelona/luxury-pool-hotels'
@@ -420,6 +430,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
+    | '/admin/evidence'
     | '/admin/login'
     | '/admin/qa'
     | '/barcelona/luxury-pool-hotels'
@@ -459,6 +470,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/verification-standards'
     | '/$citySlug/$articleSlug'
+    | '/admin/evidence'
     | '/admin/login'
     | '/admin/qa'
     | '/barcelona/luxury-pool-hotels'
@@ -499,6 +511,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VerificationStandardsRoute: typeof VerificationStandardsRoute
   CitySlugArticleSlugRoute: typeof CitySlugArticleSlugRoute
+  AdminEvidenceRoute: typeof AdminEvidenceRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminQaRoute: typeof AdminQaRoute
   BarcelonaLuxuryPoolHotelsRoute: typeof BarcelonaLuxuryPoolHotelsRoute
@@ -685,6 +698,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/evidence': {
+      id: '/admin/evidence'
+      path: '/admin/evidence'
+      fullPath: '/admin/evidence'
+      preLoaderRoute: typeof AdminEvidenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$citySlug/$articleSlug': {
       id: '/$citySlug/$articleSlug'
       path: '/$citySlug/$articleSlug'
@@ -814,6 +834,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VerificationStandardsRoute: VerificationStandardsRoute,
   CitySlugArticleSlugRoute: CitySlugArticleSlugRoute,
+  AdminEvidenceRoute: AdminEvidenceRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminQaRoute: AdminQaRoute,
   BarcelonaLuxuryPoolHotelsRoute: BarcelonaLuxuryPoolHotelsRoute,
