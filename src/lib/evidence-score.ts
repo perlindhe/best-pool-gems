@@ -1,3 +1,21 @@
+/** The ten hotels the Evidence-based Pool Score is being tested on. */
+export const EVIDENCE_TEST_GROUP: string[] = [
+  "bangkok-the-siam",
+  "los-angeles-hotel-june-west-la",
+  "barcelona-1898",
+  "mallorca-hotel-can-bordoy-grand-house-and-garden",
+  "sydney-park-hyatt-sydney",
+  "barcelona-hotel-arts",
+  "sydney-w-sydney",
+  "porto-elounda-golf-spa-resort",
+  "barcelona-grand-hotel-central",
+  "london-bvlgari-hotel-london",
+];
+
+export function isEvidenceTestHotel(slug?: string | null): boolean {
+  return !!slug && EVIDENCE_TEST_GROUP.includes(slug);
+}
+
 /**
  * EVIDENCE-BASED POOL SCORE (score_version = "evidence-v1")
  *

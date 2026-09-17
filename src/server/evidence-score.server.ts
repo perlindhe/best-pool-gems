@@ -31,23 +31,8 @@ import {
   type EvidenceVerificationStatus,
 } from "@/lib/evidence-score";
 
-/** The ten hotels the new model is being tested on. */
-export const EVIDENCE_TEST_GROUP = [
-  "bangkok-the-siam",
-  "los-angeles-hotel-june-west-la",
-  "barcelona-1898",
-  "mallorca-hotel-can-bordoy-grand-house-and-garden",
-  "sydney-park-hyatt-sydney",
-  "barcelona-hotel-arts",
-  "sydney-w-sydney",
-  "porto-elounda-golf-spa-resort",
-  "barcelona-grand-hotel-central",
-  "london-bvlgari-hotel-london",
-] as const;
-
-export function isEvidenceTestHotel(slug?: string | null): boolean {
-  return !!slug && (EVIDENCE_TEST_GROUP as readonly string[]).includes(slug);
-}
+export { EVIDENCE_TEST_GROUP, isEvidenceTestHotel } from "@/lib/evidence-score";
+import { EVIDENCE_TEST_GROUP } from "@/lib/evidence-score";
 
 const POOL_RE =
   /\bpool|rooftop|infinity|plunge|sun ?deck|poolside|swim|piscina|piscine|jacuzzi|hot tub\b/i;
