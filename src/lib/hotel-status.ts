@@ -495,7 +495,7 @@ export function heatingLabel(state?: string | null): string {
   return HEATING_COPY[heatingStatusFromState(state)];
 }
 
-export function seasonLabel(state?: string | null): string | null {
+export function seasonLabel(state?: string | null): string {
   if (state === "year_round") return "Open year-round";
   if (state === "seasonal") return "Seasonal opening";
   if (state === "conflicting") return "Season information conflicting";
