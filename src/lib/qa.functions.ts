@@ -43,7 +43,13 @@ export type QaRow = {
   warnings: string[];
   can_index: boolean;
   can_rank: boolean;
+  can_publish: boolean;
   in_sitemap: boolean;
+  /** Raw pool records, so an editor can see where a conflict comes from. */
+  pools: StatusPool[];
+  derived_heating: string;
+  derived_season: string;
+  derived_counts: ReturnType<typeof calculatePoolCounts>;
 };
 
 async function ensureAdmin(userId: string) {
