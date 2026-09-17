@@ -113,7 +113,22 @@ export async function getHotelDetail(slug: string) {
 
   const pools = (poolRows ?? []) as unknown as PoolRecord[];
 
-  return { hotel: hotelWithEditorial, photos, quotes, pools };
+  // Evidence-based Pool Score (evidence-v1) — only the test group has records.
+  const { data: evidenceRow } = await supabaseAdmin
+    .from("pool_scores_evidence")
+    .select(
+      "guest_sentiment_points, heating_points, pool_count_points, pool_size_points, external_recognition_points, total_points, score_out_of_ten, confidence_level, score_version, approved_by, approved_at",
+    )
+    .eq("hotel_id", hotel.id as string)
+    .maybeSingle();
+
+  return {
+    hotel: hotelWithEditorial,
+    photos,
+    quotes,
+    pools,
+    evidence: (evidenceRow ?? null) as unknown as EvidenceScoreRecord | null,
+  };
 }
 
 export type PoolRecord = {
