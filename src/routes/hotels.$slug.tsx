@@ -1,7 +1,6 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { PoolFactsTable } from "@/components/PoolFactsTable";
 import { PoolRecordsPanel } from "@/components/PoolRecordsPanel";
 import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
 import { MetaRatingBreakdown } from "@/components/ScoreBreakdown";
@@ -12,15 +11,16 @@ import { PoolSentimentPanel } from "@/components/PoolSentimentPanel";
 import { getHotelBySlug, getCanonicalHotelSlug } from "@/lib/hotel-detail.functions";
 import {
   validateHotelForPublication,
-  calculateVerificationStatus,
-  calculatePoolScore,
-  describePoolCounts,
+  calculatePoolCounts,
+  calculateHeatingStatus,
+  calculateSeasonStatus,
+  describePoolMix,
   hasConfirmedSwimmingPool,
-  heatingLabel,
-  seasonLabel,
   publicValue,
+  HEATING_COPY,
   STATUS_COPY,
   SCORE_PENDING_LABEL,
+  type StatusPool,
 } from "@/lib/hotel-status";
 import { SectionHeading, SectionIcon } from "@/components/SectionHeading";
 import {
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/hotels/$slug")({
     // Index control: only a fully verified, published profile may be indexed.
     // Everything else stays reachable for visitors but is kept out of search.
     const editorial = hotel.editorial_status;
-    const gate = validateHotelForPublication(hotel);
+    const gate = validateHotelForPublication(hotel, loaderData.pools as never);
     const robots =
       editorial === "draft" || editorial === "review"
         ? "noindex, nofollow"
@@ -154,19 +154,26 @@ function HotelDetailPage() {
   const { hotel, photos, quotes, pools } = Route.useLoaderData() as NonNullable<
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
-  const gate = validateHotelForPublication(hotel);
+  const poolRecords = pools as unknown as StatusPool[];
+  const gate = validateHotelForPublication(hotel, poolRecords);
   const status = gate.status;
   const score = gate.score;
   const hasPool = hasConfirmedSwimmingPool(hotel);
   const noPool = status === "no_active_pool" || !hasPool;
+  // Counts, heating and season are derived from the pool records only.
+  const counts = calculatePoolCounts(poolRecords);
+  const heating = calculateHeatingStatus(poolRecords);
+  const season = calculateSeasonStatus(poolRecords);
   // A hotel with no confirmed pool never shows pool imagery.
   const hero = noPool ? null : (photos[0]?.url ?? hotel.cover_image_url);
-  const poolSummary = describePoolCounts(hotel);
+  const poolSummary = describePoolMix(counts);
   const keyFacts: string[] = noPool ? [] : [
     hotel.rooftop ? "Rooftop" : null,
     hotel.infinity ? "Infinity edge" : null,
-    hotel.heated_state === "heated" ? "Heated" : null,
-    hotel.season_state === "year_round" ? "Year-round" : null,
+    heating === "heated_pool_available" ? "Heated" : null,
+    season.status === "year_round_swimming_pool" || season.status === "year_round_spa_pool"
+      ? "Year-round"
+      : null,
     hotel.indoor && hotel.outdoor
       ? "Indoor + outdoor"
       : hotel.indoor
@@ -264,8 +271,8 @@ function HotelDetailPage() {
             {!noPool && (
               <PracticalFact label="Pools documented" value={poolSummary} />
             )}
-            {!noPool && <PracticalFact label="Heating" value={heatingLabel(hotel.heated_state)} />}
-            {!noPool && <PracticalFact label="Season" value={seasonLabel(hotel.season_state)} />}
+            {!noPool && <PracticalFact label="Heating" value={HEATING_COPY[heating]} />}
+            {!noPool && <PracticalFact label="Season" value={season.sentence} />}
             <PracticalFact label="Last checked" value={publicValue(hotel.last_verified_date)} />
             <PracticalFact label="Checked by" value={publicValue(hotel.verified_by)} />
             <PracticalFact
@@ -312,15 +319,11 @@ function HotelDetailPage() {
       {!noPool && (
       <HeatedPoolPanel
         hotelName={hotel.name}
-        heated={hotel.heated_pool}
-        indoor={hotel.indoor}
-        outdoor={hotel.outdoor}
-        yearRound={hotel.year_round}
-        poolCount={hotel.pool_count}
-        facts={hotel.pool_facts}
+        heating={heating}
+        seasonSentence={season.sentence}
+        pools={poolRecords}
         quotes={quotes}
-        verificationStatus={hotel.verification_status}
-        verificationMethod={hotel.verification_method}
+        status={status}
         lastVerifiedDate={hotel.last_verified_date}
         officialUrl={hotel.official_url ?? hotel.website_url}
       />
@@ -361,7 +364,13 @@ function HotelDetailPage() {
                     private_pool_count: hotel.private_pool_count,
                     jacuzzi_count: hotel.jacuzzi_count,
                   }}
-                  heatedState={hotel.heated_state}
+                  heatedState={
+                    heating === "heated_pool_available"
+                      ? "heated"
+                      : heating === "no_heated_pool"
+                        ? "not_heated"
+                        : "unknown"
+                  }
                 />
                 {noPool && (
                   <p className="text-sm text-muted-foreground">
@@ -374,7 +383,7 @@ function HotelDetailPage() {
                     estimated — missing details are shown as not confirmed.
                   </p>
                 )}
-                {pools.length === 0 && !noPool && <PoolFactsTable facts={hotel.pool_facts} />}
+                
               </div>
             </div>
 
@@ -388,8 +397,8 @@ function HotelDetailPage() {
                   <PracticalFact label="Pools" value={poolSummary} />
                   <PracticalFact label="Pool type" value={publicValue(hotel.pool_type)} />
                   <PracticalFact label="Pool size" value={publicValue(hotel.pool_size)} />
-                  <PracticalFact label="Heating" value={heatingLabel(hotel.heated_state)} />
-                  <PracticalFact label="Season" value={seasonLabel(hotel.season_state)} />
+                  <PracticalFact label="Heating" value={HEATING_COPY[heating]} />
+                  <PracticalFact label="Season" value={season.sentence} />
                   <PracticalFact label="Opening hours" value={hotel.pool_opening_hours} />
                   <PracticalFact
                     label="Who can use the pool"
@@ -586,7 +595,7 @@ function HotelDetailPage() {
                       month: "long",
                       year: "numeric",
                     })
-                  : "Not yet verified — we are still checking this property."}
+                  : "Not recorded yet."}
               </p>
               {!noPool && hotel.why_included && (
                 <>

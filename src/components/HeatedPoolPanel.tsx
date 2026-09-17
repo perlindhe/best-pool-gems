@@ -1,31 +1,29 @@
 import { Thermometer } from "lucide-react";
 import { SectionIcon } from "@/components/SectionHeading";
-import type { PoolFacts, PoolCitation } from "@/lib/rankings.functions";
 import type { PoolQuote } from "@/server/hotel-detail.server";
-
-type Method =
-  | "personally_visited"
-  | "verified_with_hotel"
-  | "multiple_sources"
-  | "research_pending"
-  | null;
+import {
+  HEATING_COPY,
+  STATUS_COPY,
+  type HeatingStatus,
+  type HotelStatus,
+  type StatusPool,
+} from "@/lib/hotel-status";
 
 type Props = {
   hotelName: string;
-  heated: boolean | null;
-  indoor: boolean | null;
-  outdoor: boolean | null;
-  yearRound: boolean | null;
-  poolCount: number | null;
-  facts: PoolFacts | null | undefined;
+  /** Central heating result — derived from the individual pool records only. */
+  heating: HeatingStatus;
+  /** Central season sentence — one pool being seasonal never hides a year-round one. */
+  seasonSentence: string;
+  pools: StatusPool[];
   quotes: PoolQuote[];
-  verificationStatus: "verified" | "partially_verified" | "research_pending" | null;
-  verificationMethod: Method;
+  status: HotelStatus;
   lastVerifiedDate: string | null;
   officialUrl: string | null;
 };
 
-const HEAT_WORDS = /(heat|heated|warm|temperature|jacuzzi|hot tub|cold|chilly|freezing|unheated|\b\d{2}\s?°|degrees)/i;
+const HEAT_WORDS =
+  /(heat|heated|warm|temperature|jacuzzi|hot tub|cold|chilly|freezing|unheated|\b\d{2}\s?°|degrees)/i;
 
 const SOURCE_LABEL: Record<string, string> = {
   website: "Hotel website",
@@ -43,78 +41,29 @@ function formatDate(date?: string | null) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function heatingCitations(facts: PoolFacts | null | undefined): PoolCitation[] {
-  const s = facts?.sources;
-  if (!s) return [];
-  return [
-    ...(s.is_heated ?? []),
-    ...(s.year_round ?? []),
-    ...(s.season ?? []),
-  ].slice(0, 4);
-}
-
 export function HeatedPoolPanel({
   hotelName,
-  heated,
-  indoor,
-  outdoor,
-  yearRound,
-  poolCount,
-  facts,
+  heating,
+  seasonSentence,
+  pools,
   quotes,
-  verificationStatus,
-  verificationMethod,
+  status,
   lastVerifiedDate,
   officialUrl,
 }: Props) {
-  const isHeated = heated ?? facts?.is_heated ?? null;
-  const pools = (facts?.pools ?? []).filter((p) => p && p.type);
-  const heatedPools = pools.filter((p) => p.heated === true);
-  const totalPools = poolCount ?? facts?.pool_count ?? (pools.length || null);
-  const season = facts?.season ?? heatedPools.find((p) => p.season)?.season ?? null;
-  const isYearRound = yearRound ?? facts?.year_round ?? null;
-
-  // Which kind of pool is heated
-  let heatedKind: string | null = null;
-  if (heatedPools.length) {
-    const kinds = new Set(
-      heatedPools.map((p) =>
-        p.indoor === true ? "indoor" : p.indoor === false ? "outdoor" : "unspecified",
-      ),
-    );
-    const parts: string[] = [];
-    if (kinds.has("indoor")) parts.push("Indoor");
-    if (kinds.has("outdoor")) parts.push("Outdoor");
-    heatedKind = parts.length ? parts.join(" + ") : null;
-  }
-  if (!heatedKind && isHeated) {
-    const hasIndoor = indoor ?? facts?.has_indoor ?? null;
-    const hasOutdoor = outdoor ?? facts?.has_outdoor ?? null;
-    if (hasIndoor && hasOutdoor) heatedKind = "Indoor + outdoor";
-    else if (hasIndoor) heatedKind = "Indoor";
-    else if (hasOutdoor) heatedKind = "Outdoor";
-  }
-
-  const citations = heatingCitations(facts);
+  const heatedPools = pools.filter((p) => p.heating_state === "confirmed_heated");
+  const swimmingPools = pools.filter(
+    (p) => p.pool_category === "shared_hotel_pool" || p.pool_category === "shared_swim_up",
+  );
   const heatQuotes = quotes.filter((q) => HEAT_WORDS.test(q.quote)).slice(0, 3);
   const when = formatDate(lastVerifiedDate);
-  const websiteCited = citations.some((c) => c.source === "website");
 
-  const headline =
-    isHeated === true
-      ? "Yes — the pool is heated"
-      : isHeated === false
-        ? "No — the pool is not heated"
-        : "Heating not confirmed yet";
-
-  const confidence =
-    verificationStatus === "verified" && websiteCited
-      ? "High — confirmed on the hotel's own site"
-      : verificationStatus === "verified"
-        ? "High — confirmed across multiple sources"
-        : verificationStatus === "partially_verified"
-          ? "Medium — some heating details still unconfirmed"
-          : "Low — research pending, treat as provisional";
+  const heatedKind = (() => {
+    const parts: string[] = [];
+    if (heatedPools.some((p) => p.indoor === true)) parts.push("Indoor");
+    if (heatedPools.some((p) => p.outdoor === true)) parts.push("Outdoor");
+    return parts.length ? parts.join(" + ") : "Not confirmed";
+  })();
 
   return (
     <section className="mx-auto max-w-6xl px-6 pb-4">
@@ -124,51 +73,42 @@ export function HeatedPoolPanel({
             <SectionIcon icon={Thermometer} />
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary">Heated pool check</p>
-              <h2 className="mt-2 font-display text-3xl tracking-wide md:text-4xl">{headline}</h2>
+              <h2 className="mt-2 font-display text-3xl tracking-wide md:text-4xl">
+                {HEATING_COPY[heating]}
+              </h2>
             </div>
           </div>
           <span
             className={`rounded-sm border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${
-              isHeated === true
+              heating === "heated_pool_available"
                 ? "border-primary/60 text-primary"
                 : "border-border/70 text-muted-foreground"
             }`}
           >
-            {isHeated === true ? "Heated" : isHeated === false ? "Unheated" : "Unknown"}
+            {HEATING_COPY[heating]}
           </span>
         </div>
 
         <dl className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
-          <Item label="Heated months">
-            {isYearRound
-              ? "Year-round, all 12 months"
-              : season
-                ? season
-                : isHeated === true
-                  ? "Season not confirmed"
-                  : "—"}
-          </Item>
-          <Item label="Indoor or outdoor">{heatedKind ?? "Not confirmed"}</Item>
+          <Item label="Season">{seasonSentence}</Item>
+          <Item label="Indoor or outdoor">{heatedKind}</Item>
           <Item label="Heated pools">
-            {totalPools
-              ? `${heatedPools.length || (isHeated === true ? 1 : 0)} of ${totalPools}`
-              : isHeated === true
-                ? "At least one"
-                : "—"}
+            {heating === "heated_pool_available"
+              ? `${heatedPools.length} of ${pools.length} documented pools`
+              : "None confirmed"}
           </Item>
-          <Item label="Confidence">{confidence}</Item>
+          <Item label="Swimming pools documented">{swimmingPools.length}</Item>
         </dl>
 
         {heatedPools.length > 0 && (
           <ul className="mt-6 flex flex-wrap gap-2">
             {heatedPools.map((p, i) => (
               <li
-                key={i}
+                key={p.id ?? i}
                 className="rounded-full border border-primary/40 bg-background/40 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-foreground/85"
               >
-                {p.name || p.type.replace("_", " ")}
-                {p.season ? ` · ${p.season}` : ""}
-                {p.length_m ? ` · ${p.length_m} m` : ""}
+                {p.pool_name || String(p.pool_category).replace(/_/g, " ")}
+                {p.seasonal_dates ? ` · ${p.seasonal_dates}` : ""}
               </li>
             ))}
           </ul>
@@ -178,11 +118,7 @@ export function HeatedPoolPanel({
           {when
             ? `Heating details last checked ${when}.`
             : "Heating details have not been re-checked recently."}{" "}
-          {verificationMethod === "verified_with_hotel"
-            ? "Confirmed directly with the property."
-            : websiteCited
-              ? `Confirmed against ${hotelName}'s own website.`
-              : "Not yet confirmed on the hotel's own website."}{" "}
+          {STATUS_COPY[status].sentence}{" "}
           {officialUrl && (
             <a
               href={officialUrl}
@@ -190,12 +126,12 @@ export function HeatedPoolPanel({
               rel="noopener noreferrer nofollow"
               className="text-primary underline underline-offset-4"
             >
-              Check the hotel site
+              Check {hotelName}'s own site
             </a>
           )}
         </p>
 
-        {(heatQuotes.length > 0 || citations.length > 0) && (
+        {heatQuotes.length > 0 && (
           <div className="mt-6 border-t border-border/40 pt-5">
             <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
               What our sources say about heating
@@ -224,29 +160,6 @@ export function HeatedPoolPanel({
                   </span>
                 </li>
               ))}
-              {heatQuotes.length === 0 &&
-                citations.map((c, i) => (
-                  <li
-                    key={`c${i}`}
-                    className="rounded-md border border-border/50 bg-background/40 p-4 text-sm leading-relaxed text-foreground/90"
-                  >
-                    &ldquo;{c.quote}&rdquo;
-                    <span className="mt-2 block text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                      {c.source === "website" && officialUrl ? (
-                        <a
-                          href={officialUrl}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow"
-                          className="text-primary underline underline-offset-4"
-                        >
-                          Hotel website ↗
-                        </a>
-                      ) : (
-                        SOURCE_LABEL[c.source] ?? c.source
-                      )}
-                    </span>
-                  </li>
-                ))}
             </ul>
           </div>
         )}
