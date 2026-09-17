@@ -34,6 +34,7 @@
 
   --primary: oklch(0.52 0.105 205);
   --primary-foreground: oklch(0.99 0.004 95);
+  --on-image: oklch(0.99 0.004 95);
   --accent: oklch(0.66 0.105 192);
   --accent-foreground: oklch(0.18 0.02 225);
   --secondary: oklch(0.94 0.018 205);
@@ -87,6 +88,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-on-image: var(--on-image);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
