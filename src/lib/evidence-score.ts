@@ -189,7 +189,7 @@ export function summarizeComments(
   };
 }
 
-/** Bayesian-smoothed positive share, scaled to 40 points. Null under 5 comments. */
+/** Bayesian-smoothed positive share, scaled to 40 points. Null under 3 comments. */
 export function scoreGuestSentiment(
   breakdown: Pick<SentimentBreakdown, "positive" | "relevant">,
 ): number | null {
