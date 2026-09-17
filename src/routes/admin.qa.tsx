@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -140,8 +140,8 @@ function QaPage() {
             </thead>
             <tbody>
               {visible.map((r) => (
-                <>
-                <tr key={r.id} className="border-t border-border/40 align-top">
+                <Fragment key={r.id}>
+                <tr className="border-t border-border/40 align-top">
                   <td className="p-2">
                     <a
                       href={`/hotels/${r.slug}`}
@@ -181,7 +181,7 @@ function QaPage() {
                   <td className="p-2 text-destructive">{r.errors.join("; ") || "—"}</td>
                 </tr>
                 {/* Raw pool records, so a conflict can be traced to its source */}
-                <tr key={`${r.id}-raw`} className="border-t border-border/20 bg-surface/40">
+                <tr className="border-t border-border/20 bg-surface/40">
                   <td className="p-2 text-muted-foreground" colSpan={17}>
                     {r.pools.length === 0
                       ? "No pool records"
@@ -193,7 +193,7 @@ function QaPage() {
                           .join("   |   ")}
                   </td>
                 </tr>
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>
