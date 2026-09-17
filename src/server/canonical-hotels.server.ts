@@ -321,7 +321,7 @@ export type CityHubSummary = {
   features: CityFeatureCount[];
 };
 
-const FEATURE_DEFS: Array<{ key: string; label: string; column: keyof CanonicalHotel }> = [
+const FEATURE_DEFS: Array<{ key: string; label: string; column: keyof CanonicalHotel; value?: unknown }> = [
   { key: "rooftop", label: "Rooftop pools", column: "rooftop" },
   { key: "infinity", label: "Infinity pools", column: "infinity" },
   { key: "heated", label: "Heated pools", column: "heated_state", value: "heated" },
@@ -365,7 +365,7 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
     features: FEATURE_DEFS.map((f) => ({
       key: f.key,
       label: f.label,
-      count: rows.filter((r) => r[f.column] === true).length,
+      count: rows.filter((r) => r[f.column] === (f.value ?? true)).length,
     })).filter((f) => f.count > 0),
   };
 }
