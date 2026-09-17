@@ -133,9 +133,18 @@ function EvidencePage() {
       <main className="mx-auto max-w-6xl px-6 py-12">
         <h1 className="font-display text-4xl text-primary">Evidence-based Pool Score</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Internal review for the ten test hotels. Nothing is published until an editor
-          approves a score, and no other hotel uses this model yet.
+          Internal review for the ten test hotels. The system collects evidence,
+          recalculates every factor and approves a score by itself when all five factors
+          are evidence-backed and no QA error remains. Everything else stays pending.
+          No other hotel uses this model yet.
         </p>
+        <button
+          className="mt-4 rounded border border-border px-3 py-1.5 text-xs"
+          disabled={busy === "__auto__"}
+          onClick={() => run("__auto__", () => runEvidenceAutomationForTestGroup())}
+        >
+          {busy === "__auto__" ? "Running automation…" : "Run automation for all ten hotels"}
+        </button>
         {error && (
           <p className="mt-4 rounded border border-destructive/40 p-3 text-sm text-destructive">
             {error}
