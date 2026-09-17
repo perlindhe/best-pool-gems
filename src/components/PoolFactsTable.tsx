@@ -42,11 +42,8 @@ function buildRows(f: PoolFacts): Row[] {
   else if (f.has_outdoor) setting.push("Outdoor");
   if (setting.length) rows.push({ label: "Setting", value: setting.join(" · "), keys: ["is_rooftop", "is_infinity", "has_indoor", "has_outdoor"] });
 
-  if (yn(f.is_heated)) rows.push({ label: "Heated", value: yn(f.is_heated)!, keys: ["is_heated"] });
+  // Heating and season are never read from these legacy facts — the pool records decide.
   if (yn(f.is_saltwater)) rows.push({ label: "Saltwater", value: yn(f.is_saltwater)!, keys: ["is_saltwater"] });
-  if (yn(f.year_round))
-    rows.push({ label: "Year-round", value: yn(f.year_round)!, keys: ["year_round"] });
-  if (f.season) rows.push({ label: "Season", value: f.season, keys: ["season"] });
 
   const amenities: string[] = [];
   if (f.has_jacuzzi) amenities.push("Jacuzzi");
@@ -67,10 +64,8 @@ function poolSubtitle(p: PoolDescriptor): string {
   const bits: string[] = [];
   if (p.indoor === true) bits.push("Indoor");
   if (p.indoor === false) bits.push("Outdoor");
-  if (p.heated === true) bits.push("Heated");
   if (p.length_m != null) bits.push(`${p.length_m} m`);
   if (p.adults_only === true) bits.push("Adults only");
-  if (p.season) bits.push(p.season);
   return bits.join(" · ");
 }
 
