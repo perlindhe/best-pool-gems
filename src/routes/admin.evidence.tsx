@@ -106,7 +106,7 @@ function EvidencePage() {
       await load();
       if (open) setComments(((await listPoolComments({ data: { hotel_id: open } })).comments as unknown as Comment[]) ?? []);
     } catch (e) {
-      setError((e as Error).message);
+      setError(errText(e));
     } finally {
       setBusy(null);
     }
@@ -123,7 +123,7 @@ function EvidencePage() {
       const r = await listPoolComments({ data: { hotel_id: hotelId } });
       setComments((r.comments as unknown as Comment[]) ?? []);
     } catch (e) {
-      setError((e as Error).message);
+      setError(errText(e));
     }
   };
 
@@ -140,6 +140,10 @@ function EvidencePage() {
           <p className="mt-4 rounded border border-destructive/40 p-3 text-sm text-destructive">
             {error}
           </p>
+        )}
+
+        {!ready && (
+          <p className="mt-6 text-sm text-muted-foreground">Checking your sign-in…</p>
         )}
 
         <div className="mt-8 space-y-4">
