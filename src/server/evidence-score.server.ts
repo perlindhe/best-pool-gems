@@ -574,6 +574,19 @@ export async function buildEvidenceReport(hotelId: string): Promise<EvidenceRepo
     approvedBy,
   });
 
+  const autoBlockers = autoApprovalBlockers({
+    qaErrors,
+    blockingReasons: total.blockingReasons,
+    confidenceLevel,
+    totalPoints: total.totalPoints,
+    scoreOutOfTen: total.scoreOutOfTen,
+    relevantComments: breakdown.relevant,
+    independentSourceCount,
+    hasOfficialSource,
+    hasConflicts,
+    qaBlocked: hotel.qa_blocked === true,
+  });
+
   const areas = pools.filter(isSharedSwim).map((p) => Number(p.area_sqm)).filter((n) => n > 0);
   const lengths = pools
     .filter(isSharedSwim)
