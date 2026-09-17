@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { EvidenceScoreView as EvidenceScoreRecord } from "@/components/EvidenceScorePanel";
 
 export type HotelPhoto = {
   url: string;
