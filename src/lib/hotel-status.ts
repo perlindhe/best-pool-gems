@@ -28,31 +28,192 @@ export type HotelStatus =
  * out, so nothing outside the test group changes silently.
  */
 export const CORRECTION_PHASE_SLUGS = [
-  "sydney-hyatt-regency-sydney",
-  "sydney-park-hyatt-sydney",
-  "sydney-w-sydney",
-  "sydney-intercontinental-sydney",
-  "sydney-ace-hotel-sydney",
-  "sydney-qt-sydney",
-  "sydney-capella-sydney",
-  "barcelona-hotel-arts",
-  "barcelona-1898",
+  "bangkok-the-siam",
   "los-angeles-hotel-june-west-la",
+  "barcelona-1898",
   "mallorca-hotel-can-bordoy-grand-house-and-garden",
-  "los-angeles-the-maybourne-beverly-hills",
-  "mallorca-jumeirah-port-soller",
-  "bangkok-the-peninsula-bangkok",
-  "minos-palace-hotel-suites",
-  "london-shangri-la-the-shard",
-  "london-bvlgari-hotel-london",
-  "barcelona-grand-hotel-central",
-  "los-angeles-the-hollywood-roosevelt",
-  "porto-elounda-golf-spa-resort",
+  "sydney-park-hyatt-sydney",
 ] as const;
 
 export function isCorrectionPhase(slug?: string | null): boolean {
   return !!slug && (CORRECTION_PHASE_SLUGS as readonly string[]).includes(slug);
 }
+
+/* ------------------------------------------------------------------ */
+/* Pool records: the only source of counts, heating and season         */
+/* ------------------------------------------------------------------ */
+
+export type PoolCategory =
+  | "shared_hotel_pool"
+  | "shared_swim_up"
+  | "private_room_pool"
+  | "spa_pool"
+  | "childrens_pool"
+  | "plunge_pool"
+  | "jacuzzi";
+
+export type StatusPool = {
+  id?: string;
+  pool_name?: string | null;
+  pool_category: PoolCategory | string;
+  shared_or_private?: string | null;
+  indoor?: boolean | null;
+  outdoor?: boolean | null;
+  rooftop?: boolean | null;
+  heated?: boolean | null;
+  heating_state?: string | null;
+  season_state?: string | null;
+  seasonal_dates?: string | null;
+  year_round?: boolean | null;
+};
+
+export type PoolCounts = {
+  sharedSwimmingPools: number;
+  spaPools: number;
+  childrenPools: number;
+  privatePoolCategories: number;
+  plungePools: number;
+  jacuzzis: number;
+};
+
+const SHARED_SWIM = new Set(["shared_hotel_pool", "shared_swim_up"]);
+
+function isPrivatePool(p: StatusPool): boolean {
+  return p.pool_category === "private_room_pool" || p.shared_or_private === "private";
+}
+
+/** Counts per category. A jacuzzi is never a swimming pool. */
+export function calculatePoolCounts(pools: StatusPool[]): PoolCounts {
+  const counts: PoolCounts = {
+    sharedSwimmingPools: 0,
+    spaPools: 0,
+    childrenPools: 0,
+    privatePoolCategories: 0,
+    plungePools: 0,
+    jacuzzis: 0,
+  };
+  for (const p of pools) {
+    if (isPrivatePool(p)) {
+      counts.privatePoolCategories += 1;
+      continue;
+    }
+    if (SHARED_SWIM.has(String(p.pool_category))) counts.sharedSwimmingPools += 1;
+    else if (p.pool_category === "spa_pool") counts.spaPools += 1;
+    else if (p.pool_category === "childrens_pool") counts.childrenPools += 1;
+    else if (p.pool_category === "plunge_pool") counts.plungePools += 1;
+    else if (p.pool_category === "jacuzzi") counts.jacuzzis += 1;
+  }
+  return counts;
+}
+
+export type HeatingStatus =
+  | "heated_pool_available"
+  | "no_heated_pool"
+  | "heating_not_confirmed"
+  | "conflicting_heating_information";
+
+/** Heating comes from the pool records only — never from a manual hotel field. */
+export function calculateHeatingStatus(pools: StatusPool[]): HeatingStatus {
+  if (!pools.length) return "heating_not_confirmed";
+  let heated = 0;
+  let notHeated = 0;
+  for (const p of pools) {
+    if (p.heating_state === "conflicting") return "conflicting_heating_information";
+    if (p.heating_state === "confirmed_heated") {
+      if (p.heated === false) return "conflicting_heating_information";
+      heated += 1;
+    } else if (p.heating_state === "confirmed_not_heated") {
+      if (p.heated === true) return "conflicting_heating_information";
+      notHeated += 1;
+    }
+  }
+  if (heated > 0) return "heated_pool_available";
+  if (notHeated > 0 && notHeated === pools.length) return "no_heated_pool";
+  return "heating_not_confirmed";
+}
+
+export const HEATING_COPY: Record<HeatingStatus, string> = {
+  heated_pool_available: "Heated pool available",
+  no_heated_pool: "No heated pool",
+  heating_not_confirmed: "Heating not confirmed",
+  conflicting_heating_information: "Heating information conflicting",
+};
+
+export type SeasonStatus =
+  | "year_round_swimming_pool"
+  | "year_round_spa_pool"
+  | "seasonal"
+  | "mixed"
+  | "not_confirmed"
+  | "conflicting";
+
+function poolLabel(p: StatusPool): string {
+  if (p.pool_category === "spa_pool") return "spa pool";
+  if (p.rooftop === true) return "rooftop pool";
+  if (p.indoor === true) return "indoor pool";
+  return "outdoor pool";
+}
+
+/** Season, per pool, written so one seasonal pool never hides a year-round one. */
+export function calculateSeasonStatus(pools: StatusPool[]): {
+  status: SeasonStatus;
+  sentence: string;
+} {
+  const relevant = pools.filter((p) => !isPrivatePool(p) && p.pool_category !== "jacuzzi");
+  if (!relevant.length) return { status: "not_confirmed", sentence: "Pool season not confirmed" };
+  if (relevant.some((p) => p.season_state === "conflicting"))
+    return { status: "conflicting", sentence: "Season information conflicting" };
+  const yearRound = relevant.filter((p) => p.season_state === "year_round");
+  const seasonal = relevant.filter((p) => p.season_state === "seasonal");
+  if (!yearRound.length && !seasonal.length)
+    return { status: "not_confirmed", sentence: "Pool season not confirmed" };
+
+  if (yearRound.length && seasonal.length) {
+    const yr = yearRound[0]!;
+    const se = seasonal[0]!;
+    const dates = se.seasonal_dates ? ` (${se.seasonal_dates})` : "";
+    return {
+      status: "mixed",
+      sentence: `Year-round ${poolLabel(yr)}; ${poolLabel(se)} is seasonal${dates}`,
+    };
+  }
+  if (yearRound.length) {
+    const spaOnly = yearRound.every((p) => p.pool_category === "spa_pool");
+    return {
+      status: spaOnly ? "year_round_spa_pool" : "year_round_swimming_pool",
+      sentence: spaOnly ? "Year-round spa pool available" : "Year-round swimming pool available",
+    };
+  }
+  const dates = seasonal.find((p) => p.seasonal_dates)?.seasonal_dates;
+  return {
+    status: "seasonal",
+    sentence: dates ? `Seasonal pool opening (${dates})` : "Seasonal outdoor pools",
+  };
+}
+
+/** One readable sentence per category, built only from the pool records. */
+export function describePoolMix(counts: PoolCounts): string | null {
+  const parts: string[] = [];
+  const add = (n: number, one: string, many: string) => {
+    if (n > 0) parts.push(`${n} ${n === 1 ? one : many}`);
+  };
+  add(counts.sharedSwimmingPools, "shared swimming pool", "shared swimming pools");
+  add(counts.childrenPools, "children's pool", "children's pools");
+  add(counts.plungePools, "plunge pool", "plunge pools");
+  add(counts.spaPools, "spa pool", "spa pools");
+  add(counts.jacuzzis, "jacuzzi", "jacuzzis");
+  let text =
+    parts.length > 1
+      ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
+      : (parts[0] ?? "");
+  if (counts.privatePoolCategories > 0) {
+    const p = `${counts.privatePoolCategories} private pool ${counts.privatePoolCategories === 1 ? "category" : "categories"}`;
+    text = text ? `${text}, plus ${p} in selected rooms` : `${p} in selected rooms`;
+  }
+  if (!text) return null;
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}.`;
+}
+
 
 /** The canonical record fields the central functions need. */
 export type StatusHotel = {
@@ -90,6 +251,9 @@ export type StatusHotel = {
   pool_components?: Record<string, number> | null;
   pool_score_0_10?: number | null;
   score_approved_by?: string | null;
+  pool_type?: string | null;
+  pool_size?: string | null;
+  best_time?: string | null;
 };
 
 const n = (v: number | null | undefined) => (typeof v === "number" ? v : 0);
@@ -134,7 +298,7 @@ function hasApprovedSubscores(h: StatusHotel): boolean {
 }
 
 /** Two published values that cannot both be true. */
-export function detectConflicts(h: StatusHotel): string[] {
+export function detectConflicts(h: StatusHotel, pools?: StatusPool[]): string[] {
   const conflicts: string[] = [];
   const shared = n(h.shared_pool_count);
   if (!hasConfirmedSwimmingPool(h) && (n(h.pool_count) > 0 || shared > 0))
@@ -152,8 +316,40 @@ export function detectConflicts(h: StatusHotel): string[] {
   // plunge, private pools and jacuzzis are always counted separately.
   if (h.pool_count != null && h.pool_count !== shared)
     conflicting(conflicts, "The pool count cannot be explained by the pool records");
+
+  if (pools && pools.length) {
+    const counts = calculatePoolCounts(pools);
+    if (counts.sharedSwimmingPools !== shared)
+      conflicting(conflicts, "The summary shows a different number of shared pools than the pool records");
+    if (pools.some((p) => p.pool_category === "jacuzzi" && p.shared_or_private === "shared" && shared === 0 && n(h.pool_count) > 0))
+      conflicting(conflicts, "A jacuzzi is counted as a swimming pool");
+    if (pools.some((p) => isPrivatePool(p) && SHARED_SWIM.has(String(p.pool_category))))
+      conflicting(conflicts, "A private room pool is recorded as a shared hotel pool");
+    const heating = calculateHeatingStatus(pools);
+    if (heating === "conflicting_heating_information")
+      conflicting(conflicts, "The pool records disagree about heating");
+    if (heating === "heated_pool_available" && (h.heated_state === "not_heated" || h.heated_pool === false))
+      conflicting(conflicts, "Heating is recorded as both heated and not heated");
+    const season = calculateSeasonStatus(pools);
+    if (season.status === "conflicting")
+      conflicting(conflicts, "The pool records disagree about the season");
+    if (
+      (season.status === "year_round_swimming_pool" ||
+        season.status === "year_round_spa_pool" ||
+        season.status === "mixed") &&
+      h.year_round === false
+    )
+      conflicting(conflicts, "Year-round is recorded as both yes and no");
+    // A generic plural name must not double-count a pool described elsewhere.
+    const names = pools
+      .map((p) => (p.pool_name ?? "").trim().toLowerCase())
+      .filter((x) => x.length > 0);
+    if (new Set(names).size !== names.length)
+      conflicting(conflicts, "The same pool appears to be registered twice");
+  }
   return conflicts;
 }
+
 
 function conflicting(list: string[], message: string) {
   if (!list.includes(message)) list.push(message);
@@ -162,13 +358,13 @@ function conflicting(list: string[], message: string) {
 /**
  * ONE status per hotel. Nothing else may derive or override it.
  */
-export function calculateVerificationStatus(h: StatusHotel): HotelStatus {
+export function calculateVerificationStatus(h: StatusHotel, pools?: StatusPool[]): HotelStatus {
   if (!hasConfirmedSwimmingPool(h)) {
     // No pool at all vs. "we have not looked properly yet".
     if (h.has_active_pool === false || h.pool_status === "no_pool") return "no_active_pool";
     return "research_pending";
   }
-  if (detectConflicts(h).length > 0) return "conflicting_data";
+  if (detectConflicts(h, pools).length > 0) return "conflicting_data";
   if (h.qa_blocked === true) return "conflicting_data";
   if (h.verification_status === "research_pending") return "research_pending";
   const missing = missingCoreFacts(h);
@@ -203,12 +399,16 @@ export type PublicationResult = {
 };
 
 /** ONE gate for publishing, indexing, ranking and sitemap inclusion. */
-export function validateHotelForPublication(h: StatusHotel): PublicationResult {
-  const status = calculateVerificationStatus(h);
+export function validateHotelForPublication(
+  h: StatusHotel,
+  pools?: StatusPool[],
+): PublicationResult {
+  const status = calculateVerificationStatus(h, pools);
   const score = calculatePoolScore(h, status);
   const missing = missingCoreFacts(h);
-  const errors: string[] = [...detectConflicts(h)];
+  const errors: string[] = [...detectConflicts(h, pools)];
   const warnings: string[] = [];
+
 
   if (!hasConfirmedSwimmingPool(h) && h.ranking_eligible === true)
     errors.push("Hotel without a confirmed pool is still ranking eligible");
@@ -222,6 +422,16 @@ export function validateHotelForPublication(h: StatusHotel): PublicationResult {
   if (!h.last_verified_date) errors.push("No verification date");
   else if (h.last_verified_date > new Date().toISOString().slice(0, 10))
     errors.push("Verification date is in the future");
+  // Nothing raw ever reaches a page: a stored placeholder is a blocking error.
+  for (const [label, raw] of [
+    ["Pool type", h.pool_type],
+    ["Pool size", h.pool_size],
+    ["Best time", h.best_time],
+  ] as const) {
+    if (raw != null && String(raw).trim() !== "" && publicValue(raw) === null)
+      errors.push(`${label} contains a placeholder value`);
+  }
+
 
   for (const m of missing) if (!errors.some((e) => e.includes(m))) warnings.push(`Missing ${m}`);
 
