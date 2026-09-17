@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
