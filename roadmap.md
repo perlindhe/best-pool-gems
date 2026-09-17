@@ -24,10 +24,14 @@
 - [x] One gate: test hotels are kept out of rankings, destination lists,
       sitemap and search results until an editor approves their score
 
-### Open (waiting on a person)
-- [ ] Collect comments, add mentions and approve a score for the ten test
-      hotels on the internal review page
-- [ ] Editorial sub-scores and sign-off for all five hotels — without them there is
-      no Pool Score, no ranking place and the pages stay out of search results.
-      Automation stays paused, so this cannot be generated.
-- [ ] Approval before the same correction is rolled out to the remaining hotels
+- [x] Automatic collection of guest comments for all ten test hotels
+- [x] Automatic confirmation of pool size and heating from each hotel's own
+      pages, with a literal quote and the source link (never estimated)
+- [x] Automatic approval only when every factor is evidence-backed
+
+### Open (waiting on facts or a person)
+- [ ] Most hotels do not state pool length or area on their own pages, so the
+      size factor stays unconfirmed and no score is published. Needs either a
+      new official source or a manual measurement per hotel.
+- [ ] Hotel June and Can Bordoy have fewer than three pool comments
+- [ ] Approval before the same model is rolled out to the remaining hotels
