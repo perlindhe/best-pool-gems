@@ -35,7 +35,7 @@ for (const slug of SLUGS) {
   const res = await fetch(`${BASE}/hotels/${slug}`);
   const html = (await res.text()).replace(/\0/g, "");
   // Ignore the dev tooling script, it is not part of the page.
-  const page = html.split("<script")[0] + html.replace(/<script[\s\S]*?<\/script>/g, "");
+  const page = html.replace(/<script[\s\S]*?<\/script>/g, "");
 
   check(`${slug}: page loads`, res.status === 200, `status ${res.status}`);
 
