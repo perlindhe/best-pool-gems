@@ -717,10 +717,13 @@ export async function runEvidenceAutomation() {
     .in("slug", EVIDENCE_TEST_GROUP);
   if (error) throw new Error(error.message);
 
+  const { ingestPoolFacts } = await import("./pool-facts.server");
+
   const results: Array<{
     slug: string;
     name: string;
     collected?: number;
+    facts?: { updatedPools: number; confirmedSize: number; confirmedHeating: number };
     approved: boolean;
     scoreOutOfTen: number | null;
     blockers: string[];
@@ -735,11 +738,23 @@ export async function runEvidenceAutomation() {
       } catch {
         collected = undefined;
       }
+      let facts: { updatedPools: number; confirmedSize: number; confirmedHeating: number } | undefined;
+      try {
+        const f = await ingestPoolFacts(h.id);
+        facts = {
+          updatedPools: f.updatedPools,
+          confirmedSize: f.confirmedSize,
+          confirmedHeating: f.confirmedHeating,
+        };
+      } catch {
+        facts = undefined;
+      }
       const report = await saveEvidenceReport(h.id);
       results.push({
         slug: h.slug,
         name: h.name,
         collected,
+        facts,
         approved: report.approvedBy != null,
         scoreOutOfTen: report.scoreOutOfTen,
         blockers: report.autoBlockers,
