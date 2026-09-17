@@ -36,7 +36,7 @@ type Scope =
   | "no_source";
 
 const SCOPES: Array<{ key: Scope; label: string }> = [
-  { key: "test", label: "Test group (20)" },
+  { key: "test", label: "Test group (5)" },
   { key: "errors", label: "Blocking errors" },
   { key: "conflicting", label: "Conflicting" },
   { key: "partial", label: "Partially verified" },

@@ -3,9 +3,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   validateHotelForPublication,
-  describePoolCounts,
+  calculatePoolCounts,
+  calculateHeatingStatus,
+  calculateSeasonStatus,
+  describePoolMix,
+  HEATING_COPY,
   type HotelStatus,
   type StatusHotel,
+  type StatusPool,
 } from "@/lib/hotel-status";
 
 export type QaRow = {
