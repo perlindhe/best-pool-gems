@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      external_mentions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          author: string | null
+          canonical_url: string | null
+          created_at: string
+          excluded_reason: string | null
+          hotel_id: string
+          id: string
+          is_about_pool: boolean | null
+          is_positive: boolean | null
+          notes: string | null
+          publication: string | null
+          published_at: string | null
+          tier: string | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          author?: string | null
+          canonical_url?: string | null
+          created_at?: string
+          excluded_reason?: string | null
+          hotel_id: string
+          id?: string
+          is_about_pool?: boolean | null
+          is_positive?: boolean | null
+          notes?: string | null
+          publication?: string | null
+          published_at?: string | null
+          tier?: string | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          author?: string | null
+          canonical_url?: string | null
+          created_at?: string
+          excluded_reason?: string | null
+          hotel_id?: string
+          id?: string
+          is_about_pool?: boolean | null
+          is_positive?: boolean | null
+          notes?: string | null
+          publication?: string | null
+          published_at?: string | null
+          tier?: string | null
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_mentions_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_mentions_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hotel_photos: {
         Row: {
           alt_text: string | null
@@ -102,6 +174,7 @@ export type Database = {
         Row: {
           adults_only: boolean | null
           approximate_size: string | null
+          area_sqm: number | null
           children_allowed: boolean | null
           created_at: string
           day_pass: boolean | null
@@ -129,6 +202,8 @@ export type Database = {
           season_state: string
           seasonal_dates: string | null
           shared_or_private: string
+          size_source_url: string | null
+          size_verified: boolean
           source_urls: Json
           updated_at: string
           view: string | null
@@ -137,6 +212,7 @@ export type Database = {
         Insert: {
           adults_only?: boolean | null
           approximate_size?: string | null
+          area_sqm?: number | null
           children_allowed?: boolean | null
           created_at?: string
           day_pass?: boolean | null
@@ -164,6 +240,8 @@ export type Database = {
           season_state?: string
           seasonal_dates?: string | null
           shared_or_private?: string
+          size_source_url?: string | null
+          size_verified?: boolean
           source_urls?: Json
           updated_at?: string
           view?: string | null
@@ -172,6 +250,7 @@ export type Database = {
         Update: {
           adults_only?: boolean | null
           approximate_size?: string | null
+          area_sqm?: number | null
           children_allowed?: boolean | null
           created_at?: string
           day_pass?: boolean | null
@@ -199,6 +278,8 @@ export type Database = {
           season_state?: string
           seasonal_dates?: string | null
           shared_or_private?: string
+          size_source_url?: string | null
+          size_verified?: boolean
           source_urls?: Json
           updated_at?: string
           view?: string | null
@@ -536,6 +617,100 @@ export type Database = {
           },
         ]
       }
+      pool_comments: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          author: string | null
+          created_at: string
+          editor_relevance: string | null
+          editor_sentiment: string | null
+          excluded_reason: string | null
+          hotel_id: string
+          id: string
+          is_duplicate_of: string | null
+          is_owner_content: boolean
+          normalized_text: string
+          published_at: string | null
+          raw_text: string
+          relevance: string
+          sentiment: string
+          source: string
+          source_url: string | null
+          stay_group_key: string | null
+          text_hash: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          author?: string | null
+          created_at?: string
+          editor_relevance?: string | null
+          editor_sentiment?: string | null
+          excluded_reason?: string | null
+          hotel_id: string
+          id?: string
+          is_duplicate_of?: string | null
+          is_owner_content?: boolean
+          normalized_text: string
+          published_at?: string | null
+          raw_text: string
+          relevance?: string
+          sentiment?: string
+          source: string
+          source_url?: string | null
+          stay_group_key?: string | null
+          text_hash: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          author?: string | null
+          created_at?: string
+          editor_relevance?: string | null
+          editor_sentiment?: string | null
+          excluded_reason?: string | null
+          hotel_id?: string
+          id?: string
+          is_duplicate_of?: string | null
+          is_owner_content?: boolean
+          normalized_text?: string
+          published_at?: string | null
+          raw_text?: string
+          relevance?: string
+          sentiment?: string
+          source?: string
+          source_url?: string | null
+          stay_group_key?: string | null
+          text_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pool_comments_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pool_comments_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pool_comments_is_duplicate_of_fkey"
+            columns: ["is_duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "pool_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pool_quotes: {
         Row: {
           author: string | null
@@ -610,6 +785,84 @@ export type Database = {
           },
           {
             foreignKeyName: "pool_scores_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: true
+            referencedRelation: "public_hotels_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pool_scores_evidence: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          blocking_reasons: Json
+          calculated_at: string
+          confidence_level: string
+          created_at: string
+          external_recognition_points: number | null
+          guest_sentiment_points: number | null
+          heating_points: number | null
+          hotel_id: string
+          inputs: Json
+          pool_count_points: number | null
+          pool_size_points: number | null
+          score_out_of_ten: number | null
+          score_version: string
+          total_points: number | null
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          blocking_reasons?: Json
+          calculated_at?: string
+          confidence_level?: string
+          created_at?: string
+          external_recognition_points?: number | null
+          guest_sentiment_points?: number | null
+          heating_points?: number | null
+          hotel_id: string
+          inputs?: Json
+          pool_count_points?: number | null
+          pool_size_points?: number | null
+          score_out_of_ten?: number | null
+          score_version?: string
+          total_points?: number | null
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          blocking_reasons?: Json
+          calculated_at?: string
+          confidence_level?: string
+          created_at?: string
+          external_recognition_points?: number | null
+          guest_sentiment_points?: number | null
+          heating_points?: number | null
+          hotel_id?: string
+          inputs?: Json
+          pool_count_points?: number | null
+          pool_size_points?: number | null
+          score_out_of_ten?: number | null
+          score_version?: string
+          total_points?: number | null
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pool_scores_evidence_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: true
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pool_scores_evidence_hotel_id_fkey"
             columns: ["hotel_id"]
             isOneToOne: true
             referencedRelation: "public_hotels_view"

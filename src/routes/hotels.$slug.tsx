@@ -4,6 +4,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { PoolRecordsPanel } from "@/components/PoolRecordsPanel";
 import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
 import { MetaRatingBreakdown } from "@/components/ScoreBreakdown";
+import { EvidenceScorePanel } from "@/components/EvidenceScorePanel";
+import { EVIDENCE_TEST_GROUP } from "@/lib/evidence-score";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
@@ -151,13 +153,22 @@ export const Route = createFileRoute("/hotels/$slug")({
 });
 
 function HotelDetailPage() {
-  const { hotel, photos, quotes, pools } = Route.useLoaderData() as NonNullable<
+  const { hotel, photos, quotes, pools, evidence } = Route.useLoaderData() as NonNullable<
     Awaited<ReturnType<typeof getHotelBySlug>>
   >;
   const poolRecords = pools as unknown as StatusPool[];
   const gate = validateHotelForPublication(hotel, poolRecords);
   const status = gate.status;
   const score = gate.score;
+  // The ten test hotels use the Evidence-based Pool Score; everyone else keeps
+  // the previous model until the new one is approved for rollout.
+  const usesEvidenceScore = EVIDENCE_TEST_GROUP.includes(hotel.slug);
+  const evidencePublished = Boolean(
+    evidence?.approved_by &&
+      evidence?.approved_at &&
+      evidence?.score_out_of_ten != null &&
+      evidence.confidence_level !== "low",
+  );
   const hasPool = hasConfirmedSwimmingPool(hotel);
   const noPool = status === "no_active_pool" || !hasPool;
   // Counts, heating and season are derived from the pool records only.
@@ -288,7 +299,15 @@ function HotelDetailPage() {
             <PracticalFact label="Checked by" value={publicValue(hotel.verified_by)} />
             <PracticalFact
               label="Pool Score"
-              value={score != null ? `${score.toFixed(1)} / 10` : SCORE_PENDING_LABEL}
+              value={
+                usesEvidenceScore
+                  ? evidencePublished
+                    ? `${evidence!.score_out_of_ten!.toFixed(1)} / 10`
+                    : SCORE_PENDING_LABEL
+                  : score != null
+                    ? `${score.toFixed(1)} / 10`
+                    : SCORE_PENDING_LABEL
+              }
             />
             <PracticalFact
               label="Included in rankings"
@@ -297,6 +316,12 @@ function HotelDetailPage() {
           </dl>
         </div>
       </section>
+
+      {usesEvidenceScore && (
+        <section className="mx-auto max-w-6xl px-6 pt-12">
+          <EvidenceScorePanel record={evidence} lastVerified={hotel.last_verified_date} />
+        </section>
+      )}
 
       {/* Scores at-a-glance */}
       <section className="mx-auto max-w-6xl px-6 py-12">

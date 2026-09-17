@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { EvidenceScoreView } from "@/components/EvidenceScorePanel";
 import { getHotelDetail, resolveCanonicalSlug, type HotelPhoto, type PoolQuote, type HotelSource, type PoolRecord } from "@/server/hotel-detail.server";
 import type { PoolFacts } from "@/lib/rankings.functions";
 
@@ -81,6 +82,7 @@ export type HotelDetailResult = {
   photos: HotelPhoto[];
   quotes: PoolQuote[];
   pools: PoolRecord[];
+  evidence: EvidenceScoreView | null;
 } | null;
 
 export const getHotelBySlug = createServerFn({ method: "GET" })
