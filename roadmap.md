@@ -18,7 +18,15 @@
 - [x] Hotel 1898, Can Bordoy, Park Hyatt Sydney checked; Can Bordoy rooftop
       heating corrected to "not confirmed" (only the garden pool is confirmed heated)
 
+## Evidence-based Pool Score (ten test hotels)
+- [x] Scoring engine, admin review page and public score panel
+- [x] Three pool comments are enough instead of five
+- [x] One gate: test hotels are kept out of rankings, destination lists,
+      sitemap and search results until an editor approves their score
+
 ### Open (waiting on a person)
+- [ ] Collect comments, add mentions and approve a score for the ten test
+      hotels on the internal review page
 - [ ] Editorial sub-scores and sign-off for all five hotels — without them there is
       no Pool Score, no ranking place and the pages stay out of search results.
       Automation stays paused, so this cannot be generated.

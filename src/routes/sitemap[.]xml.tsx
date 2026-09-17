@@ -66,6 +66,10 @@ export const Route = createFileRoute("/sitemap.xml")({
         // Partially verified and research-pending profiles stay reachable for
         // visitors but are noindex, so they must never be submitted to Google.
         {
+          const { getApprovedEvidenceSlugs, passesEvidenceGate } = await import(
+            "@/server/evidence-gate.server"
+          );
+          const approvedEvidence = await getApprovedEvidenceSlugs();
           const pageSize = 1000;
           for (let offset = 0; ; ) {
             const { data, error } = await supabaseAdmin
@@ -82,6 +86,8 @@ export const Route = createFileRoute("/sitemap.xml")({
               const h = row as { slug: string | null; updated_at: string | null };
               // One gate decides indexing, ranking and sitemap membership.
               if (!h.slug || !validateHotelForPublication(row as StatusHotel).in_sitemap) continue;
+              // Test-group hotels need an approved Evidence-based Pool Score.
+              if (!passesEvidenceGate(h.slug, approvedEvidence)) continue;
               entries.push({
                 path: `/hotels/${h.slug}`,
                 lastmod: h.updated_at ? h.updated_at.slice(0, 10) : undefined,
