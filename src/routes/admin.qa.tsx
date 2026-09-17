@@ -17,26 +17,11 @@ export const Route = createFileRoute("/admin/qa")({
 });
 
 const TEST_GROUP = [
-  "sydney-hyatt-regency-sydney",
-  "sydney-park-hyatt-sydney",
-  "sydney-w-sydney",
-  "sydney-intercontinental-sydney",
-  "sydney-ace-hotel-sydney",
-  "sydney-qt-sydney",
-  "sydney-capella-sydney",
-  "barcelona-hotel-arts",
-  "barcelona-1898",
+  "bangkok-the-siam",
   "los-angeles-hotel-june-west-la",
+  "barcelona-1898",
   "mallorca-hotel-can-bordoy-grand-house-and-garden",
-  "los-angeles-the-maybourne-beverly-hills",
-  "mallorca-jumeirah-port-soller",
-  "bangkok-the-peninsula-bangkok",
-  "minos-palace-hotel-suites",
-  "london-shangri-la-the-shard",
-  "london-bvlgari-hotel-london",
-  "barcelona-grand-hotel-central",
-  "los-angeles-the-hollywood-roosevelt",
-  "porto-elounda-golf-spa-resort",
+  "sydney-park-hyatt-sydney",
 ];
 
 type Scope =
