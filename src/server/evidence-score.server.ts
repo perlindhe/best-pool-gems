@@ -419,6 +419,11 @@ export type EvidenceReport = {
   blockingReasons: string[];
   approvedBy: string | null;
   approvedAt: string | null;
+  autoApproved: boolean;
+  autoBlockers: string[];
+  autoEligible: boolean;
+  hasOfficialSource: boolean;
+  independentSourceCount: number;
   scoreVersion: string;
 };
 
