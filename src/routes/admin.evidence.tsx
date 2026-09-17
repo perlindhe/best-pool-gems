@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { installServerFnAuth } from "@/integrations/supabase/server-fn-auth";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
@@ -52,7 +53,19 @@ function num(v: unknown): number | null {
   return typeof v === "number" ? v : null;
 }
 
+function errText(e: unknown): string {
+  if (e instanceof Response) {
+    return e.status === 401 || e.status === 403
+      ? "You need to be signed in as an admin."
+      : `Request failed (${e.status}).`;
+  }
+  const msg = e instanceof Error ? e.message : String(e);
+  return msg === "[object Response]" ? "Request failed. Please sign in again." : msg;
+}
+
 function EvidencePage() {
+  const navigate = useNavigate();
+  const [ready, setReady] = useState(false);
   const [reports, setReports] = useState<Report[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -61,12 +74,29 @@ function EvidencePage() {
 
   const load = () =>
     getEvidenceOverview()
-      .then((r) => setReports(r.reports as Report[]))
-      .catch((e) => setError((e as Error).message));
+      .then((r) => setReports((r?.reports as Report[]) ?? []))
+      .catch((e) => {
+        setReports([]);
+        setError(errText(e));
+      });
 
   useEffect(() => {
-    load();
-  }, []);
+    let unsub: (() => void) | undefined;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate({ to: "/admin/login" });
+        return;
+      }
+      setReady(true);
+      load();
+      const sub = supabase.auth.onAuthStateChange((_e, sess) => {
+        if (!sess) navigate({ to: "/admin/login" });
+      });
+      unsub = () => sub.data.subscription.unsubscribe();
+    });
+    return () => unsub?.();
+  }, [navigate]);
+
 
   const run = async (id: string, fn: () => Promise<unknown>) => {
     setBusy(id);
@@ -76,7 +106,7 @@ function EvidencePage() {
       await load();
       if (open) setComments(((await listPoolComments({ data: { hotel_id: open } })).comments as unknown as Comment[]) ?? []);
     } catch (e) {
-      setError((e as Error).message);
+      setError(errText(e));
     } finally {
       setBusy(null);
     }
@@ -93,7 +123,7 @@ function EvidencePage() {
       const r = await listPoolComments({ data: { hotel_id: hotelId } });
       setComments((r.comments as unknown as Comment[]) ?? []);
     } catch (e) {
-      setError((e as Error).message);
+      setError(errText(e));
     }
   };
 
@@ -110,6 +140,10 @@ function EvidencePage() {
           <p className="mt-4 rounded border border-destructive/40 p-3 text-sm text-destructive">
             {error}
           </p>
+        )}
+
+        {!ready && (
+          <p className="mt-6 text-sm text-muted-foreground">Checking your sign-in…</p>
         )}
 
         <div className="mt-8 space-y-4">
