@@ -120,14 +120,19 @@ export const adminQaOverview = createServerFn({ method: "GET" })
         qa_checked_at: (h.qa_checked_at as string | null) ?? null,
         missing,
         status: gate.status,
-        pool_summary: describePoolCounts(h as StatusHotel),
+        pool_summary: describePoolMix(calculatePoolCounts(pools)),
         official_url: (h.official_url as string | null) ?? null,
         secondary_source_url: (h.secondary_source_url as string | null) ?? null,
         errors: gate.errors,
         warnings: gate.warnings,
         can_index: gate.can_index,
         can_rank: gate.can_rank,
+        can_publish: gate.can_publish,
         in_sitemap: gate.in_sitemap,
+        pools,
+        derived_heating: HEATING_COPY[calculateHeatingStatus(pools)],
+        derived_season: calculateSeasonStatus(pools).sentence,
+        derived_counts: calculatePoolCounts(pools),
       };
     });
 
