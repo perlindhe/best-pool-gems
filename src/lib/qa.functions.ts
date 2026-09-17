@@ -77,9 +77,24 @@ export const adminQaOverview = createServerFn({ method: "GET" })
       .order("name");
     if (error) throw new Error(error.message);
 
+    // Raw pool records: every derived value on this page comes from these.
+    const { data: poolData, error: poolError } = await supabaseAdmin
+      .from("hotel_pools")
+      .select(
+        "id, hotel_id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, heated, heating_state, season_state, seasonal_dates, year_round",
+      );
+    if (poolError) throw new Error(poolError.message);
+    const poolsByHotel = new Map<string, StatusPool[]>();
+    for (const p of poolData ?? []) {
+      const list = poolsByHotel.get(p.hotel_id as string) ?? [];
+      list.push(p as unknown as StatusPool);
+      poolsByHotel.set(p.hotel_id as string, list);
+    }
+
     const rows: QaRow[] = (data ?? []).map((h) => {
+      const pools = poolsByHotel.get(h.id as string) ?? [];
       // Same gate as the public site — the QA page can never disagree with it.
-      const gate = validateHotelForPublication(h as StatusHotel);
+      const gate = validateHotelForPublication(h as StatusHotel, pools);
       const missing = [...gate.missing];
       if (gate.score == null) missing.push("Pool Score");
       return {
