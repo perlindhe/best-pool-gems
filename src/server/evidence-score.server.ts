@@ -21,6 +21,9 @@ import {
   calculateTotal,
   evidenceQaErrors,
   commentHash,
+  autoApprovalBlockers,
+  isAutoApprover,
+  AUTO_APPROVER,
   normalizeCommentText,
   toEvidenceCategory,
   type HeatingCategory,
@@ -419,6 +422,11 @@ export type EvidenceReport = {
   blockingReasons: string[];
   approvedBy: string | null;
   approvedAt: string | null;
+  autoApproved: boolean;
+  autoBlockers: string[];
+  autoEligible: boolean;
+  hasOfficialSource: boolean;
+  independentSourceCount: number;
   scoreVersion: string;
 };
 
@@ -569,6 +577,19 @@ export async function buildEvidenceReport(hotelId: string): Promise<EvidenceRepo
     approvedBy,
   });
 
+  const autoBlockers = autoApprovalBlockers({
+    qaErrors,
+    blockingReasons: total.blockingReasons,
+    confidenceLevel,
+    totalPoints: total.totalPoints,
+    scoreOutOfTen: total.scoreOutOfTen,
+    relevantComments: breakdown.relevant,
+    independentSourceCount,
+    hasOfficialSource,
+    hasConflicts,
+    qaBlocked: hotel.qa_blocked === true,
+  });
+
   const areas = pools.filter(isSharedSwim).map((p) => Number(p.area_sqm)).filter((n) => n > 0);
   const lengths = pools
     .filter(isSharedSwim)
@@ -612,6 +633,11 @@ export async function buildEvidenceReport(hotelId: string): Promise<EvidenceRepo
     blockingReasons: total.blockingReasons,
     approvedBy,
     approvedAt,
+    autoApproved: isAutoApprover(approvedBy),
+    autoBlockers,
+    autoEligible: autoBlockers.length === 0,
+    hasOfficialSource,
+    independentSourceCount,
     scoreVersion: SCORE_VERSION,
   };
 }
@@ -646,7 +672,90 @@ export async function saveEvidenceReport(hotelId: string) {
     { onConflict: "hotel_id" },
   );
   if (error) throw new Error(error.message);
+
+  // Automatic sign-off: the system approves a score by itself only when every
+  // factor is evidence-backed and no QA error remains. A score the system
+  // approved is withdrawn again as soon as the evidence stops supporting it.
+  // A human approval is never touched here.
+  const manualApproval = report.approvedBy != null && !isAutoApprover(report.approvedBy);
+  if (!manualApproval) {
+    const shouldApprove = report.autoEligible;
+    const isApproved = isAutoApprover(report.approvedBy);
+    if (shouldApprove !== isApproved) {
+      const { error: apprErr } = await supabaseAdmin
+        .from("pool_scores_evidence")
+        .update({
+          approved_by: shouldApprove ? AUTO_APPROVER : null,
+          approved_at: shouldApprove ? new Date().toISOString() : null,
+        } as never)
+        .eq("hotel_id", hotelId);
+      if (apprErr) throw new Error(apprErr.message);
+      // Recompute once so verification status and QA reflect the new approval.
+      const updated = await buildEvidenceReport(hotelId);
+      await supabaseAdmin
+        .from("pool_scores_evidence")
+        .update({
+          verification_status: updated.verificationStatus,
+          blocking_reasons: [...updated.qaErrors, ...updated.blockingReasons] as never,
+        } as never)
+        .eq("hotel_id", hotelId);
+      return updated;
+    }
+  }
   return report;
+}
+
+/**
+ * Run the full automatic pipeline for the evidence-v1 test group:
+ * collect fresh guest comments, recompute every factor and let the system
+ * approve or withdraw each score. Scoped to the ten test hotels.
+ */
+export async function runEvidenceAutomation() {
+  const { data: hotels, error } = await supabaseAdmin
+    .from("hotels")
+    .select("id, slug, name")
+    .in("slug", EVIDENCE_TEST_GROUP);
+  if (error) throw new Error(error.message);
+
+  const results: Array<{
+    slug: string;
+    name: string;
+    collected?: number;
+    approved: boolean;
+    scoreOutOfTen: number | null;
+    blockers: string[];
+    error?: string;
+  }> = [];
+
+  for (const h of (hotels ?? []) as Array<{ id: string; slug: string; name: string }>) {
+    try {
+      let collected: number | undefined;
+      try {
+        collected = (await ingestPoolComments(h.id)).stored;
+      } catch {
+        collected = undefined;
+      }
+      const report = await saveEvidenceReport(h.id);
+      results.push({
+        slug: h.slug,
+        name: h.name,
+        collected,
+        approved: report.approvedBy != null,
+        scoreOutOfTen: report.scoreOutOfTen,
+        blockers: report.autoBlockers,
+      });
+    } catch (e) {
+      results.push({
+        slug: h.slug,
+        name: h.name,
+        approved: false,
+        scoreOutOfTen: null,
+        blockers: [],
+        error: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+  return { results };
 }
 
 /** Editor sign-off. Only an approved record may ever be shown or ranked. */

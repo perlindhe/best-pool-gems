@@ -211,3 +211,12 @@ export const approveEvidenceScore = createServerFn({ method: "POST" })
     const { setEvidenceApproval } = await import("@/server/evidence-score.server");
     return setEvidenceApproval(data.hotel_id, data.editor);
   });
+
+/** Runs collection + scoring + automatic approval for the ten test hotels. */
+export const runEvidenceAutomationForTestGroup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context.supabase as never, context.userId);
+    const { runEvidenceAutomation } = await import("@/server/evidence-score.server");
+    return runEvidenceAutomation();
+  });

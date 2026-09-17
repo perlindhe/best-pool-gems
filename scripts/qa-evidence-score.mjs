@@ -17,6 +17,10 @@ import {
   canRank,
   robotsDirective,
   MIN_RELEVANT_COMMENTS,
+  autoApprovalBlockers,
+  canAutoApprove,
+  AUTO_APPROVER,
+  isAutoApprover,
 } from "/dev-server/src/lib/evidence-score.ts";
 
 let pass = 0;
@@ -357,6 +361,35 @@ console.log("\n== QA blockers ==");
     heatingCategory: "shared_full_season", totalPoints: 81.6, scoreOutOfTen: 9.9,
     hasOfficialSource: true, approvedBy: "Editor",
   }).includes("The 0–10 score does not match the total points"), true);
+}
+
+/* ---------------------------------------------------------------- */
+{
+  console.log("\nAutomatic approval");
+  const good = {
+    qaErrors: ["No editorial approval"],
+    blockingReasons: [],
+    confidenceLevel: "high",
+    totalPoints: 81.6,
+    scoreOutOfTen: 8.2,
+    relevantComments: 40,
+    independentSourceCount: 2,
+    hasOfficialSource: true,
+    hasConflicts: false,
+    qaBlocked: false,
+  };
+  check("full evidence auto-approves", canAutoApprove(good), true);
+  check("missing approval is not a blocker", autoApprovalBlockers(good), []);
+  check("low confidence blocks", canAutoApprove({ ...good, confidenceLevel: "low" }), false);
+  check("no score blocks", canAutoApprove({ ...good, totalPoints: null, scoreOutOfTen: null }), false);
+  check("too few comments block", canAutoApprove({ ...good, relevantComments: 2 }), false);
+  check("no official source blocks", canAutoApprove({ ...good, hasOfficialSource: false }), false);
+  check("no independent source blocks", canAutoApprove({ ...good, independentSourceCount: 0 }), false);
+  check("conflicts block", canAutoApprove({ ...good, hasConflicts: true }), false);
+  check("qa blocked blocks", canAutoApprove({ ...good, qaBlocked: true }), false);
+  check("other qa errors block", canAutoApprove({ ...good, qaErrors: ["No official source"] }), false);
+  check("auto approver recognised", isAutoApprover(AUTO_APPROVER), true);
+  check("editor is not auto approver", isAutoApprover("Per"), false);
 }
 
 console.log(`\n${pass} passed, ${fail} failed\n`);
