@@ -9,6 +9,7 @@ import {
   getEvidenceOverview,
   listPoolComments,
   recalculateEvidenceScore,
+  runEvidenceAutomationForTestGroup,
   updatePoolComment,
   upsertExternalMention,
 } from "@/lib/evidence.functions";
