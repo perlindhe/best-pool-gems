@@ -1,17 +1,17 @@
 /**
  * Acceptance tests for the pool-data correction.
- * Usage: bun scripts/qa-testgroup.mjs            (20-hotel test group)
+ * Usage: bun scripts/qa-testgroup.mjs            (5-hotel test group)
  *        bun scripts/qa-testgroup.mjs --all      (every published hotel)
  * Reads the database directly via psql.
  */
 import { execFileSync } from "node:child_process";
 
 const SLUGS = [
-  "sydney-hyatt-regency-sydney","sydney-park-hyatt-sydney","sydney-w-sydney","sydney-intercontinental-sydney",
-  "sydney-ace-hotel-sydney","sydney-qt-sydney","sydney-capella-sydney","barcelona-hotel-arts","barcelona-1898",
-  "los-angeles-hotel-june-west-la","mallorca-hotel-can-bordoy-grand-house-and-garden","los-angeles-the-maybourne-beverly-hills",
-  "mallorca-jumeirah-port-soller","bangkok-the-peninsula-bangkok","minos-palace-hotel-suites","london-shangri-la-the-shard",
-  "london-bvlgari-hotel-london","barcelona-grand-hotel-central","los-angeles-the-hollywood-roosevelt","porto-elounda-golf-spa-resort",
+  "bangkok-the-siam",
+  "los-angeles-hotel-june-west-la",
+  "barcelona-1898",
+  "mallorca-hotel-can-bordoy-grand-house-and-garden",
+  "sydney-park-hyatt-sydney",
 ];
 
 const sql = (q) =>
@@ -88,6 +88,15 @@ test("17. Adults-only and family-friendly are never both true", (h) =>
   !(h.adults_only === true && h.family_friendly === true));
 test("18. No pool → excluded from index and score", (h) =>
   h.has_active_pool !== false || (h.ranking_eligible === false && h.pool_score_0_10 == null));
+test("19. Private room pools are never shared swimming pools", (_h, p) =>
+  !p.some((x) => x.shared_or_private === "private" && ["shared_hotel_pool","shared_swim_up"].includes(x.pool_category)));
+test("20. The same pool is never registered twice", (_h, p) => {
+  const names = p.map((x) => (x.pool_name ?? "").trim().toLowerCase()).filter(Boolean);
+  return new Set(names).size === names.length;
+});
+test("21. A Pool Score only exists on a fully verified profile", (h) =>
+  h.pool_score_0_10 == null || h.verification_status === "verified");
+test("22. Every pool record has a category", (_h, p) => p.every((x) => Boolean(x.pool_category)));
 
-console.log(`\n${18 - failed}/18 checks passed`);
+console.log(`\n${22 - failed}/22 checks passed`);
 process.exit(failed ? 1 : 0);
