@@ -143,9 +143,11 @@ console.log("\n== Test scenario from the specification ==");
 
 console.log("\n== Missing data never becomes zero ==");
 {
-  const few = summarizeComments(makeComments(3, 1, 0), today);
-  check("under five comments -> null", scoreGuestSentiment(few), null);
-  check("minimum is five", MIN_RELEVANT_COMMENTS, 5);
+  const few = summarizeComments(makeComments(2, 0, 0), today);
+  check("under three comments -> null", scoreGuestSentiment(few), null);
+  check("minimum is three", MIN_RELEVANT_COMMENTS, 3);
+  const three = summarizeComments(makeComments(3, 0, 0), today);
+  check("exactly three comments -> scored", scoreGuestSentiment(three) !== null, true);
   check("heating unknown -> null", scoreHeating("not_confirmed"), null);
   check("heating conflicting -> null", scoreHeating("conflicting"), null);
   check("no heated pool -> 0 points", scoreHeating("none_heated"), 0);
