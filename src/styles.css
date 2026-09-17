@@ -4,16 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@layer base {
-  @font-face {
-    font-family: "Bebas Neue";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("https://fonts.gstatic.com/s/bebasneue/v14/JTUSjIg69CK48gW7PXoo9Wlhyw.woff2") format("woff2");
-  }
-}
-
 :root {
   --font-display: "Playfair Display", Georgia, serif;
   --font-body: "Work Sans", ui-sans-serif, system-ui, sans-serif;
@@ -118,6 +108,7 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    letter-spacing: 0 !important;
   }
   html {
     font-family: var(--font-body);
