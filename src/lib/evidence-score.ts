@@ -82,7 +82,7 @@ export type PoolComment = {
   excluded?: boolean | null;
 };
 
-export const MIN_RELEVANT_COMMENTS = 5;
+export const MIN_RELEVANT_COMMENTS = 3;
 const MAX_PER_STAY = 3;
 
 export function normalizeCommentText(text: string): string {
@@ -642,7 +642,7 @@ export type QaInput = EvidenceFactors & {
 export function evidenceQaErrors(q: QaInput): string[] {
   const errors: string[] = [];
   if (q.breakdown.relevant < MIN_RELEVANT_COMMENTS)
-    errors.push("Fewer than five relevant pool comments");
+    errors.push("Fewer than three relevant pool comments");
   for (const { key, label } of FACTOR_LABELS)
     if (q[key] == null) errors.push(`${label} has no verified value`);
   if (q.counts.sharedSwimmingPoolCount <= 0)
