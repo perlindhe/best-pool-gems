@@ -160,13 +160,59 @@ function RankingsPage() {
           The world's best <span className="text-primary">hotel pools</span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-foreground/85">
-          Each hotel earns a <strong>Pool Score (0–10)</strong> from our editors across five
-          dimensions. We blend it with a live <strong>Meta Rating (0–100)</strong> built from{" "}
-          Google and TripAdvisor guest ratings. Updated continuously.
+          Best Pool Hotels is a dedicated ranking of the world's best hotel pools — the pool
+          itself is scored, not the hotel as a whole. Each hotel earns a{" "}
+          <strong>Pool Score (0–10)</strong> from our editors across five pool-specific factors,
+          blended with a live <strong>Meta Rating (0–100)</strong> built from Google and
+          TripAdvisor guest ratings. The list is updated continuously as pools are re-verified
+          and new guest ratings arrive.
+        </p>
+        <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
+          Most travel publishers mention pools as one detail in broader hotel reviews. Here the
+          pool is the entire rating: size, heating, season, views and water quality are verified
+          against official sources before a hotel can be ranked.
         </p>
         <p className="mt-4 text-xs uppercase tracking-[0.25em] text-muted-foreground">
           {total} hotels · {cities.length} destinations
         </p>
+      </section>
+
+      {/* What these rankings cover — concise facts, reusable by readers and AI */}
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="rounded-xl border border-border/60 bg-surface/40 p-6 md:p-8">
+          <h2 className="font-display text-3xl tracking-wide">What these rankings cover</h2>
+          <ul className="mt-5 grid gap-x-10 gap-y-3 text-sm text-foreground/85 md:grid-cols-2">
+            <li>
+              <strong>{total} hotels</strong> across <strong>{cities.length} destinations</strong>,
+              including {cities.slice(0, 4).map((c) => c.city).join(", ")}
+              {cities.length > 4 ? " and more" : ""}.
+            </li>
+            <li>
+              Five scoring factors: pool experience, heating, pool size, number of pools and
+              external recognition.
+            </li>
+            <li>
+              Only hotels with pool facts verified against official and independent sources are
+              eligible for ranking.
+            </li>
+            <li>
+              Pool Scores update when new evidence is verified; guest ratings refresh
+              continuously from Google and TripAdvisor.
+            </li>
+          </ul>
+          <p className="mt-5 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            <Link to="/about" className="text-primary underline-offset-4 hover:underline">
+              Full methodology
+            </Link>
+            <span className="mx-3 text-border">·</span>
+            <Link
+              to="/verification-standards"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Verification standards
+            </Link>
+          </p>
+        </div>
       </section>
 
       {/* Filters */}
