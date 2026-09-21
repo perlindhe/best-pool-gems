@@ -70,23 +70,25 @@ export const Route = createFileRoute("/rankings")({
     ]);
     return { ...result, cities: facets.cities, page };
   },
-  head: ({ match }) => {
+  head: ({ match, loaderData }) => {
     const s = (match.search ?? {}) as Search;
     const filtered = Object.keys(s).some((k) => k !== "page");
     const title = "Live pool rankings — Best Pool Hotels";
+    const total = loaderData?.total ?? 0;
+    const destinations = loaderData?.cities?.length ?? 0;
     return {
       meta: [
         { title },
         {
           name: "description",
           content:
-            "Live ranking of hotel pools, scored by our editors and combined with real-time guest ratings from Google and TripAdvisor. Filter by rooftop, heated, infinity, adults-only and more.",
+            "The dedicated ranking of the world's best hotel pools — every hotel scored 0–10 on the pool itself across five factors, blended with live guest ratings from Google and TripAdvisor. Filter by rooftop, heated, infinity, adults-only and more.",
         },
         { property: "og:title", content: title },
         {
           property: "og:description",
           content:
-            "Hotels ranked by pool score and live guest ratings, filterable by pool type, view and season.",
+            "A pool-specific hotel ranking: pools scored on their own merits, combined with live guest ratings, filterable by pool type, view and season.",
         },
         { property: "og:type", content: "website" },
         { property: "og:url", content: "https://bestpoolhotels.com/rankings" },
@@ -94,6 +96,30 @@ export const Route = createFileRoute("/rankings")({
         ...(filtered ? [{ name: "robots", content: "noindex, follow" }] : []),
       ],
       links: [{ rel: "canonical", href: "https://bestpoolhotels.com/rankings" }],
+      scripts: filtered
+        ? []
+        : [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "CollectionPage",
+                name: "Live pool rankings — Best Pool Hotels",
+                url: "https://bestpoolhotels.com/rankings",
+                description:
+                  "The dedicated ranking of the world's best hotel pools. Each hotel's pool is scored 0–10 by editors across five factors — pool experience, heating, size, number of pools and external recognition — and blended with a live Meta Rating (0–100) from Google and TripAdvisor guest ratings.",
+                isPartOf: { "@type": "WebSite", name: "Best Pool Hotels", url: "https://bestpoolhotels.com" },
+                about:
+                  "Hotel pool rankings: a pool-specific ranking where the pool itself, not the hotel as a whole, determines the score.",
+                mainEntity: {
+                  "@type": "ItemList",
+                  numberOfItems: total,
+                  itemListOrder: "https://schema.org/ItemListOrderDescending",
+                  description: `${total} hotels across ${destinations} destinations, ranked by Pool Score and live guest ratings.`,
+                },
+              }),
+            },
+          ],
     };
   },
   errorComponent: ({ error }) => (
