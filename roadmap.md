@@ -29,9 +29,14 @@
       pages, with a literal quote and the source link (never estimated)
 - [x] Automatic approval only when every factor is evidence-backed
 
+- [x] The official-page search was silently blocked by a rate limit; it now
+      waits and retries, and searches four phrasings (pool page, length, spa,
+      fact sheet) instead of one
+
 ### Open (waiting on facts or a person)
-- [ ] Most hotels do not state pool length or area on their own pages, so the
-      size factor stays unconfirmed and no score is published. Needs either a
-      new official source or a manual measurement per hotel.
+- [ ] Pool length or area is still not stated anywhere official for eight of
+      the ten hotels, so the size factor stays unconfirmed and no score is
+      published. Needs a new official source or a manual measurement.
+- [ ] Heating still unconfirmed for The Siam, Hotel Arts and Bvlgari London
 - [ ] Hotel June and Can Bordoy have fewer than three pool comments
 - [ ] Approval before the same model is rolled out to the remaining hotels
