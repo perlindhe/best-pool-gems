@@ -70,23 +70,25 @@ export const Route = createFileRoute("/rankings")({
     ]);
     return { ...result, cities: facets.cities, page };
   },
-  head: ({ match }) => {
+  head: ({ match, loaderData }) => {
     const s = (match.search ?? {}) as Search;
     const filtered = Object.keys(s).some((k) => k !== "page");
     const title = "Live pool rankings — Best Pool Hotels";
+    const total = loaderData?.total ?? 0;
+    const destinations = loaderData?.cities?.length ?? 0;
     return {
       meta: [
         { title },
         {
           name: "description",
           content:
-            "Live ranking of hotel pools, scored by our editors and combined with real-time guest ratings from Google and TripAdvisor. Filter by rooftop, heated, infinity, adults-only and more.",
+            "The dedicated ranking of the world's best hotel pools — every hotel scored 0–10 on the pool itself across five factors, blended with live guest ratings from Google and TripAdvisor. Filter by rooftop, heated, infinity, adults-only and more.",
         },
         { property: "og:title", content: title },
         {
           property: "og:description",
           content:
-            "Hotels ranked by pool score and live guest ratings, filterable by pool type, view and season.",
+            "A pool-specific hotel ranking: pools scored on their own merits, combined with live guest ratings, filterable by pool type, view and season.",
         },
         { property: "og:type", content: "website" },
         { property: "og:url", content: "https://bestpoolhotels.com/rankings" },
@@ -94,6 +96,30 @@ export const Route = createFileRoute("/rankings")({
         ...(filtered ? [{ name: "robots", content: "noindex, follow" }] : []),
       ],
       links: [{ rel: "canonical", href: "https://bestpoolhotels.com/rankings" }],
+      scripts: filtered
+        ? []
+        : [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "CollectionPage",
+                name: "Live pool rankings — Best Pool Hotels",
+                url: "https://bestpoolhotels.com/rankings",
+                description:
+                  "The dedicated ranking of the world's best hotel pools. Each hotel's pool is scored 0–10 by editors across five factors — pool experience, heating, size, number of pools and external recognition — and blended with a live Meta Rating (0–100) from Google and TripAdvisor guest ratings.",
+                isPartOf: { "@type": "WebSite", name: "Best Pool Hotels", url: "https://bestpoolhotels.com" },
+                about:
+                  "Hotel pool rankings: a pool-specific ranking where the pool itself, not the hotel as a whole, determines the score.",
+                mainEntity: {
+                  "@type": "ItemList",
+                  numberOfItems: total,
+                  itemListOrder: "https://schema.org/ItemListOrderDescending",
+                  description: `${total} hotels across ${destinations} destinations, ranked by Pool Score and live guest ratings.`,
+                },
+              }),
+            },
+          ],
     };
   },
   errorComponent: ({ error }) => (
@@ -134,13 +160,59 @@ function RankingsPage() {
           The world's best <span className="text-primary">hotel pools</span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-foreground/85">
-          Each hotel earns a <strong>Pool Score (0–10)</strong> from our editors across five
-          dimensions. We blend it with a live <strong>Meta Rating (0–100)</strong> built from{" "}
-          Google and TripAdvisor guest ratings. Updated continuously.
+          Best Pool Hotels is a dedicated ranking of the world's best hotel pools — the pool
+          itself is scored, not the hotel as a whole. Each hotel earns a{" "}
+          <strong>Pool Score (0–10)</strong> from our editors across five pool-specific factors,
+          blended with a live <strong>Meta Rating (0–100)</strong> built from Google and
+          TripAdvisor guest ratings. The list is updated continuously as pools are re-verified
+          and new guest ratings arrive.
+        </p>
+        <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
+          Most travel publishers mention pools as one detail in broader hotel reviews. Here the
+          pool is the entire rating: size, heating, season, views and water quality are verified
+          against official sources before a hotel can be ranked.
         </p>
         <p className="mt-4 text-xs uppercase tracking-[0.25em] text-muted-foreground">
           {total} hotels · {cities.length} destinations
         </p>
+      </section>
+
+      {/* What these rankings cover — concise facts, reusable by readers and AI */}
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="rounded-xl border border-border/60 bg-surface/40 p-6 md:p-8">
+          <h2 className="font-display text-3xl tracking-wide">What these rankings cover</h2>
+          <ul className="mt-5 grid gap-x-10 gap-y-3 text-sm text-foreground/85 md:grid-cols-2">
+            <li>
+              <strong>{total} hotels</strong> across <strong>{cities.length} destinations</strong>,
+              including {cities.slice(0, 4).map((c) => c.city).join(", ")}
+              {cities.length > 4 ? " and more" : ""}.
+            </li>
+            <li>
+              Five scoring factors: pool experience, heating, pool size, number of pools and
+              external recognition.
+            </li>
+            <li>
+              Only hotels with pool facts verified against official and independent sources are
+              eligible for ranking.
+            </li>
+            <li>
+              Pool Scores update when new evidence is verified; guest ratings refresh
+              continuously from Google and TripAdvisor.
+            </li>
+          </ul>
+          <p className="mt-5 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            <Link to="/about" className="text-primary underline-offset-4 hover:underline">
+              Full methodology
+            </Link>
+            <span className="mx-3 text-border">·</span>
+            <Link
+              to="/verification-standards"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Verification standards
+            </Link>
+          </p>
+        </div>
       </section>
 
       {/* Filters */}

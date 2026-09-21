@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RooftopPoolHotelsRouteImport } from './routes/rooftop-pool-hotels'
 import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PoolRankingsRouteImport } from './routes/pool-rankings'
 import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
 import { Route as IndoorPoolHotelsRouteImport } from './routes/indoor-pool-hotels'
 import { Route as HeatedPoolHotelsRouteImport } from './routes/heated-pool-hotels'
@@ -71,6 +72,11 @@ const RankingsRoute = RankingsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoolRankingsRoute = PoolRankingsRouteImport.update({
+  id: '/pool-rankings',
+  path: '/pool-rankings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/heated-pool-hotels': typeof HeatedPoolHotelsRoute
   '/indoor-pool-hotels': typeof IndoorPoolHotelsRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/pool-rankings': typeof PoolRankingsRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/rooftop-pool-hotels': typeof RooftopPoolHotelsRoute
@@ -301,6 +308,7 @@ export interface FileRoutesByTo {
   '/heated-pool-hotels': typeof HeatedPoolHotelsRoute
   '/indoor-pool-hotels': typeof IndoorPoolHotelsRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/pool-rankings': typeof PoolRankingsRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/rooftop-pool-hotels': typeof RooftopPoolHotelsRoute
@@ -342,6 +350,7 @@ export interface FileRoutesById {
   '/heated-pool-hotels': typeof HeatedPoolHotelsRoute
   '/indoor-pool-hotels': typeof IndoorPoolHotelsRoute
   '/integritetspolicy': typeof IntegritetspolicyRoute
+  '/pool-rankings': typeof PoolRankingsRoute
   '/privacy': typeof PrivacyRoute
   '/rankings': typeof RankingsRoute
   '/rooftop-pool-hotels': typeof RooftopPoolHotelsRoute
@@ -384,6 +393,7 @@ export interface FileRouteTypes {
     | '/heated-pool-hotels'
     | '/indoor-pool-hotels'
     | '/integritetspolicy'
+    | '/pool-rankings'
     | '/privacy'
     | '/rankings'
     | '/rooftop-pool-hotels'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/heated-pool-hotels'
     | '/indoor-pool-hotels'
     | '/integritetspolicy'
+    | '/pool-rankings'
     | '/privacy'
     | '/rankings'
     | '/rooftop-pool-hotels'
@@ -464,6 +475,7 @@ export interface FileRouteTypes {
     | '/heated-pool-hotels'
     | '/indoor-pool-hotels'
     | '/integritetspolicy'
+    | '/pool-rankings'
     | '/privacy'
     | '/rankings'
     | '/rooftop-pool-hotels'
@@ -505,6 +517,7 @@ export interface RootRouteChildren {
   HeatedPoolHotelsRoute: typeof HeatedPoolHotelsRoute
   IndoorPoolHotelsRoute: typeof IndoorPoolHotelsRoute
   IntegritetspolicyRoute: typeof IntegritetspolicyRoute
+  PoolRankingsRoute: typeof PoolRankingsRoute
   PrivacyRoute: typeof PrivacyRoute
   RankingsRoute: typeof RankingsRoute
   RooftopPoolHotelsRoute: typeof RooftopPoolHotelsRoute
@@ -570,6 +583,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pool-rankings': {
+      id: '/pool-rankings'
+      path: '/pool-rankings'
+      fullPath: '/pool-rankings'
+      preLoaderRoute: typeof PoolRankingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integritetspolicy': {
@@ -828,6 +848,7 @@ const rootRouteChildren: RootRouteChildren = {
   HeatedPoolHotelsRoute: HeatedPoolHotelsRoute,
   IndoorPoolHotelsRoute: IndoorPoolHotelsRoute,
   IntegritetspolicyRoute: IntegritetspolicyRoute,
+  PoolRankingsRoute: PoolRankingsRoute,
   PrivacyRoute: PrivacyRoute,
   RankingsRoute: RankingsRoute,
   RooftopPoolHotelsRoute: RooftopPoolHotelsRoute,

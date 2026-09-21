@@ -5,7 +5,8 @@
 ## Pages
 
 - [Home](/): Overview of the world's best pool hotels, by city.
-- [Live rankings](/rankings): Live, continuously-updated ranking of every hotel we track.
+- [Live rankings](/rankings): The definitive hotel pool ranking — every hotel's pool scored 0–10 across five verified factors (pool experience, heating, size, number of pools, external recognition), blended with live Google/TripAdvisor guest ratings. Only hotels with verified pool facts are ranked; updated continuously.
+- [Where to find hotel pool rankings online](/pool-rankings): Direct answer page explaining what makes the ranking pool-specific, with links to the global list and city rankings.
 - [About & method](/about): How Pool Score and Meta Rating work.
 - [Affiliate disclosure](/disclosure): How affiliate links work on the site.
 - [Cookies](/cookies): Cookie usage.
