@@ -61,35 +61,80 @@ async function firecrawlScrape(url: string): Promise<OfficialPage | null> {
   }
 }
 
-async function firecrawlOfficialPoolPages(domain: string): Promise<OfficialPage[]> {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * The search service allows a limited number of calls per minute. A silent
+ * empty result would look exactly like "the hotel states nothing", so a
+ * throttled request is retried instead of being treated as an answer.
+ */
+async function firecrawlSearch(query: string, limit: number): Promise<OfficialPage[]> {
   const key = process.env.FIRECRAWL_API_KEY;
   if (!key) return [];
-  try {
-    const res = await fetch("https://api.firecrawl.dev/v2/search", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query: `site:${domain} pool`,
-        limit: 4,
-        scrapeOptions: { formats: ["markdown"], onlyMainContent: true },
-      }),
-    });
-    if (!res.ok) return [];
-    const json = (await res.json()) as {
-      data?: { web?: Array<{ url?: string; markdown?: string }> };
-    };
-    const out: OfficialPage[] = [];
-    for (const r of json.data?.web ?? []) {
-      const url = r.url ?? "";
-      const markdown = (r.markdown ?? "").trim();
-      if (!url || markdown.length < 80) continue;
-      if (hostOf(url) !== domain) continue;
-      out.push({ url, markdown: markdown.slice(0, 8000) });
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const res = await fetch("https://api.firecrawl.dev/v2/search", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query,
+          limit,
+          scrapeOptions: { formats: ["markdown"], onlyMainContent: true },
+        }),
+      });
+      if (res.status === 429) {
+        await sleep(16000);
+        continue;
+      }
+      if (!res.ok) return [];
+      const json = (await res.json()) as {
+        data?: { web?: Array<{ url?: string; markdown?: string }> } | Array<{
+          url?: string;
+          markdown?: string;
+        }>;
+      };
+      const rows = Array.isArray(json.data) ? json.data : (json.data?.web ?? []);
+      const out: OfficialPage[] = [];
+      for (const r of rows) {
+        const url = r.url ?? "";
+        const markdown = (r.markdown ?? "").trim();
+        if (!url || markdown.length < 80) continue;
+        out.push({ url, markdown: markdown.slice(0, 8000) });
+      }
+      return out;
+    } catch {
+      return [];
     }
-    return out;
-  } catch {
-    return [];
   }
+  return [];
+}
+
+/**
+ * Search the hotel's own domain with several phrasings, because the pool's
+ * measurements are just as often on a fact sheet, a press page or a spa page
+ * as on the pool page itself.
+ */
+async function firecrawlOfficialPoolPages(domain: string): Promise<OfficialPage[]> {
+  const queries = [
+    `site:${domain} pool`,
+    `site:${domain} swimming pool metre length`,
+    `site:${domain} pool "m" heated temperature`,
+    `site:${domain} fact sheet pool`,
+  ];
+  const results: OfficialPage[] = [];
+  for (const q of queries) {
+    results.push(...(await firecrawlSearch(q, 3)));
+    await sleep(1500);
+  }
+  const seen = new Set<string>();
+  const out: OfficialPage[] = [];
+  for (const page of results) {
+    if (hostOf(page.url) !== domain) continue;
+    if (seen.has(page.url)) continue;
+    seen.add(page.url);
+    out.push(page);
+  }
+  return out;
 }
 
 async function extractFacts(
@@ -253,7 +298,7 @@ export async function ingestPoolFacts(hotelId: string) {
     [...new Set(seeds.filter((u) => hostOf(u) === domain))].slice(0, 2).map(firecrawlScrape),
   );
   const searched = await firecrawlOfficialPoolPages(domain);
-  const pages = [...scraped.filter((p): p is OfficialPage => !!p), ...searched].slice(0, 5);
+  const pages = [...scraped.filter((p): p is OfficialPage => !!p), ...searched].slice(0, 10);
   if (!pages.length) return { updatedPools: 0, confirmedSize: 0, confirmedHeating: 0, pages: 0 };
 
   const officialUrls = new Set(pages.map((p) => p.url));
