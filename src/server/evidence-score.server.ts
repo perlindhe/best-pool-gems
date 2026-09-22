@@ -545,7 +545,8 @@ export async function buildEvidenceReport(hotelId: string): Promise<EvidenceRepo
     poolCountConfirmed,
     sizeConfirmed,
     hasConflicts,
-    allFactorsNumeric: total.totalPoints != null,
+    allFactorsNumeric: total.factorsUsed === total.factorsTotal,
+    requiredFactorsNumeric: total.totalPoints != null,
   });
 
   const approvedBy = existing?.approved_by ?? null;
