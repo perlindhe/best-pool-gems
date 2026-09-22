@@ -1,4 +1,10 @@
-/** The ten hotels the Evidence-based Pool Score is being tested on. */
+/**
+ * The Evidence-based Pool Score is rolled out to every hotel.
+ * The ten hotels below were the original pilot group and are kept only so the
+ * automation can still be run for them first.
+ */
+export const EVIDENCE_ROLLOUT_ALL = true;
+
 export const EVIDENCE_TEST_GROUP: string[] = [
   "bangkok-the-siam",
   "los-angeles-hotel-june-west-la",
@@ -12,8 +18,9 @@ export const EVIDENCE_TEST_GROUP: string[] = [
   "london-bvlgari-hotel-london",
 ];
 
+/** Every hotel now uses the evidence model. */
 export function isEvidenceTestHotel(slug?: string | null): boolean {
-  return !!slug && EVIDENCE_TEST_GROUP.includes(slug);
+  return EVIDENCE_ROLLOUT_ALL ? !!slug : !!slug && EVIDENCE_TEST_GROUP.includes(slug);
 }
 
 /**
