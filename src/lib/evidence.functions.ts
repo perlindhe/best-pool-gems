@@ -225,11 +225,20 @@ export const approveEvidenceScore = createServerFn({ method: "POST" })
     return setEvidenceApproval(data.hotel_id, data.editor);
   });
 
-/** Runs collection + scoring + automatic approval for the ten test hotels. */
+/** Runs collection + scoring + automatic approval, one batch of hotels. */
 export const runEvidenceAutomationForTestGroup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        limit: z.number().int().min(1).max(50).optional(),
+        offset: z.number().int().min(0).optional(),
+      })
+      .optional()
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
     await ensureAdmin(context.supabase as never, context.userId);
     const { runEvidenceAutomation } = await import("@/server/evidence-score.server");
-    return runEvidenceAutomation();
+    return runEvidenceAutomation({ limit: data?.limit, offset: data?.offset });
   });
