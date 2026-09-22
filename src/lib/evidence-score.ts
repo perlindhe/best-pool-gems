@@ -744,7 +744,8 @@ export function autoApprovalBlockers(input: AutoApprovalInput): string[] {
   if (input.relevantComments < MIN_RELEVANT_COMMENTS)
     reasons.push("Fewer than three relevant pool comments");
   if (!input.hasOfficialSource) reasons.push("No official source");
-  if (input.independentSourceCount < 1) reasons.push("No independent source");
+  // An independent source raises confidence but is not required for a score:
+  // the official page plus deduplicated guest comments already carry evidence.
   if (input.hasConflicts) reasons.push("Conflicting data");
   if (input.qaBlocked) reasons.push("Hotel is QA blocked");
   return [...new Set(reasons)];
