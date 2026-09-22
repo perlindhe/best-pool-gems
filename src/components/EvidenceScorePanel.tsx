@@ -136,7 +136,7 @@ export function EvidenceScorePanel({
         </p>
         {formatDate(lastVerified) && <p>Last verified: {formatDate(lastVerified)}</p>}
         {record?.approved_by && <p>Checked by: {record.approved_by}</p>}
-        <p>Score version: {record?.score_version ?? "evidence-v1"}</p>
+        <p>Score version: {record?.score_version ?? "evidence-v2"}</p>
       </div>
     </div>
   );
