@@ -163,9 +163,24 @@ console.log("\n== Missing data never becomes zero ==");
     poolSizePoints: 16,
     externalRecognitionPoints: 10,
   });
-  check("missing factor -> no total", t.totalPoints, null);
-  check("missing factor -> no 0-10 score", t.scoreOutOfTen, null);
+  check("missing required factor -> no total", t.totalPoints, null);
+  check("missing required factor -> no 0-10 score", t.scoreOutOfTen, null);
   check("reason shown", t.blockingReasons, ["Insufficient guest feedback"]);
+
+  // Optional factor missing: the score is computed against the confirmed
+  // factors only, and says how many that is. Missing points are never given away.
+  const partial = calculateTotal({
+    guestSentimentPoints: 32,
+    heatingPoints: null,
+    poolCountPoints: 12,
+    poolSizePoints: null,
+    externalRecognitionPoints: 5,
+  });
+  check("partial score uses confirmed factors", partial.factorsUsed, 3);
+  check("partial score max available", partial.maxAvailable, 65);
+  check("partial total", partial.totalPoints, 75.4);
+  check("partial 0-10", partial.scoreOutOfTen, 7.5);
+  check("partial has no blockers", partial.blockingReasons, []);
 }
 
 console.log("\n== Pool counting rules ==");
@@ -346,7 +361,14 @@ console.log("\n== QA blockers ==");
     hasOfficialSource: true,
     approvedBy: "Editor",
   });
-  check("missing size blocks", errs.includes("Pool size has no verified value"), true);
+  check("missing size does not block", errs.includes("Pool size has no verified value"), false);
+  check("missing guest sentiment blocks", evidenceQaErrors({
+    guestSentimentPoints: null, heatingPoints: 13, poolCountPoints: 11, poolSizePoints: 16, externalRecognitionPoints: 10,
+    breakdown: { relevant: 40 },
+    counts: { sharedSwimmingPoolCount: 2, spaPoolCount: 0, childrenPoolCount: 0, privatePoolCategoryCount: 0, plungePoolCount: 0, jacuzziCount: 0 },
+    heatingCategory: "shared_full_season",
+    totalPoints: null, scoreOutOfTen: null, hasOfficialSource: true, approvedBy: "Editor",
+  }).includes("Guest pool sentiment has no verified value"), true);
   check("photo estimate blocks", evidenceQaErrors({
     guestSentimentPoints: 31.6, heatingPoints: 13, poolCountPoints: 11, poolSizePoints: 16, externalRecognitionPoints: 10,
     breakdown: { relevant: 40 },
@@ -384,7 +406,7 @@ console.log("\n== QA blockers ==");
   check("no score blocks", canAutoApprove({ ...good, totalPoints: null, scoreOutOfTen: null }), false);
   check("too few comments block", canAutoApprove({ ...good, relevantComments: 2 }), false);
   check("no official source blocks", canAutoApprove({ ...good, hasOfficialSource: false }), false);
-  check("no independent source blocks", canAutoApprove({ ...good, independentSourceCount: 0 }), false);
+  check("no independent source still approves", canAutoApprove({ ...good, independentSourceCount: 0 }), true);
   check("conflicts block", canAutoApprove({ ...good, hasConflicts: true }), false);
   check("qa blocked blocks", canAutoApprove({ ...good, qaBlocked: true }), false);
   check("other qa errors block", canAutoApprove({ ...good, qaErrors: ["No official source"] }), false);

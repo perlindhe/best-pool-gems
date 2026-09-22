@@ -72,10 +72,16 @@ function EvidencePage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState<number | null>(null);
+  const PAGE = 10;
 
-  const load = () =>
-    getEvidenceOverview()
-      .then((r) => setReports((r?.reports as Report[]) ?? []))
+  const load = (from = offset) =>
+    getEvidenceOverview({ data: { limit: PAGE, offset: from } })
+      .then((r) => {
+        setReports((r?.reports as Report[]) ?? []);
+        setTotal((r?.total as number | null) ?? null);
+      })
       .catch((e) => {
         setReports([]);
         setError(errText(e));
@@ -134,18 +140,51 @@ function EvidencePage() {
       <main className="mx-auto max-w-6xl px-6 py-12">
         <h1 className="font-display text-4xl text-primary">Evidence-based Pool Score</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Internal review for the ten test hotels. The system collects evidence,
-          recalculates every factor and approves a score by itself when all five factors
-          are evidence-backed and no QA error remains. Everything else stays pending.
-          No other hotel uses this model yet.
+          Internal review for every hotel. The system collects evidence, recalculates
+          every factor and approves a score by itself when guest sentiment and the pool
+          count are evidence-backed and no QA error remains. Unconfirmed factors are
+          left out of the score and shown as "Not confirmed" — never guessed.
         </p>
-        <button
-          className="mt-4 rounded border border-border px-3 py-1.5 text-xs"
-          disabled={busy === "__auto__"}
-          onClick={() => run("__auto__", () => runEvidenceAutomationForTestGroup())}
-        >
-          {busy === "__auto__" ? "Running automation…" : "Run automation for all ten hotels"}
-        </button>
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <button
+            className="rounded border border-border px-3 py-1.5"
+            disabled={busy === "__auto__"}
+            onClick={() =>
+              run("__auto__", () =>
+                runEvidenceAutomationForTestGroup({ data: { limit: PAGE, offset } }),
+              )
+            }
+          >
+            {busy === "__auto__" ? "Running automation…" : "Run automation for these hotels"}
+          </button>
+          <button
+            className="rounded border border-border px-3 py-1.5 disabled:opacity-40"
+            disabled={offset === 0}
+            onClick={() => {
+              const next = Math.max(0, offset - PAGE);
+              setOffset(next);
+              load(next);
+            }}
+          >
+            Previous
+          </button>
+          <button
+            className="rounded border border-border px-3 py-1.5 disabled:opacity-40"
+            disabled={total != null && offset + PAGE >= total}
+            onClick={() => {
+              const next = offset + PAGE;
+              setOffset(next);
+              load(next);
+            }}
+          >
+            Next
+          </button>
+          <span className="text-muted-foreground">
+            {total != null
+              ? `${offset + 1}–${Math.min(offset + PAGE, total)} of ${total} hotels`
+              : ""}
+          </span>
+        </div>
         {error && (
           <p className="mt-4 rounded border border-destructive/40 p-3 text-sm text-destructive">
             {error}
