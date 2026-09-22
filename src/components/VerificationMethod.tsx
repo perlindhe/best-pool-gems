@@ -37,7 +37,7 @@ export function VerificationMethodBadge({
   return (
     <span
       title={config.detail}
-      className={`inline-flex items-center rounded-sm border border-border/70 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-foreground/80 ${className}`}
+      className={`inline-flex items-center rounded-sm border border-border/70 bg-background/90 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-foreground/80 ${className}`}
     >
       {config.label}
     </span>

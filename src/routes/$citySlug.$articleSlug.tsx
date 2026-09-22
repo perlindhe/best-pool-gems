@@ -115,25 +115,25 @@ function GuidePage() {
             decoding="async"
             className="absolute inset-0 -z-10 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-hero" />
+          <div className="absolute inset-0 -z-10 bg-gradient-overlay" />
           <div className="mx-auto flex min-h-[60vh] max-w-5xl flex-col justify-end px-6 pb-16 pt-28">
-            <nav className="text-xs uppercase tracking-[0.35em] text-primary">
-              <Link to="/" className="hover:text-foreground">Home</Link>
-              <span className="mx-2 text-muted-foreground">/</span>
+            <nav className="text-xs uppercase tracking-[0.35em] text-on-image/90">
+              <Link to="/" className="hover:text-on-image">Home</Link>
+              <span className="mx-2 text-on-image/60">/</span>
               <Link
                 to="/$citySlug"
                 params={{ citySlug: guide.citySlug }}
-                className="hover:text-foreground"
+                className="hover:text-on-image"
               >
                 {guide.city}
               </Link>
-              <span className="mx-2 text-muted-foreground">/</span>
-              <span className="text-foreground">{guide.category}</span>
+              <span className="mx-2 text-on-image/60">/</span>
+              <span className="text-on-image">{guide.category}</span>
             </nav>
-            <h1 className="mt-5 font-display text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] tracking-tight text-balance">
+            <h1 className="mt-5 font-display text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] tracking-tight text-balance text-on-image">
               {guide.title}
             </h1>
-            <p className="mt-5 max-w-2xl text-lg text-foreground/85 md:text-xl">{content.hero}</p>
+            <p className="mt-5 max-w-2xl text-lg text-on-image/90 md:text-xl">{content.hero}</p>
           </div>
         </section>
 

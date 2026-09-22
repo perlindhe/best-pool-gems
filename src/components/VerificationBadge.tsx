@@ -50,7 +50,7 @@ export function VerificationBadge({
     <span
       data-derived="status"
       data-status={status}
-      className={`inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${tone} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-sm border bg-background/90 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${tone} ${className}`}
     >
       <span aria-hidden>{icon}</span>
       {label}

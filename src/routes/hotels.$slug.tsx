@@ -230,23 +230,23 @@ function HotelDetailPage() {
             className="absolute inset-0 -z-10 h-full w-full object-cover"
           />
         )}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/40 via-background/60 to-background" />
+        <div className="absolute inset-0 -z-10 bg-gradient-overlay" />
         <div className="mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-6 pb-20 pt-28">
           <Link
             to="/rankings"
-            className="text-xs uppercase tracking-[0.3em] text-primary hover:underline"
+            className="text-xs uppercase tracking-[0.3em] text-on-image/90 hover:underline"
           >
             ← Rankings
           </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.35em] text-primary">
+          <p className="mt-6 text-xs uppercase tracking-[0.35em] text-on-image/80">
             {hotel.city}
             {hotel.neighborhood ? ` · ${hotel.neighborhood}` : ""} · {hotel.country}
           </p>
-          <h1 className="mt-3 font-display text-[clamp(3rem,9vw,7rem)] leading-[0.9] tracking-tight">
+          <h1 className="mt-3 font-display text-[clamp(3rem,9vw,7rem)] leading-[0.9] tracking-tight text-on-image">
             {hotel.name}
           </h1>
           {hotel.pool_type && (
-            <p className="mt-4 text-sm uppercase tracking-[0.25em] text-foreground/85">
+            <p className="mt-4 text-sm uppercase tracking-[0.25em] text-on-image/85">
               {hotel.pool_type}
               {hotel.best_time ? ` · best ${hotel.best_time}` : ""}
             </p>
@@ -259,7 +259,7 @@ function HotelDetailPage() {
               <VerificationMethodBadge method={hotel.verification_method} />
             )}
             {hotel.meta_rating_0_100 != null && (
-              <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/60 bg-primary/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-sm border border-primary/60 bg-background/90 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
                 Meta rating {Math.round(hotel.meta_rating_0_100)}/100
               </span>
             )}
@@ -269,7 +269,7 @@ function HotelDetailPage() {
               {keyFacts.map((f) => (
                 <li
                   key={f}
-                  className="rounded-full border border-border/70 bg-background/40 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-foreground/85 backdrop-blur"
+                  className="rounded-full border border-border/70 bg-background/90 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-foreground/85 backdrop-blur"
                 >
                   {f}
                 </li>
