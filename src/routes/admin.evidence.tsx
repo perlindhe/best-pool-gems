@@ -72,10 +72,16 @@ function EvidencePage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState<number | null>(null);
+  const PAGE = 10;
 
-  const load = () =>
-    getEvidenceOverview()
-      .then((r) => setReports((r?.reports as Report[]) ?? []))
+  const load = (from = offset) =>
+    getEvidenceOverview({ data: { limit: PAGE, offset: from } })
+      .then((r) => {
+        setReports((r?.reports as Report[]) ?? []);
+        setTotal((r?.total as number | null) ?? null);
+      })
       .catch((e) => {
         setReports([]);
         setError(errText(e));
