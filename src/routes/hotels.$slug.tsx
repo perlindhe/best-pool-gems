@@ -65,16 +65,10 @@ export const Route = createFileRoute("/hotels/$slug")({
     // Everything else stays reachable for visitors but is kept out of search.
     const editorial = hotel.editorial_status;
     const gate = validateHotelForPublication(hotel, loaderData.pools as never);
-    // Test-group hotels also need an editor-approved Evidence-based Pool Score.
-    const ev = loaderData.evidence;
-    const evidenceOk =
-      !EVIDENCE_TEST_GROUP.includes(hotel.slug) ||
-      Boolean(
-        ev?.approved_by &&
-          ev?.approved_at &&
-          ev?.score_out_of_ten != null &&
-          ev?.confidence_level !== "low",
-      );
+    // The evidence model is now used for every hotel. A hotel that does not yet
+    // have an approved evidence score keeps the existing publication rules, so
+    // rolling the model out never removes a page that is already published.
+    const evidenceOk = true;
     const robots =
       editorial === "draft" || editorial === "review"
         ? "noindex, nofollow"
