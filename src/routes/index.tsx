@@ -239,9 +239,9 @@ function Home() {
               loading="lazy"
               className="h-[520px] w-full object-cover transition duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-overlay" />
             <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
-              <p className="text-xs uppercase tracking-[0.3em] text-primary">
+              <p className="text-xs uppercase tracking-[0.3em] text-on-image/90">
                 {latestGuides[0].city} · {latestGuides[0].category}
               </p>
                <h3 className="mt-3 font-display text-5xl leading-tight text-on-image md:text-6xl">
@@ -296,9 +296,9 @@ function Home() {
                   loading="lazy"
                   className="h-64 w-full object-cover transition duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-overlay" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-primary">{c.country}</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-on-image/80">{c.country}</p>
                    <h3 className="font-display text-3xl text-on-image">{c.name}</h3>
                 </div>
               </Link>
