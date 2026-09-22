@@ -707,16 +707,28 @@ export async function saveEvidenceReport(hotelId: string) {
 }
 
 /**
- * Run the full automatic pipeline for the evidence-v1 test group:
- * collect fresh guest comments, recompute every factor and let the system
- * approve or withdraw each score. Scoped to the ten test hotels.
+ * Run the full automatic pipeline: collect fresh guest comments, recompute
+ * every factor and let the system approve or withdraw each score.
+ * Now rolled out to every hotel, processed in batches.
  */
-export async function runEvidenceAutomation() {
-  const { data: hotels, error } = await supabaseAdmin
+export async function runEvidenceAutomation(
+  opts: { limit?: number; offset?: number; slugs?: string[] } = {},
+) {
+  const limit = Math.min(Math.max(opts.limit ?? 10, 1), 50);
+  const offset = Math.max(opts.offset ?? 0, 0);
+
+  let countQuery = supabaseAdmin.from("hotels").select("id", { count: "exact", head: true });
+  if (opts.slugs?.length) countQuery = countQuery.in("slug", opts.slugs);
+  const { count: total } = await countQuery;
+
+  let listQuery = supabaseAdmin
     .from("hotels")
     .select("id, slug, name")
-    .in("slug", EVIDENCE_TEST_GROUP);
+    .order("name", { ascending: true });
+  if (opts.slugs?.length) listQuery = listQuery.in("slug", opts.slugs);
+  const { data: hotels, error } = await listQuery.range(offset, offset + limit - 1);
   if (error) throw new Error(error.message);
+
 
   const { ingestPoolFacts } = await import("./pool-facts.server");
 
@@ -771,7 +783,16 @@ export async function runEvidenceAutomation() {
       });
     }
   }
-  return { results };
+  const nextOffset = offset + (hotels?.length ?? 0);
+  const hasMore = total != null ? nextOffset < total : (hotels?.length ?? 0) === limit;
+  return {
+    results,
+    total: total ?? null,
+    offset,
+    limit,
+    next_offset: hasMore ? nextOffset : null,
+    has_more: hasMore,
+  };
 }
 
 /** Editor sign-off. Only an approved record may ever be shown or ranked. */
