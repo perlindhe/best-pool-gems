@@ -63,7 +63,7 @@ export function EvidenceScorePanel({
   return (
     <div
       data-derived="evidence-score"
-      data-score-version={record?.score_version ?? "evidence-v1"}
+      data-score-version={record?.score_version ?? "evidence-v2"}
       className="rounded-lg border border-border/60 bg-surface/40"
     >
       <div className="flex items-baseline justify-between gap-4 border-b border-border/60 px-5 py-4">
@@ -76,13 +76,18 @@ export function EvidenceScorePanel({
           </p>
         </div>
         {published ? (
-          <p className="font-display text-3xl text-primary" data-evidence-score>
-            {outOfTen!.toFixed(1)}
-            <span className="text-sm text-muted-foreground">/10</span>
-            <span className="ml-2 text-xs text-muted-foreground">
-              {Math.round(total!)}/100
-            </span>
-          </p>
+          <div className="text-right">
+            <p className="font-display text-3xl text-primary" data-evidence-score>
+              {outOfTen!.toFixed(1)}
+              <span className="text-sm text-muted-foreground">/10</span>
+              <span className="ml-2 text-xs text-muted-foreground">
+                {Math.round(total!)}/100
+              </span>
+            </p>
+            <p className="mt-1 text-[11px] text-muted-foreground" data-evidence-factors>
+              Based on {factorsUsed} of {factorsTotal} factors
+            </p>
+          </div>
         ) : (
           <p className="max-w-[16rem] text-right text-xs text-muted-foreground" data-evidence-pending>
             {confidence === "low" && total != null ? SCORE_PENDING_CONFIDENCE : SCORE_PENDING_DATA}
