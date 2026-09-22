@@ -75,18 +75,9 @@ export const collectPoolComments = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ hotel_id: z.string().uuid() }).parse(input))
   .handler(async ({ context, data }) => {
     await ensureAdmin(context.supabase as never, context.userId);
-    const { ingestPoolComments, saveEvidenceReport, isEvidenceTestHotel } = await import(
+    const { ingestPoolComments, saveEvidenceReport } = await import(
       "@/server/evidence-score.server"
     );
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: hotel } = await supabaseAdmin
-      .from("hotels")
-      .select("slug")
-      .eq("id", data.hotel_id)
-      .maybeSingle();
-    if (!isEvidenceTestHotel(hotel?.slug)) {
-      throw new Error("Collection is limited to the evidence-v1 test group while it is under review.");
-    }
     const result = await ingestPoolComments(data.hotel_id);
     await saveEvidenceReport(data.hotel_id);
     return result;
