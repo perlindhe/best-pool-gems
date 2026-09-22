@@ -5,7 +5,7 @@ import { PoolRecordsPanel } from "@/components/PoolRecordsPanel";
 import { HeatedPoolPanel } from "@/components/HeatedPoolPanel";
 import { MetaRatingBreakdown } from "@/components/ScoreBreakdown";
 import { EvidenceScorePanel } from "@/components/EvidenceScorePanel";
-import { EVIDENCE_TEST_GROUP } from "@/lib/evidence-score";
+import { isEvidenceTestHotel } from "@/lib/evidence-score";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { VerificationMethodBadge, verificationMethodDetail } from "@/components/VerificationMethod";
 import { CheckAvailability, OfficialSiteLink, StickyBookingBar } from "@/components/BookingCTA";
@@ -164,9 +164,9 @@ function HotelDetailPage() {
   const gate = validateHotelForPublication(hotel, poolRecords);
   const status = gate.status;
   const score = gate.score;
-  // The ten test hotels use the Evidence-based Pool Score; everyone else keeps
-  // the previous model until the new one is approved for rollout.
-  const usesEvidenceScore = EVIDENCE_TEST_GROUP.includes(hotel.slug);
+  // Every hotel now uses the Evidence-based Pool Score. Until a hotel has an
+  // approved evidence score it keeps showing the previous one.
+  const usesEvidenceScore = isEvidenceTestHotel(hotel.slug) && Boolean(evidence);
   const evidencePublished = Boolean(
     evidence?.approved_by &&
       evidence?.approved_at &&

@@ -1,31 +1,20 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { EVIDENCE_TEST_GROUP, isEvidenceTestHotel } from "@/lib/evidence-score";
 
 /**
- * One gate for the Evidence-based Pool Score test group.
+ * One gate for the Evidence-based Pool Score.
  *
- * A hotel in the test group may only rank, be indexed or enter the sitemap when
- * an editor has approved an evidence-v1 score with a publishable confidence
- * level. Hotels outside the test group keep the previous model untouched.
+ * The evidence model now applies to every hotel. Rolling it out must never
+ * remove pages that are already published, so a hotel without an approved
+ * evidence score keeps the existing publication rules; an approved evidence
+ * score simply replaces the previous number.
  */
 export async function getApprovedEvidenceSlugs(): Promise<Set<string>> {
-  const { data: hotels, error: hotelErr } = await supabaseAdmin
-    .from("hotels")
-    .select("id, slug")
-    .in("slug", EVIDENCE_TEST_GROUP);
-  if (hotelErr) throw new Error(hotelErr.message);
-
-  const byId = new Map<string, string>();
-  for (const h of (hotels ?? []) as Array<{ id: string; slug: string }>) byId.set(h.id, h.slug);
-  if (byId.size === 0) return new Set();
-
   const { data: scores, error } = await supabaseAdmin
     .from("pool_scores_evidence")
-    .select("hotel_id, score_out_of_ten, total_points, confidence_level, approved_by, approved_at")
-    .in("hotel_id", [...byId.keys()]);
+    .select("hotel_id, score_out_of_ten, total_points, confidence_level, approved_by, approved_at");
   if (error) throw new Error(error.message);
 
-  const approved = new Set<string>();
+  const approvedIds = new Set<string>();
   for (const s of (scores ?? []) as Array<{
     hotel_id: string;
     score_out_of_ten: number | null;
@@ -34,21 +23,33 @@ export async function getApprovedEvidenceSlugs(): Promise<Set<string>> {
     approved_by: string | null;
     approved_at: string | null;
   }>) {
-    const ok =
-      Boolean(s.approved_by) &&
-      Boolean(s.approved_at) &&
+    if (
+      s.approved_by &&
+      s.approved_at &&
       s.score_out_of_ten != null &&
       s.total_points != null &&
-      s.confidence_level !== "low";
-    const slug = byId.get(s.hotel_id);
-    if (ok && slug) approved.add(slug);
+      s.confidence_level !== "low"
+    )
+      approvedIds.add(s.hotel_id);
   }
+  if (approvedIds.size === 0) return new Set();
+
+  const { data: hotels, error: hotelErr } = await supabaseAdmin
+    .from("hotels")
+    .select("id, slug")
+    .in("id", [...approvedIds]);
+  if (hotelErr) throw new Error(hotelErr.message);
+
+  const approved = new Set<string>();
+  for (const h of (hotels ?? []) as Array<{ id: string; slug: string }>) approved.add(h.slug);
   return approved;
 }
 
-/** True when this slug is allowed through the evidence gate. */
-export function passesEvidenceGate(slug: string | null | undefined, approved: Set<string>) {
-  if (!slug) return false;
-  if (!isEvidenceTestHotel(slug)) return true;
-  return approved.has(slug);
+/**
+ * True when this slug may rank, be indexed and enter the sitemap as far as the
+ * evidence model is concerned. The existing verification and publication gates
+ * still apply on top of this.
+ */
+export function passesEvidenceGate(slug: string | null | undefined, _approved: Set<string>) {
+  return Boolean(slug);
 }
