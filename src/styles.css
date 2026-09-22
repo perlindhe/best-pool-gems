@@ -39,6 +39,7 @@
   --ring: oklch(0.52 0.105 205);
 
   --gradient-hero: linear-gradient(90deg, oklch(0.17 0.025 230 / 0.82) 0%, oklch(0.2 0.025 220 / 0.35) 55%, transparent 100%);
+  --gradient-overlay: linear-gradient(to top, oklch(0.16 0.025 230 / 0.92) 0%, oklch(0.16 0.025 230 / 0.55) 50%, transparent 100%);
   --gradient-aqua: linear-gradient(135deg, oklch(0.52 0.105 205), oklch(0.7 0.11 190));
   --shadow-glow: 0 20px 55px -25px oklch(0.52 0.105 205 / 0.28);
   --shadow-card: 0 18px 45px -30px oklch(0.25 0.02 230 / 0.28);
@@ -130,6 +131,7 @@
 @layer utilities {
   .font-display { font-family: var(--font-display); }
   .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-overlay { background-image: var(--gradient-overlay); }
   .bg-gradient-aqua { background-image: var(--gradient-aqua); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }
