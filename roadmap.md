@@ -33,6 +33,15 @@
       waits and retries, and searches four phrasings (pool page, length, spa,
       fact sheet) instead of one
 
+## Same score model for all hotels
+- [x] The model now covers all 261 hotels, not only the ten test hotels
+- [x] A hotel is scored on the facts that are confirmed ("based on 4 of 5
+      factors"); guest comments and number of pools are the minimum
+- [x] Approval happens automatically as soon as the evidence is in place
+- [x] Hotels without a new score keep their current visibility
+- [ ] Run the collection for all hotels — blocked: the workspace AI credit
+      limit is reached, so guest comments cannot be classified right now
+
 ### Open (waiting on facts or a person)
 - [ ] Pool length or area is still not stated anywhere official for eight of
       the ten hotels, so the size factor stays unconfirmed and no score is
