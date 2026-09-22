@@ -57,6 +57,8 @@ export function EvidenceScorePanel({
     poolSizePoints: record?.pool_size_points ?? null,
     externalRecognitionPoints: record?.external_recognition_points ?? null,
   };
+  const factorsUsed = Object.values(values).filter((v) => v != null).length;
+  const factorsTotal = FACTOR_LABELS.length;
 
   return (
     <div
