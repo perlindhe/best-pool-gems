@@ -298,7 +298,7 @@ function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-overlay" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-primary">{c.country}</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-on-image/80">{c.country}</p>
                    <h3 className="font-display text-3xl text-on-image">{c.name}</h3>
                 </div>
               </Link>
