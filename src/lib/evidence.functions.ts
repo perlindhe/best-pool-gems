@@ -7,19 +7,34 @@ async function ensureAdmin(supabase: { rpc: (fn: string, args: Record<string, un
   if (data !== true) throw new Error("Forbidden: admin only");
 }
 
-/** The ten hotels in the evidence-v1 test group, with their current report. */
+/** Hotels with their current evidence report, one page at a time. */
 export const getEvidenceOverview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        limit: z.number().int().min(1).max(50).optional(),
+        offset: z.number().int().min(0).optional(),
+      })
+      .optional()
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
     await ensureAdmin(context.supabase as never, context.userId);
-    const { EVIDENCE_TEST_GROUP, buildEvidenceReport } = await import(
-      "@/server/evidence-score.server"
-    );
+    const { buildEvidenceReport } = await import("@/server/evidence-score.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const limit = data?.limit ?? 20;
+    const offset = data?.offset ?? 0;
+
+    const { count: total } = await supabaseAdmin
+      .from("hotels")
+      .select("id", { count: "exact", head: true });
+
     const { data: hotels, error } = await supabaseAdmin
       .from("hotels")
       .select("id, slug, name, city")
-      .in("slug", EVIDENCE_TEST_GROUP as unknown as string[]);
+      .order("name", { ascending: true })
+      .range(offset, offset + limit - 1);
     if (error) throw new Error(error.message);
 
     const reports = [];
@@ -36,7 +51,14 @@ export const getEvidenceOverview = createServerFn({ method: "POST" })
         });
       }
     }
-    return { reports };
+    const nextOffset = offset + (hotels?.length ?? 0);
+    return {
+      reports,
+      total: total ?? null,
+      offset,
+      limit,
+      next_offset: total != null && nextOffset < total ? nextOffset : null,
+    };
   });
 
 export const recalculateEvidenceScore = createServerFn({ method: "POST" })
