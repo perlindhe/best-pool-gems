@@ -547,7 +547,7 @@ function LuxuryPoolHotels() {
       </section>
 
       {/* CTA + how we rank */}
-      <section className="border-t border-border/40 bg-gradient-hero">
+      <section className="border-t border-border/40 bg-surface">
         <div className="mx-auto max-w-5xl px-6 py-24 text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-primary">Pool-first stays</p>
           <h2 className="mt-4 font-display text-5xl leading-tight tracking-wide md:text-6xl">
