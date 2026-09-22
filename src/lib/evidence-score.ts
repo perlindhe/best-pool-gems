@@ -32,7 +32,7 @@ export function isEvidenceTestHotel(slug?: string | null): boolean {
  * its points are never redistributed over the other factors.
  */
 
-export const SCORE_VERSION = "evidence-v1";
+export const SCORE_VERSION = "evidence-v2";
 
 export type ConfidenceLevel = "low" | "medium" | "high";
 
@@ -523,6 +523,13 @@ export type EvidenceTotal = {
   totalPoints: number | null;
   scoreOutOfTen: number | null;
   blockingReasons: string[];
+  /** How many of the five factors carry documented evidence. */
+  factorsUsed: number;
+  factorsTotal: number;
+  /** The maximum points the confirmed factors could have scored. */
+  maxAvailable: number;
+  /** Human-readable names of the factors that are still unconfirmed. */
+  missingFactors: string[];
 };
 
 export const FACTOR_LABELS: Array<{ key: keyof EvidenceFactors; label: string; max: number; hint: string }> = [
@@ -566,27 +573,52 @@ const MISSING_COPY: Record<keyof EvidenceFactors, string> = {
   externalRecognitionPoints: "Independent recognition not reviewed",
 };
 
+/**
+ * Factors that must always be evidence-backed. Without them there is no score.
+ * The other three factors are optional: when one is unconfirmed it is left out
+ * of the score entirely — its points are never guessed and never handed to the
+ * remaining factors. The score is expressed against the factors that ARE
+ * documented, and the page always says how many that is.
+ */
+export const REQUIRED_FACTORS: Array<keyof EvidenceFactors> = [
+  "guestSentimentPoints",
+  "poolCountPoints",
+];
+
 export function calculateTotal(f: EvidenceFactors): EvidenceTotal {
-  const blockingReasons: string[] = [];
-  for (const { key } of FACTOR_LABELS) {
-    if (f[key] == null) blockingReasons.push(MISSING_COPY[key]);
-  }
-  if (blockingReasons.length) {
-    return { totalPoints: null, scoreOutOfTen: null, blockingReasons };
-  }
-  const total = clamp(
-    (f.guestSentimentPoints ?? 0) +
-      (f.heatingPoints ?? 0) +
-      (f.poolCountPoints ?? 0) +
-      (f.poolSizePoints ?? 0) +
-      (f.externalRecognitionPoints ?? 0),
-    0,
-    100,
+  const factorsTotal = FACTOR_LABELS.length;
+  const missingFactors = FACTOR_LABELS.filter(({ key }) => f[key] == null).map(
+    ({ label }) => label,
   );
+  const blockingReasons = REQUIRED_FACTORS.filter((key) => f[key] == null).map(
+    (key) => MISSING_COPY[key],
+  );
+  const confirmed = FACTOR_LABELS.filter(({ key }) => f[key] != null);
+
+  if (blockingReasons.length || confirmed.length === 0) {
+    return {
+      totalPoints: null,
+      scoreOutOfTen: null,
+      blockingReasons: blockingReasons.length ? blockingReasons : [MISSING_COPY.guestSentimentPoints],
+      factorsUsed: confirmed.length,
+      factorsTotal,
+      maxAvailable: 0,
+      missingFactors,
+    };
+  }
+
+  const earned = confirmed.reduce((sum, { key }) => sum + (f[key] as number), 0);
+  const maxAvailable = confirmed.reduce((sum, { max }) => sum + max, 0);
+  const total = clamp((earned / maxAvailable) * 100, 0, 100);
+
   return {
     totalPoints: round1(total),
     scoreOutOfTen: Math.round(total) / 10,
     blockingReasons: [],
+    factorsUsed: confirmed.length,
+    factorsTotal,
+    maxAvailable,
+    missingFactors,
   };
 }
 
@@ -651,7 +683,8 @@ export function evidenceQaErrors(q: QaInput): string[] {
   if (q.breakdown.relevant < MIN_RELEVANT_COMMENTS)
     errors.push("Fewer than three relevant pool comments");
   for (const { key, label } of FACTOR_LABELS)
-    if (q[key] == null) errors.push(`${label} has no verified value`);
+    if (REQUIRED_FACTORS.includes(key) && q[key] == null)
+      errors.push(`${label} has no verified value`);
   if (q.counts.sharedSwimmingPoolCount <= 0)
     errors.push("The number of shared swimming pools cannot be derived");
   if (q.heatingCategory === "conflicting") errors.push("Heating information conflicts");
