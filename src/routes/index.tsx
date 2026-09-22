@@ -241,7 +241,7 @@ function Home() {
             />
             <div className="absolute inset-0 bg-gradient-overlay" />
             <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
-              <p className="text-xs uppercase tracking-[0.3em] text-primary">
+              <p className="text-xs uppercase tracking-[0.3em] text-on-image/90">
                 {latestGuides[0].city} · {latestGuides[0].category}
               </p>
                <h3 className="mt-3 font-display text-5xl leading-tight text-on-image md:text-6xl">
