@@ -479,7 +479,10 @@ export type ConfidenceInput = {
   poolCountConfirmed: boolean;
   sizeConfirmed: boolean;
   hasConflicts: boolean;
+  /** True when every one of the five factors is evidence-backed. */
   allFactorsNumeric: boolean;
+  /** True when the factors the score requires are evidence-backed. */
+  requiredFactorsNumeric?: boolean;
 };
 
 export function calculateConfidence(input: ConfidenceInput): ConfidenceLevel {
@@ -497,9 +500,8 @@ export function calculateConfidence(input: ConfidenceInput): ConfidenceLevel {
   }
   if (
     input.hasOfficialSource &&
-    input.independentSourceCount >= 1 &&
     input.relevantComments >= MIN_RELEVANT_COMMENTS &&
-    input.allFactorsNumeric &&
+    (input.requiredFactorsNumeric ?? input.allFactorsNumeric) &&
     !input.hasConflicts
   ) {
     return "medium";
