@@ -730,9 +730,10 @@ export type AutoApprovalInput = {
 };
 
 /**
- * Reasons the system may NOT approve this score by itself.
- * An empty array means every factor is evidence-backed and the score can be
- * published automatically; anything else stays pending for a human.
+ * Reasons the system may NOT approve this score yet.
+ * An empty array means the score is published automatically. Anything else
+ * stays "pending" until the scheduled job finds more evidence — there is no
+ * human review step.
  */
 export function autoApprovalBlockers(input: AutoApprovalInput): string[] {
   const reasons: string[] = [];
