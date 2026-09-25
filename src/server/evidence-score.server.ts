@@ -310,7 +310,10 @@ export async function ingestPoolComments(hotelId: string) {
     return { hotel: hotel.name, fetched: 0, stored: 0, duplicates: 0 };
   }
 
-  const classifications = await classifyComments(hotel.name, candidates.slice(0, 40));
+  // Credit saver: 12 candidates are plenty to reach the 3-comment threshold;
+  // classifying 40 costs ~3x the AI tokens for no extra score precision.
+  const MAX_CLASSIFY = 12;
+  const classifications = await classifyComments(hotel.name, candidates.slice(0, MAX_CLASSIFY));
   const byIdx = new Map(classifications.map((c) => [c.idx, c]));
 
   let stored = 0;
