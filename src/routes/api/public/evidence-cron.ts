@@ -9,7 +9,9 @@ import { createFileRoute } from "@tanstack/react-router";
  * - pauses itself on AI credit / policy errors (402/403) and probes one hotel per run until it works again
  */
 const BATCH = 4;
-const STALE_DAYS = 7;
+// Runs only on the 1st and 15th of each month (every 20 min those days),
+// so every hotel is re-scored roughly every two weeks.
+const STALE_DAYS = 10;
 const LEASE_MIN = 15;
 
 function isCreditError(msg: string) {
