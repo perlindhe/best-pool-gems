@@ -115,11 +115,10 @@ async function firecrawlSearch(query: string, limit: number): Promise<OfficialPa
  * as on the pool page itself.
  */
 async function firecrawlOfficialPoolPages(domain: string): Promise<OfficialPage[]> {
+  // Credit saver: two targeted queries find the same pages as four did.
   const queries = [
     `site:${domain} pool`,
-    `site:${domain} swimming pool metre length`,
-    `site:${domain} pool "m" heated temperature`,
-    `site:${domain} fact sheet pool`,
+    `site:${domain} swimming pool metre length heated`,
   ];
   const results: OfficialPage[] = [];
   for (const q of queries) {

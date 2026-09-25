@@ -276,6 +276,18 @@ export async function ingestPoolComments(hotelId: string) {
   if (error) throw new Error(error.message);
   if (!hotel) throw new Error("Hotel not found");
 
+  // Credit saver: once a hotel already has enough relevant pool comments,
+  // re-fetching and re-classifying adds nothing — skip all external calls.
+  const { count: relevantCount } = await supabaseAdmin
+    .from("pool_comments")
+    .select("id", { count: "exact", head: true })
+    .eq("hotel_id", hotelId)
+    .eq("relevance", "pool")
+    .eq("is_owner_content", false);
+  if ((relevantCount ?? 0) >= MIN_RELEVANT_COMMENTS) {
+    return { hotel: hotel.name, fetched: 0, stored: 0, duplicates: 0, skipped: "enough_comments" };
+  }
+
   const { data: mappings } = await supabaseAdmin
     .from("source_mappings")
     .select("source, source_place_id")
