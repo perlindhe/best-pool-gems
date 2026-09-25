@@ -165,7 +165,8 @@ async function classifyComments(
   const items = reviews.map((r, idx) => ({
     idx,
     source: r.source,
-    text: r.text.slice(0, 1200),
+    // Credit saver: 600 chars per comment is enough to judge pool relevance.
+    text: r.text.slice(0, 600),
   }));
 
   const instructions =
@@ -276,6 +277,18 @@ export async function ingestPoolComments(hotelId: string) {
   if (error) throw new Error(error.message);
   if (!hotel) throw new Error("Hotel not found");
 
+  // Credit saver: once a hotel already has enough relevant pool comments,
+  // re-fetching and re-classifying adds nothing — skip all external calls.
+  const { count: relevantCount } = await supabaseAdmin
+    .from("pool_comments")
+    .select("id", { count: "exact", head: true })
+    .eq("hotel_id", hotelId)
+    .eq("relevance", "pool")
+    .eq("is_owner_content", false);
+  if ((relevantCount ?? 0) >= MIN_RELEVANT_COMMENTS) {
+    return { hotel: hotel.name, fetched: 0, stored: 0, duplicates: 0, skipped: "enough_comments" };
+  }
+
   const { data: mappings } = await supabaseAdmin
     .from("source_mappings")
     .select("source, source_place_id")
@@ -298,12 +311,15 @@ export async function ingestPoolComments(hotelId: string) {
     return { hotel: hotel.name, fetched: 0, stored: 0, duplicates: 0 };
   }
 
-  const classifications = await classifyComments(hotel.name, candidates.slice(0, 40));
+  // Credit saver: 12 candidates are plenty to reach the 3-comment threshold;
+  // classifying 40 costs ~3x the AI tokens for no extra score precision.
+  const MAX_CLASSIFY = 12;
+  const classifications = await classifyComments(hotel.name, candidates.slice(0, MAX_CLASSIFY));
   const byIdx = new Map(classifications.map((c) => [c.idx, c]));
 
   let stored = 0;
   let duplicates = 0;
-  for (let i = 0; i < Math.min(candidates.length, 40); i++) {
+  for (let i = 0; i < Math.min(candidates.length, MAX_CLASSIFY); i++) {
     const r = candidates[i]!;
     const c = byIdx.get(i);
     if (!c) continue;

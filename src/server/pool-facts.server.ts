@@ -115,11 +115,10 @@ async function firecrawlSearch(query: string, limit: number): Promise<OfficialPa
  * as on the pool page itself.
  */
 async function firecrawlOfficialPoolPages(domain: string): Promise<OfficialPage[]> {
+  // Credit saver: two targeted queries find the same pages as four did.
   const queries = [
     `site:${domain} pool`,
-    `site:${domain} swimming pool metre length`,
-    `site:${domain} pool "m" heated temperature`,
-    `site:${domain} fact sheet pool`,
+    `site:${domain} swimming pool metre length heated`,
   ];
   const results: OfficialPage[] = [];
   for (const q of queries) {
@@ -293,6 +292,12 @@ export async function ingestPoolFacts(hotelId: string) {
     .eq("hotel_id", hotelId);
   const pools = (poolRows ?? []) as unknown as PoolRow[];
   if (!pools.length) return { updatedPools: 0, confirmedSize: 0, confirmedHeating: 0, pages: 0 };
+
+  // Credit saver: when every pool already has a verified size, re-scraping the
+  // official site and re-extracting facts costs credits without changing anything.
+  if (pools.every((p) => p.size_verified)) {
+    return { updatedPools: 0, confirmedSize: 0, confirmedHeating: 0, pages: 0, skipped: "size_verified" };
+  }
 
   const scraped = await Promise.all(
     [...new Set(seeds.filter((u) => hostOf(u) === domain))].slice(0, 2).map(firecrawlScrape),
