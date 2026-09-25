@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      evidence_automation_state: {
+        Row: {
+          cron_token: string
+          id: number
+          last_result: Json | null
+          last_run_at: string | null
+          locked_until: string | null
+          paused_at: string | null
+          paused_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          cron_token?: string
+          id?: number
+          last_result?: Json | null
+          last_run_at?: string | null
+          locked_until?: string | null
+          paused_at?: string | null
+          paused_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cron_token?: string
+          id?: number
+          last_result?: Json | null
+          last_run_at?: string | null
+          locked_until?: string | null
+          paused_at?: string | null
+          paused_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       external_mentions: {
         Row: {
           approved_at: string | null
