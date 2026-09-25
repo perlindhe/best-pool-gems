@@ -36,6 +36,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminEvidenceRouteImport } from './routes/admin.evidence'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
 import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
+import { Route as ApiPublicEvidenceCronRouteImport } from './routes/api/public/evidence-cron'
 import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
 import { Route as ApiPublicHooksWriteEditorialRouteImport } from './routes/api/public/hooks/write-editorial'
 import { Route as ApiPublicHooksVerifyPoolExistenceRouteImport } from './routes/api/public/hooks/verify-pool-existence'
@@ -185,6 +186,11 @@ const ApiPublicHotelsRoute = ApiPublicHotelsRouteImport.update({
   path: '/api/public/hotels',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicEvidenceCronRoute = ApiPublicEvidenceCronRouteImport.update({
+  id: '/api/public/evidence-cron',
+  path: '/api/public/evidence-cron',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -284,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/editors/': typeof EditorsIndexRoute
+  '/api/public/evidence-cron': typeof ApiPublicEvidenceCronRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -325,6 +332,7 @@ export interface FileRoutesByTo {
   '/$citySlug': typeof CitySlugIndexRoute
   '/admin': typeof AdminIndexRoute
   '/editors': typeof EditorsIndexRoute
+  '/api/public/evidence-cron': typeof ApiPublicEvidenceCronRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -367,6 +375,7 @@ export interface FileRoutesById {
   '/$citySlug/': typeof CitySlugIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/editors/': typeof EditorsIndexRoute
+  '/api/public/evidence-cron': typeof ApiPublicEvidenceCronRoute
   '/api/public/hotels': typeof ApiPublicHotelsRouteWithChildren
   '/api/public/hooks/auto-score-all': typeof ApiPublicHooksAutoScoreAllRoute
   '/api/public/hooks/backfill-pool-quotes': typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -410,6 +419,7 @@ export interface FileRouteTypes {
     | '/$citySlug/'
     | '/admin/'
     | '/editors/'
+    | '/api/public/evidence-cron'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-pool-quotes'
@@ -451,6 +461,7 @@ export interface FileRouteTypes {
     | '/$citySlug'
     | '/admin'
     | '/editors'
+    | '/api/public/evidence-cron'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-pool-quotes'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/$citySlug/'
     | '/admin/'
     | '/editors/'
+    | '/api/public/evidence-cron'
     | '/api/public/hotels'
     | '/api/public/hooks/auto-score-all'
     | '/api/public/hooks/backfill-pool-quotes'
@@ -534,6 +546,7 @@ export interface RootRouteChildren {
   CitySlugIndexRoute: typeof CitySlugIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
   EditorsIndexRoute: typeof EditorsIndexRoute
+  ApiPublicEvidenceCronRoute: typeof ApiPublicEvidenceCronRoute
   ApiPublicHotelsRoute: typeof ApiPublicHotelsRouteWithChildren
   ApiPublicHooksAutoScoreAllRoute: typeof ApiPublicHooksAutoScoreAllRoute
   ApiPublicHooksBackfillPoolQuotesRoute: typeof ApiPublicHooksBackfillPoolQuotesRoute
@@ -739,6 +752,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHotelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/evidence-cron': {
+      id: '/api/public/evidence-cron'
+      path: '/api/public/evidence-cron'
+      fullPath: '/api/public/evidence-cron'
+      preLoaderRoute: typeof ApiPublicEvidenceCronRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hotels/$slug': {
       id: '/api/public/hotels/$slug'
       path: '/$slug'
@@ -865,6 +885,7 @@ const rootRouteChildren: RootRouteChildren = {
   CitySlugIndexRoute: CitySlugIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
   EditorsIndexRoute: EditorsIndexRoute,
+  ApiPublicEvidenceCronRoute: ApiPublicEvidenceCronRoute,
   ApiPublicHotelsRoute: ApiPublicHotelsRouteWithChildren,
   ApiPublicHooksAutoScoreAllRoute: ApiPublicHooksAutoScoreAllRoute,
   ApiPublicHooksBackfillPoolQuotesRoute: ApiPublicHooksBackfillPoolQuotesRoute,
