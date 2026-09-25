@@ -165,7 +165,8 @@ async function classifyComments(
   const items = reviews.map((r, idx) => ({
     idx,
     source: r.source,
-    text: r.text.slice(0, 1200),
+    // Credit saver: 600 chars per comment is enough to judge pool relevance.
+    text: r.text.slice(0, 600),
   }));
 
   const instructions =
@@ -318,7 +319,7 @@ export async function ingestPoolComments(hotelId: string) {
 
   let stored = 0;
   let duplicates = 0;
-  for (let i = 0; i < Math.min(candidates.length, 40); i++) {
+  for (let i = 0; i < Math.min(candidates.length, MAX_CLASSIFY); i++) {
     const r = candidates[i]!;
     const c = byIdx.get(i);
     if (!c) continue;
