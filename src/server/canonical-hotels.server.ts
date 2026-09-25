@@ -343,16 +343,29 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
   const { data, error } = await supabaseAdmin
     .from("public_hotels_view")
     .select(
-      "pool_score_0_10, verification_status, editorial_status, qa_blocked, last_verified_date, rooftop, infinity, heated_state, season_state, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
+      "id, pool_score_0_10, verification_status, editorial_status, qa_blocked, last_verified_date, rooftop, infinity, heated_state, season_state, indoor, outdoor, beachfront, adults_only, family_friendly, saltwater",
     )
     .eq("city_slug", citySlug);
   if (error) throw new Error(error.message);
 
-  const rows = (data ?? []) as unknown as CanonicalHotel[];
-  const finished = rows.filter((r) => isIndexableHotel(r));
-  const scores = finished
-    .map((r) => r.pool_score_0_10)
-    .filter((s): s is number => typeof s === "number");
+  const rows = (data ?? []) as unknown as (CanonicalHotel & { id: string })[];
+  const finished = rows.filter(
+    (r) => r.verification_status === "verified" && !r.qa_blocked,
+  );
+  // Scores come from the approved evidence-based Pool Score (same as profiles).
+  const ids = rows.map((r) => r.id).filter(Boolean);
+  const { data: ev } = ids.length
+    ? await supabaseAdmin
+        .from("pool_scores_evidence")
+        .select("score_out_of_ten, confidence_level, approved_at")
+        .in("hotel_id", ids)
+        .not("approved_at", "is", null)
+        .not("score_out_of_ten", "is", null)
+    : { data: [] as { score_out_of_ten: number | null; confidence_level: string }[] };
+  const scores = (ev ?? [])
+    .filter((e) => e.confidence_level !== "low")
+    .map((e) => Number(e.score_out_of_ten))
+    .filter((s) => Number.isFinite(s));
   const dates = rows
     .map((r) => r.last_verified_date)
     .filter((d): d is string => Boolean(d))
