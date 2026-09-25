@@ -49,3 +49,10 @@
 - [ ] Heating still unconfirmed for The Siam, Hotel Arts and Bvlgari London
 - [ ] Hotel June and Can Bordoy have fewer than three pool comments
 - [ ] Approval before the same model is rolled out to the remaining hotels
+
+## Kreditoptimering av betygsautomationen (klar 2026-09-25)
+- Hoppar över kommentarsinsamling för hotell som redan har ≥3 relevanta poolkommentarer (34 hotell sparas per körning).
+- Hoppar över faktainsamling för hotell där alla pooler redan har verifierad storlek.
+- AI-klassificering: max 12 kommentarer (var 40), 600 tecken per kommentar (var 1200).
+- Faktasökning: 2 sökfrågor per hotell (var 4).
+- Schema oförändrat: 1:a och 15:e varje månad. QA 75/75 + tsgo ok.
