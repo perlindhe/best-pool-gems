@@ -9,9 +9,10 @@ import { createFileRoute } from "@tanstack/react-router";
  * - pauses itself on AI credit / policy errors (402/403) and probes one hotel per run until it works again
  */
 const BATCH = 4;
-// Runs only on the 1st and 15th of each month (every 20 min those days),
-// so every hotel is re-scored roughly every two weeks.
-const STALE_DAYS = 10;
+// Credit guard: scoring only runs on the 1st of the month, even if the
+// scheduler calls on other days. Each hotel is re-scored at most monthly.
+const RUN_DAY_OF_MONTH = 1;
+const STALE_DAYS = 25;
 const LEASE_MIN = 15;
 
 function isCreditError(msg: string) {
@@ -37,6 +38,8 @@ export const Route = createFileRoute("/api/public/evidence-cron")({
         if (!s || !token || token !== s.cron_token) return new Response("Unauthorized", { status: 401 });
 
         const now = new Date();
+        if (now.getUTCDate() !== RUN_DAY_OF_MONTH)
+          return Response.json({ skipped: "not_run_day" });
         if (s.locked_until && new Date(s.locked_until) > now)
           return Response.json({ skipped: "locked" });
         const lease = new Date(now.getTime() + LEASE_MIN * 60_000).toISOString();
