@@ -265,9 +265,10 @@ function LuxuryPoolHotels() {
             and just as many poolside cocktails.
           </p>
           <p>
-            Every hotel gets a Pool Score from 0–10 built from five criteria —
-            pool design &amp; setting, view &amp; atmosphere, size &amp; lounging
-            space, access &amp; seasonality, and service &amp; maintenance. We
+            Every hotel gets a Pool Score from 0–10 — the same
+            evidence-based score shown on every page, built from guest pool
+            sentiment, heating, number of pools, pool size and independent
+            recognition. We
             don't accept payment for placement, and the ranking is set by the
             editorial team before any booking links are added. You can trust
             that a 7 here is a 7 no matter who advertises.
