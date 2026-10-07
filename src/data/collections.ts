@@ -104,7 +104,7 @@ export const collections: Collection[] = [
     intro: [
       "Air temperatures in the south of the island sit around 21–24°C through the winter. Unheated pool water does not follow: it typically drops to 19–21°C, which is swimmable for a brave few and unpleasant for everyone else.",
       "The hotels below run heated pools and, in most cases, keep them open through the whole winter season. That combination is what makes a December or February pool holiday work.",
-      "Scores are our own five-criteria Pool Score and are never influenced by affiliate relationships. Heating claims come from the hotel's own site or from multiple independent sources.",
+      "Scores are our evidence-based Pool Score and are never influenced by affiliate relationships. Heating claims come from the hotel's own site or from multiple independent sources.",
     ],
     faqs: [
       {
@@ -140,7 +140,7 @@ export const collections: Collection[] = [
     intro: [
       "Gran Canaria has an unusually deep adults-only market compared with the other Canary Islands, and the pool areas are the main reason people book them: fewer people, more loungers per guest and a quieter poolside.",
       "Every hotel below is adults-only according to the property's own booking terms. Minimum ages vary — 16 and 18 are both common — so verify the age limit for your party.",
-      "Pool Score is calculated the same way here as everywhere else: wow factor, size, view, loungers and service.",
+      "Pool Score is calculated the same way here as everywhere else: guest pool sentiment, heating, number of pools, pool size and independent recognition.",
     ],
     faqs: [
       {
@@ -171,7 +171,7 @@ export const collections: Collection[] = [
     intro: [
       "Very few London hotels have an outdoor pool, and the ones that do are seasonal. The real question in this city is which indoor pool is big enough, warm enough and quiet enough to be worth choosing a hotel for.",
       "We separate proper lap pools from spa plunge pools in the pool facts on each hotel page, because the difference matters and hotel marketing routinely blurs it.",
-      "Everything here is scored on the same five criteria as our outdoor rankings, so a great basement pool can outrank a mediocre rooftop.",
+      "Everything here uses the same Pool Score as our outdoor rankings, so a great basement pool can outrank a mediocre rooftop.",
     ],
     faqs: [
       {
@@ -206,7 +206,7 @@ export const collections: Collection[] = [
     hero: "Paris keeps its best pools underground — vaulted, quiet and warm, with the spa attached.",
     intro: [
       "The classic Paris hotel pool is a stone-vaulted basement below a palace hotel: dramatic, warm, and often small. A handful of properties break the pattern with pools long enough to swim properly.",
-      "We score them on the same five criteria as everywhere else, so atmosphere alone does not carry a page: size, loungers and service count too.",
+      "They use the same Pool Score as everywhere else, so atmosphere alone does not carry a page: guest feedback, size and heating count too.",
       "Access rules in Paris are stricter than in most cities — several of these pools are for guests and spa members only.",
     ],
     faqs: [
@@ -278,7 +278,7 @@ export const collections: Collection[] = [
     hero: "In LA the rooftop pool is the hotel's living room. The question is whether you want the scene or the swim.",
     intro: [
       "Los Angeles rooftop pools split into two categories: social decks where the pool is a backdrop for a bar, and quieter ones where you can actually swim. We note which is which, because arriving at the wrong one ruins the afternoon.",
-      "Views range from the Downtown skyline to the Hollywood Hills. Score-wise, view is only one of five criteria — a spectacular outlook does not compensate for four loungers and no shade.",
+      "Views range from the Downtown skyline to the Hollywood Hills. A spectacular outlook does not raise the Pool Score on its own — it is built from guest feedback, heating, pool count, size and recognition.",
       "Most LA rooftop pools operate year-round thanks to heating, though winter evenings are cooler than visitors expect.",
     ],
     faqs: [

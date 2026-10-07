@@ -40,7 +40,7 @@ const COMMON_SOURCES: GuideSource[] = [
 export const guideContent: Record<string, GuideContent> = {
   // -------------------------------------------------- TOP 10 LUXURY
   "barcelona/luxury-pool-hotels": {
-    hero: "The definitive editorial ranking of the ten best hotel pools in Barcelona — scored by our five-criteria Pool Score, re-verified for the 2026 season.",
+    hero: "The definitive editorial ranking of the ten best hotel pools in Barcelona — scored by our evidence-based Pool Score: guest pool sentiment, heating, number of pools, pool size and independent recognition, re-verified for the 2026 season.",
     publishedDate: "2024-05-18",
     lastUpdated: "2026-05-22",
     sources: COMMON_SOURCES,

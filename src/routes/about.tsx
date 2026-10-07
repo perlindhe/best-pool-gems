@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { POOL_SCORE_CRITERIA, POOL_SCORE_MAX_POINTS, POOL_SCORE_VERSION } from "@/lib/pool-score-config";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -9,13 +10,13 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "BestPoolHotels uses a five-criterion Pool Score with explicit weightings. See the method, the example scoring table and how Pool Score differs from Meta Rating.",
+          "BestPoolHotels uses one evidence-based Pool Score with explicit weightings. See the criteria, the weights and how Pool Score differs from Meta Rating.",
       },
       { property: "og:title", content: "Pool Score method — How we rank hotel pools" },
       {
         property: "og:description",
         content:
-          "Five criteria, explicit weightings and a worked example. Plus the difference between our editorial Pool Score and the external Meta Rating.",
+          "One evidence-based Pool Score with explicit weightings. Plus the difference between our editorial Pool Score and the external Meta Rating.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://bestpoolhotels.com/about" },
@@ -66,10 +67,12 @@ function AboutPage() {
         </h2>
         <div className="mt-6 space-y-6 text-lg leading-relaxed text-foreground/90">
           <p>
-            Every hotel earns a single Pool Score from 0 to 10, calculated from
-            <strong className="text-foreground"> five weighted criteria</strong>.
-            Each criterion is scored 0–10 by an editor, then the criteria are
-            combined with the weightings below.
+            Every hotel has exactly one Pool Score from 0 to 10 — the same
+            number on every page. It is built from{" "}
+            <strong className="text-foreground">{POOL_SCORE_CRITERIA.length} evidence-based criteria</strong>{" "}
+            worth {POOL_SCORE_MAX_POINTS} points in total. A criterion we cannot
+            document is left out rather than guessed, and the page says how many
+            criteria the score is based on.
           </p>
 
           <div className="overflow-hidden rounded-lg border border-border/60 bg-surface/40">
@@ -78,71 +81,30 @@ function AboutPage() {
                 <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   <th className="px-5 py-3 font-normal">Criterion</th>
                   <th className="px-5 py-3 font-normal">What we look at</th>
-                  <th className="px-5 py-3 font-normal text-right">Weight</th>
+                  <th className="px-5 py-3 font-normal text-right">Max points</th>
                 </tr>
               </thead>
               <tbody className="text-base">
-                <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">Pool design &amp; setting</td>
-                  <td className="px-5 py-3 text-foreground/85">Architecture, materials, shape, integration with the building.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">25%</td>
-                </tr>
-                <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">View &amp; atmosphere</td>
-                  <td className="px-5 py-3 text-foreground/85">What you see from the water, the crowd, the music, the light.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">25%</td>
-                </tr>
-                <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">Size &amp; lounging space</td>
-                  <td className="px-5 py-3 text-foreground/85">Pool footprint, deck size, sunbeds, shade, room at peak hour.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">20%</td>
-                </tr>
-                <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">Access &amp; seasonality</td>
-                  <td className="px-5 py-3 text-foreground/85">Guest-only vs. day-pass, season length, daily hours, heated / year-round.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">15%</td>
-                </tr>
-                <tr className="border-t border-border/40 align-top">
-                  <td className="px-5 py-3 text-foreground">Service &amp; maintenance</td>
-                  <td className="px-5 py-3 text-foreground/85">Cleanliness, water temperature, towel and bar service, attentiveness.</td>
-                  <td className="px-5 py-3 text-right tabular-nums">15%</td>
-                </tr>
-
+                {POOL_SCORE_CRITERIA.map((c) => (
+                  <tr key={c.key} className="border-t border-border/40 align-top">
+                    <td className="px-5 py-3 text-foreground">{c.label}{c.required ? " *" : ""}</td>
+                    <td className="px-5 py-3 text-foreground/85">{c.hint}</td>
+                    <td className="px-5 py-3 text-right tabular-nums">{c.max}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-
-          <h3 className="font-display text-2xl tracking-wide text-foreground">
-            Example scoring — Grand Hotel Central
-          </h3>
-          <div className="overflow-hidden rounded-lg border border-border/60 bg-surface/40">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  <th className="px-5 py-3 font-normal">Criterion</th>
-                  <th className="px-5 py-3 font-normal">Score (0–10)</th>
-                  <th className="px-5 py-3 font-normal">Weight</th>
-                  <th className="px-5 py-3 font-normal text-right">Contribution</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Pool design &amp; setting</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">25%</td><td className="px-5 py-3 text-right tabular-nums">2.38</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">View &amp; atmosphere</td><td className="px-5 py-3 tabular-nums">9.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">25%</td><td className="px-5 py-3 text-right tabular-nums">2.38</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Size &amp; lounging space</td><td className="px-5 py-3 tabular-nums">9.0</td><td className="px-5 py-3 tabular-nums text-muted-foreground">20%</td><td className="px-5 py-3 text-right tabular-nums">1.80</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Access &amp; seasonality</td><td className="px-5 py-3 tabular-nums">8.5</td><td className="px-5 py-3 tabular-nums text-muted-foreground">15%</td><td className="px-5 py-3 text-right tabular-nums">1.28</td></tr>
-                <tr className="border-t border-border/40"><td className="px-5 py-3">Service &amp; maintenance</td><td className="px-5 py-3 tabular-nums">9.0</td><td className="px-5 py-3 tabular-nums text-muted-foreground">15%</td><td className="px-5 py-3 text-right tabular-nums">1.35</td></tr>
-                <tr className="border-t border-border/40 bg-primary/5"><td className="px-5 py-3 font-semibold text-foreground" colSpan={3}>Pool Score</td><td className="px-5 py-3 text-right font-display text-2xl text-primary">9.2</td></tr>
-
-              </tbody>
-            </table>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            * Required — without it no score is published. Model version {POOL_SCORE_VERSION}; each hotel page shows when its score was last recalculated.
+          </p>
 
           <h3 className="font-display text-2xl tracking-wide text-foreground">
             Pool Score vs. Meta Rating
           </h3>
           <p>
             <strong className="text-foreground">Pool Score (0–10)</strong> is our
-            own editorial judgement of the pool, built from the five criteria
+            evidence-based assessment of the pool, built from the criteria
             above. <strong className="text-foreground">Meta Rating (0–100)</strong>
             is a separate, external signal — a weighted blend of guest ratings
             from Google and TripAdvisor for the hotel as a whole.
@@ -155,7 +117,7 @@ function AboutPage() {
             rather than show a fake number.
           </p>
           <p>
-            We re-score every hotel before each summer season.
+            Scores are recalculated automatically once a month.
           </p>
           <p className="rounded-md border border-border/60 bg-surface/60 p-4 text-base text-muted-foreground">
             <strong className="text-foreground">A small note:</strong> pool
