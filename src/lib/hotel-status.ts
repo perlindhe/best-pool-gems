@@ -413,6 +413,10 @@ export function validateHotelForPublication(
     errors.push(`Fully verified but missing: ${missing.join(", ")}`);
   if (h.pool_components && hasIdenticalSubscores(h.pool_components))
     errors.push("All five sub-scores are identical default values");
+  // Location sanity: no data from another city or country may be published.
+  errors.push(...detectLocationIssues(h as Parameters<typeof detectLocationIssues>[0]));
+  if (h.pool_size != null && publicValue(h.pool_size) == null)
+    errors.push("Pool size is empty, zero or a placeholder");
   if (!h.official_url && !h.primary_source_url) errors.push("No official source");
   if (!h.last_verified_date) errors.push("No verification date");
   else if (h.last_verified_date > new Date().toISOString().slice(0, 10))
@@ -532,7 +536,70 @@ export function describePoolCounts(h: StatusHotel): string | null {
   return `${text.charAt(0).toUpperCase()}${text.slice(1)}.`;
 }
 
+/** Shown instead of a value we cannot vouch for. Never show a guessed number. */
+export const NOT_VERIFIED_LABEL = "Not verified";
+export const UNAVAILABLE_LABEL = "Information unavailable";
+const ZERO_MEASURE = /^0+([.,]0+)?\s*(m|m2|m²|sqm|metres|meters|ft|%)?$/i;
+
+/** Canonical English country names; every page uses the same spelling. */
+export const COUNTRY_NAMES: Record<string, string> = {
+  spanien: "Spain", "españa": "Spain", espana: "Spain", spain: "Spain",
+  usa: "United States", us: "United States", "united states": "United States",
+  uk: "United Kingdom", "united kingdom": "United Kingdom",
+  greece: "Greece", grekland: "Greece", france: "France", frankrike: "France",
+  australia: "Australia", australien: "Australia", thailand: "Thailand",
+};
+export function normalizeCountry(c: string | null | undefined): string | null {
+  const t = (c ?? "").trim();
+  if (!t) return null;
+  return COUNTRY_NAMES[t.toLowerCase()] ?? t;
+}
+
+/** Approximate city centres; a hotel must lie within reach of its own city. */
+const CITY_CENTRES: Record<string, { lat: number; lng: number; km: number; country: string }> = {
+  barcelona: { lat: 41.39, lng: 2.17, km: 40, country: "Spain" },
+  malaga: { lat: 36.72, lng: -4.42, km: 80, country: "Spain" },
+  mallorca: { lat: 39.6, lng: 2.95, km: 90, country: "Spain" },
+  "gran-canaria": { lat: 27.92, lng: -15.6, km: 60, country: "Spain" },
+  crete: { lat: 35.24, lng: 24.8, km: 180, country: "Greece" },
+  paris: { lat: 48.86, lng: 2.35, km: 40, country: "France" },
+  london: { lat: 51.51, lng: -0.13, km: 50, country: "United Kingdom" },
+  "new-york": { lat: 40.75, lng: -73.98, km: 50, country: "United States" },
+  "los-angeles": { lat: 34.05, lng: -118.3, km: 80, country: "United States" },
+  sydney: { lat: -33.87, lng: 151.21, km: 60, country: "Australia" },
+  bangkok: { lat: 13.75, lng: 100.52, km: 50, country: "Thailand" },
+};
+const slugify = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/** Data that belongs to another city or country, or a mismatched city name. */
+export function detectLocationIssues(h: {
+  city?: string | null; city_slug?: string | null; country?: string | null;
+  latitude?: number | null; longitude?: number | null;
+}): string[] {
+  const out: string[] = [];
+  if (!h.city || !h.city_slug) return out;
+  if (slugify(h.city) !== h.city_slug) out.push(`City "${h.city}" does not match its destination page "${h.city_slug}"`);
+  const ref = CITY_CENTRES[h.city_slug];
+  const country = normalizeCountry(h.country);
+  if (ref && country && ref.country !== country) out.push(`Country "${h.country}" does not belong to ${h.city}`);
+  if (country && h.country && country !== h.country.trim()) out.push(`Country spelled "${h.country}" instead of "${country}"`);
+  if (ref && typeof h.latitude === "number" && typeof h.longitude === "number") {
+    const R = 6371, toR = Math.PI / 180;
+    const dLat = (h.latitude - ref.lat) * toR, dLng = (h.longitude - ref.lng) * toR;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(ref.lat * toR) * Math.cos(h.latitude * toR) * Math.sin(dLng / 2) ** 2;
+    const km = 2 * R * Math.asin(Math.sqrt(a));
+    if (km > ref.km) out.push(`Location is ${Math.round(km)} km from ${h.city} — data may belong to another city`);
+  }
+  return out;
+}
+
 const PLACEHOLDERS = new Set([
+  "tbd",
+  "tba",
+  "placeholder",
+  "lorem ipsum",
+  "0",
   "unknown",
   "n/a",
   "na",
@@ -553,18 +620,20 @@ const PLACEHOLDERS = new Set([
 export function publicValue(value: unknown): string | null {
   if (value == null) return null;
   if (typeof value === "number") {
-    if (!Number.isFinite(value)) return null;
+    // 0 is never a published fact (e.g. "0 m" pool, 0 pools on a pool hotel).
+    if (!Number.isFinite(value) || value <= 0) return null;
     return String(Math.round(value * 10) / 10);
   }
   const text = String(value).trim();
   if (!text) return null;
   if (PLACEHOLDERS.has(text.toLowerCase())) return null;
+  if (ZERO_MEASURE.test(text)) return null;
   if (/^best\s+(n\/a|unknown|null)$/i.test(text)) return null;
   return text;
 }
 
 /** 5.0990195… m → "approximately 5.1 m" */
 export function formatMetres(value: number | null | undefined): string | null {
-  if (value == null || !Number.isFinite(value)) return null;
+  if (value == null || !Number.isFinite(value) || value <= 0) return null;
   return `approximately ${Math.round(value * 10) / 10} m`;
 }

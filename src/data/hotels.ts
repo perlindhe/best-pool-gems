@@ -63,7 +63,7 @@ export const cities: City[] = [
   {
     slug: "new-york",
     name: "New York",
-    country: "USA",
+    country: "United States",
     tagline: "Rooftop pools with skyscrapers in the background",
     intro: "Manhattan's pools are nearly always on the roof — and often worth the hype.",
     image: newyorkImg,
@@ -107,7 +107,7 @@ export const cities: City[] = [
   {
     slug: "los-angeles",
     name: "Los Angeles",
-    country: "USA",
+    country: "United States",
     tagline: "Hollywood pool decks under California sun",
     intro:
       "From Bel Air's pink-tiled icon to rooftop infinity pools above the Sunset Strip, Los Angeles invented the cinematic hotel pool. Year-round sun, palm trees and cabanas included.",

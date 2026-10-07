@@ -60,7 +60,7 @@ function poolLine(p: PoolRecord): string {
     bits.push(p.heated_months ? `Heated (${p.heated_months})` : "Heated");
   else if (p.heating_state === "confirmed_not_heated") bits.push("Not heated");
   else bits.push("Heating not confirmed");
-  if (p.length_metres != null) bits.push(`${p.length_metres} m`);
+  if (p.length_metres != null && p.length_metres > 0) bits.push(`${p.length_metres} m`);
   if (p.saltwater === true) bits.push("Saltwater");
   if (p.adults_only === true) bits.push("Adults only");
   if (p.season_state === "year_round") bits.push("Open year-round");
