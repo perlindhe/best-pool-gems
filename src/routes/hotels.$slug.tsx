@@ -1,3 +1,4 @@
+import { formatScoreDate } from "@/lib/pool-score-config";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -305,7 +306,7 @@ function HotelDetailPage() {
               label="Pool Score"
               value={
                 score != null
-                    ? `${score.toFixed(1)} / 10`
+                    ? `${score.toFixed(1)} / 10${formatScoreDate(hotel.pool_score_updated_at) ? ` · recalculated ${formatScoreDate(hotel.pool_score_updated_at)}` : ""}`
                     : SCORE_PENDING_LABEL
               }
             />
