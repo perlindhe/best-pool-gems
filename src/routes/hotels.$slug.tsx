@@ -304,11 +304,7 @@ function HotelDetailPage() {
             <PracticalFact
               label="Pool Score"
               value={
-                usesEvidenceScore
-                  ? evidencePublished
-                    ? `${evidence!.score_out_of_ten!.toFixed(1)} / 10`
-                    : SCORE_PENDING_LABEL
-                  : score != null
+                score != null
                     ? `${score.toFixed(1)} / 10`
                     : SCORE_PENDING_LABEL
               }
