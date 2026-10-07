@@ -62,7 +62,7 @@ export function HeatedPoolPanel({
     const parts: string[] = [];
     if (heatedPools.some((p) => p.indoor === true)) parts.push("Indoor");
     if (heatedPools.some((p) => p.outdoor === true)) parts.push("Outdoor");
-    return parts.length ? parts.join(" + ") : "Not confirmed";
+    return parts.length ? parts.join(" + ") : "Not verified";
   })();
 
   return (

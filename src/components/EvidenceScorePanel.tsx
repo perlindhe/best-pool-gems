@@ -119,7 +119,7 @@ export function EvidenceScorePanel({
                           <span className="text-muted-foreground">/{max}</span>
                         </>
                       ) : (
-                        <span className="text-xs text-muted-foreground">Not confirmed</span>
+                        <span className="text-xs text-muted-foreground">Not verified</span>
                       )}
                     </span>
                   </div>

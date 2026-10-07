@@ -822,7 +822,7 @@ function PracticalFact({
     <div className="border-b border-border/40 pb-3" {...rest}>
       <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</dt>
       <dd className={confirmed ? "mt-1 text-sm text-foreground" : "mt-1 text-sm text-muted-foreground/70"}>
-        {confirmed ? value : "Not confirmed"}
+        {confirmed ? value : "Not verified"}
       </dd>
     </div>
   );
