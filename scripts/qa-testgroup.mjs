@@ -94,8 +94,8 @@ test("20. The same pool is never registered twice", (_h, p) => {
   const names = p.map((x) => (x.pool_name ?? "").trim().toLowerCase()).filter(Boolean);
   return new Set(names).size === names.length;
 });
-test("21. A Pool Score only exists on a fully verified profile", (h) =>
-  h.pool_score_0_10 == null || h.verification_status === "verified");
+test("21. A Pool Score is never zero, negative or above 10", (h) =>
+  h.pool_score_0_10 == null || (Number(h.pool_score_0_10) > 0 && Number(h.pool_score_0_10) <= 10));
 test("22. Every pool record has a category", (_h, p) => p.every((x) => Boolean(x.pool_category)));
 
 console.log(`\n${22 - failed}/22 checks passed`);
