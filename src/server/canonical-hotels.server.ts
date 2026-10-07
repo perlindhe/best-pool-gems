@@ -352,20 +352,10 @@ export async function getCityHubSummary(citySlug: string): Promise<CityHubSummar
   const finished = rows.filter(
     (r) => r.verification_status === "verified" && !r.qa_blocked,
   );
-  // Scores come from the approved evidence-based Pool Score (same as profiles).
-  const ids = rows.map((r) => r.id).filter(Boolean);
-  const { data: ev } = ids.length
-    ? await supabaseAdmin
-        .from("pool_scores_evidence")
-        .select("score_out_of_ten, confidence_level, approved_at")
-        .in("hotel_id", ids)
-        .not("approved_at", "is", null)
-        .not("score_out_of_ten", "is", null)
-    : { data: [] as { score_out_of_ten: number | null; confidence_level: string }[] };
-  const scores = (ev ?? [])
-    .filter((e) => e.confidence_level !== "low")
-    .map((e) => Number(e.score_out_of_ten))
-    .filter((s) => Number.isFinite(s));
+  // Single source of truth: the view's pool_score_0_10 is the approved evidence score.
+  const scores = rows
+    .map((r) => Number(r.pool_score_0_10))
+    .filter((s) => Number.isFinite(s) && s > 0);
   const dates = rows
     .map((r) => r.last_verified_date)
     .filter((d): d is string => Boolean(d))
