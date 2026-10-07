@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect, Link } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { getCity, cities, getCityGuides, type Guide } from "@/data/hotels";
@@ -18,6 +18,12 @@ const citySearchSchema = z.object({
 
 export const Route = createFileRoute("/$citySlug/")({
   validateSearch: zodValidator(citySearchSchema),
+  // /city?page=1 → /city (301-style) so page 1 only exists at the clean URL.
+  beforeLoad: ({ search, params }) => {
+    if ((search as { page?: number }).page === 1) {
+      throw redirect({ to: "/$citySlug", params: { citySlug: params.citySlug }, search: {}, statusCode: 301 });
+    }
+  },
   loader: async ({ params }) => {
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
@@ -40,6 +46,8 @@ export const Route = createFileRoute("/$citySlug/")({
     const title = `Best Pool Hotels in ${city.name} — Ranked & Reviewed`;
     const description = `Rankings and guides to hotels with the best pools in ${city.name}. ${city.tagline}.`;
     const url = `https://bestpoolhotels.com/${params.citySlug}`;
+    // Page 1 is always the clean URL; page 2+ is self-referencing ?page=N.
+    const canonical = pageNo > 1 ? `${url}?page=${pageNo}` : url;
     const ld = {
       "@context": "https://schema.org",
       "@graph": [
@@ -81,13 +89,13 @@ export const Route = createFileRoute("/$citySlug/")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: url },
+        { property: "og:url", content: canonical },
         { property: "og:image", content: city.image },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: city.image },
         ...(pageNo > 1 ? [{ name: "robots", content: "noindex, follow" }] : []),
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: canonical }],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
     };
   },
