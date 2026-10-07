@@ -129,7 +129,7 @@ function Home() {
                 {total} verified hotel profiles
               </h2>
               <p className="mt-4 max-w-xl text-sm text-muted-foreground">
-                A profile counts as verified when its pool facts are confirmed against an official source, an independent source, and all five scoring criteria. Filter the full list, or jump straight into a destination.
+                A profile counts as verified when its pool facts are confirmed against an official source, and an independent source. Filter the full list, or jump straight into a destination.
               </p>
             </div>
             <Link

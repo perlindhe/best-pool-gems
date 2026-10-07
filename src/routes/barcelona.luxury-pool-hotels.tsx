@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
-import { toCanonicalComponents, POOL_CRITERIA } from "@/lib/scoring";
 import { calculatePoolScore } from "@/lib/hotel-status";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -11,7 +10,7 @@ import barcelonaImg from "@/assets/barcelona.jpg";
 
 const TITLE = "Top 10 pool hotels in Barcelona — Pool Score 2026";
 const DESCRIPTION =
-  "Editorial top 10 of Barcelona's best hotel pools, scored on five criteria and re-verified for the 2026 season. Rooftop, beachfront and quiet rooftop picks side by side.";
+  "Editorial top 10 of Barcelona's best hotel pools, ranked by Pool Score and re-verified for the 2026 season. Rooftop, beachfront and quiet rooftop picks side by side.";
 const PAGE_URL = "https://bestpoolhotels.com/barcelona/luxury-pool-hotels";
 const PUBLISHED_DATE = "2024-05-18";
 const LAST_UPDATED = "2026-05-22";
@@ -173,7 +172,7 @@ const NEIGHBORHOODS = [
 const FAQS = [
   {
     q: "What is Pool Score?",
-    a: "A weighted 0–10 score built from five criteria — pool design & setting (25%), view & atmosphere (25%), size & lounging space (20%), access & seasonality (15%), and service & maintenance (15%). We re-score before each summer season.",
+    a: "One evidence-based 0–10 score, the same on every page: guest pool sentiment (40%), pool size (20%), heating (15%), number of pools (15%) and independent recognition (10%). Recalculated automatically each month.",
   },
   {
     q: "When are Barcelona's rooftop pools open?",
@@ -442,19 +441,15 @@ function LuxuryPoolHotels() {
           </p>
 
           <div className="mt-8 overflow-x-auto rounded-xl border border-border/60 bg-background/60">
-            <table className="w-full min-w-[760px] text-sm">
+            <table className="w-full min-w-[420px] text-sm">
               <thead>
                 <tr className="border-b border-border/60 text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   <th className="px-5 py-3 font-normal">Hotel</th>
-                  {POOL_CRITERIA.map((c) => (
-                    <th key={c.key} className="px-3 py-3 text-right font-normal">{c.label}</th>
-                  ))}
                   <th className="px-5 py-3 text-right font-normal text-primary">Pool Score</th>
                 </tr>
               </thead>
               <tbody>
                 {visible.map((h) => {
-                  const c = toCanonicalComponents(h.pool_components);
                   return (
                   <tr key={h.id} className="border-t border-border/40 align-top">
                     <td className="px-5 py-4">
@@ -463,11 +458,6 @@ function LuxuryPoolHotels() {
                         {h.neighborhood}
                       </p>
                     </td>
-                    {POOL_CRITERIA.map((crit) => (
-                      <td key={crit.key} className="px-3 py-4 text-right tabular-nums text-foreground/85">
-                        {c[crit.key].toFixed(1)}
-                      </td>
-                    ))}
                     <td className="px-5 py-4 text-right font-display text-xl text-primary tabular-nums">
                       {h.pool_score_0_10!.toFixed(1)}
                     </td>

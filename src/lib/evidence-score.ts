@@ -32,7 +32,8 @@ export function isEvidenceTestHotel(slug?: string | null): boolean {
  * its points are never redistributed over the other factors.
  */
 
-export const SCORE_VERSION = "evidence-v2";
+import { POOL_SCORE_VERSION, POOL_SCORE_CRITERIA } from "@/lib/pool-score-config";
+export const SCORE_VERSION = POOL_SCORE_VERSION;
 
 export type ConfidenceLevel = "low" | "medium" | "high";
 
@@ -534,38 +535,8 @@ export type EvidenceTotal = {
   missingFactors: string[];
 };
 
-export const FACTOR_LABELS: Array<{ key: keyof EvidenceFactors; label: string; max: number; hint: string }> = [
-  {
-    key: "guestSentimentPoints",
-    label: "Guest pool sentiment",
-    max: 40,
-    hint: "How guests describe the pool itself, across deduplicated reviews.",
-  },
-  {
-    key: "heatingPoints",
-    label: "Heating",
-    max: 15,
-    hint: "Whether the shared swimming pool is heated, and for how much of the year.",
-  },
-  {
-    key: "poolCountPoints",
-    label: "Number of pools",
-    max: 15,
-    hint: "Shared swimming pools count first; spa, children's and private pools add little.",
-  },
-  {
-    key: "poolSizePoints",
-    label: "Pool size",
-    max: 20,
-    hint: "The largest shared pool guests can use, measured in area or length.",
-  },
-  {
-    key: "externalRecognitionPoints",
-    label: "Independent recognition",
-    max: 10,
-    hint: "Positive, independently published articles about the pool.",
-  },
-];
+export const FACTOR_LABELS: Array<{ key: keyof EvidenceFactors; label: string; max: number; hint: string }> =
+  POOL_SCORE_CRITERIA.map(({ key, label, max, hint }) => ({ key, label, max, hint }));
 
 const MISSING_COPY: Record<keyof EvidenceFactors, string> = {
   guestSentimentPoints: "Insufficient guest feedback",
@@ -582,10 +553,7 @@ const MISSING_COPY: Record<keyof EvidenceFactors, string> = {
  * remaining factors. The score is expressed against the factors that ARE
  * documented, and the page always says how many that is.
  */
-export const REQUIRED_FACTORS: Array<keyof EvidenceFactors> = [
-  "guestSentimentPoints",
-  "poolCountPoints",
-];
+export const REQUIRED_FACTORS: Array<keyof EvidenceFactors> = POOL_SCORE_CRITERIA.filter((c) => c.required).map((c) => c.key);
 
 export function calculateTotal(f: EvidenceFactors): EvidenceTotal {
   const factorsTotal = FACTOR_LABELS.length;
