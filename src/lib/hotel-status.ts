@@ -376,14 +376,11 @@ export function calculateVerificationStatus(h: StatusHotel, pools?: StatusPool[]
 /**
  * ONE Pool Score per hotel. Returns null whenever a number would be a guess.
  */
-export function calculatePoolScore(h: StatusHotel, status?: HotelStatus): number | null {
-  const state = status ?? calculateVerificationStatus(h);
-  if (state !== "fully_verified") return null;
-  if (h.ranking_eligible === false) return null;
-  if (!hasApprovedSubscores(h)) return null;
-  const computed = computePoolScore(h.pool_components ?? {});
-  if (!Number.isFinite(computed) || computed <= 0) return null;
-  return computed;
+export function calculatePoolScore(h: StatusHotel, _status?: HotelStatus): number | null {
+  // Single source of truth: public_hotels_view.pool_score_0_10 is the approved
+  // evidence score (pool_scores_evidence). Every page shows exactly this value.
+  const v = h.pool_score_0_10;
+  return typeof v === "number" && Number.isFinite(v) && v > 0 ? Math.round(v * 10) / 10 : null;
 }
 
 export type PublicationResult = {
@@ -414,8 +411,6 @@ export function validateHotelForPublication(
     errors.push("Hotel without a confirmed pool is still ranking eligible");
   if (status === "fully_verified" && missing.length > 0)
     errors.push(`Fully verified but missing: ${missing.join(", ")}`);
-  if (status !== "fully_verified" && h.pool_score_0_10 != null && h.pool_score_0_10 > 0)
-    errors.push("A numeric Pool Score is stored on a profile that is not fully verified");
   if (h.pool_components && hasIdenticalSubscores(h.pool_components))
     errors.push("All five sub-scores are identical default values");
   if (!h.official_url && !h.primary_source_url) errors.push("No official source");

@@ -43,28 +43,13 @@ export const getHotelsForCompare = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const ids = (rows ?? []).map((r) => r.id as string);
-    const [{ data: pool }, { data: meta }] = await Promise.all([
-      supabaseAdmin.from("pool_scores").select("hotel_id, pool_score_0_10, components").in("hotel_id", ids),
-      supabaseAdmin.from("meta_scores").select("hotel_id, meta_rating_0_100").in("hotel_id", ids),
-    ]);
+    const { data: meta } = await supabaseAdmin.from("meta_scores").select("hotel_id, meta_rating_0_100").in("hotel_id", ids);
     const { calculatePoolScore } = await import("@/lib/hotel-status");
-    // One gate: the score shown here is the same one the profile shows.
-    const byId = new Map((rows ?? []).map((r) => [r.id as string, r]));
-    const poolMap = new Map(
-      (pool ?? []).map((p) => [
-        p.hotel_id as string,
-        calculatePoolScore({
-          ...(byId.get(p.hotel_id as string) as Record<string, unknown>),
-          pool_components: p.components as Record<string, number> | null,
-          pool_score_0_10: p.pool_score_0_10 as number | null,
-        }),
-      ]),
-    );
     const metaMap = new Map((meta ?? []).map((m) => [m.hotel_id as string, m.meta_rating_0_100 as number | null]));
 
     const merged = (rows ?? []).map((r) => ({
       ...r,
-      pool_score_0_10: poolMap.get(r.id as string) ?? null,
+      pool_score_0_10: calculatePoolScore(r as never),
       meta_rating_0_100: metaMap.get(r.id as string) ?? null,
     })) as CompareHotel[];
 
