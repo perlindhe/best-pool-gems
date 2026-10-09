@@ -48,7 +48,13 @@ export const Route = createFileRoute("/sitemap.xml")({
             priority: "0.7",
           });
         }
+        // Same thin-page gate as the route: collections below minHotels 404.
+        const { listCollectionHotels } = await import("@/lib/collections.functions");
         for (const c of collections) {
+          const { hotels } = await listCollectionHotels({
+            data: { citySlug: c.citySlug, articleSlug: c.articleSlug },
+          });
+          if (hotels.length < c.minHotels) continue;
           entries.push({
             path: `/${c.citySlug}/${c.articleSlug}`,
             lastmod: c.lastUpdated,
