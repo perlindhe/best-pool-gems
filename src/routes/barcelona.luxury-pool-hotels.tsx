@@ -372,7 +372,7 @@ function LuxuryPoolHotels() {
               <div className="flex-1 p-6 md:p-8">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h2 className="font-display text-3xl tracking-wide md:text-4xl group-hover:text-primary">
-                    {h.name}
+                    <Link to="/hotels/$slug" params={{ slug: h.slug }}>{h.name}</Link>
                   </h2>
                   <span className="font-display text-2xl text-primary">
                     {calculatePoolScore(h)!.toFixed(1)}
