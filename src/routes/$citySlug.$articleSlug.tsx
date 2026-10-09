@@ -9,12 +9,24 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GuideMeta } from "@/components/GuideMeta";
 import { AlsoConsidered } from "@/components/AlsoConsidered";
+import { HotelCard } from "@/components/HotelCard";
+import { listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
+import { calculatePoolScore } from "@/lib/hotel-status";
 
 export const Route = createFileRoute("/$citySlug/$articleSlug")({
   loader: async ({ params }) => {
     const guide = getGuideByParts(params.citySlug, params.articleSlug);
     const content = guide ? guideContent[guide.slug] : undefined;
-    if (guide && content) return { kind: "guide" as const, guide, content };
+    if (guide && content) {
+      // Live, database-driven shortlist so every guide links to ranked profiles.
+      const { hotels } = await listCityHotelsFn({ data: { citySlug: guide.citySlug } }).catch(() => ({
+        hotels: [] as CityHotel[],
+      }));
+      const topHotels = [...hotels]
+        .sort((a, b) => (calculatePoolScore(b) ?? -1) - (calculatePoolScore(a) ?? -1))
+        .slice(0, 5);
+      return { kind: "guide" as const, guide, content, topHotels };
+    }
 
     const collection = getCollection(params.citySlug, params.articleSlug);
     if (collection) {

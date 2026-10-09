@@ -129,7 +129,7 @@ export function CollectionPage({
 
             <Link
               to="/rankings"
-              search={{ city: collection.citySlug, page: 1 }}
+              search={{ city: collection.citySlug }}
               className="mt-10 inline-block text-sm uppercase tracking-[0.25em] text-primary hover:text-foreground"
             >
               See all {collection.city} pools →
