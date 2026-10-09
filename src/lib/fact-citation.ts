@@ -35,10 +35,11 @@ export function factCitation(input: {
       : input.field === "opening_hours" ? /opening hours|open daily|\b\d{1,2}[:.]\d{2}\b/i.test(quote) : false;
     if (!direct && entry.field !== input.field && !mentions) continue;
     if (entry.verified === false || entry.status === "not_verified" || entry.status === "research_pending") continue;
-    let url = safeUrl(entry.source_url ?? entry.url);
+    let url = safeUrl(entry.source_url ?? entry.url ?? entry.source);
     if (!url && entry.source === "website" && Array.isArray(input.sourceUrls)) {
       url = input.sourceUrls.map(safeUrl).find((u): u is string => Boolean(u && sameHotel(u))) ?? null;
     }
+    if (!url && entry.source === "website" && mentions) url = official[0] ?? null;
     if (!url) continue;
     const rawDate = entry.verified_at ?? entry.last_verified ?? input.date;
     const date = typeof rawDate === "string" && /^\d{4}-\d{2}-\d{2}/.test(rawDate) && Number.isFinite(Date.parse(rawDate))
