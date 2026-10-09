@@ -3,6 +3,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import type { Collection } from "@/data/collections";
+import { CheckAvailability } from "@/components/BookingCTA";
+import { bookingUrlFor } from "@/lib/booking-url";
+import { calculatePoolScore, SCORE_PENDING_LABEL } from "@/lib/hotel-status";
 
 export type CollectionHotel = {
   id: string;
@@ -19,6 +22,8 @@ export type CollectionHotel = {
   season: string | null;
   why_included: string | null;
   editorial_notes: string | null;
+  booking_url?: string | null;
+  affiliate_url?: string | null;
 };
 
 export function CollectionPage({
@@ -82,10 +87,8 @@ export function CollectionPage({
             </h2>
             <div className="mt-10 space-y-5">
               {hotels.map((h, i) => (
-                <Link
+                <div
                   key={h.id}
-                  to="/hotels/$slug"
-                  params={{ slug: h.slug }}
                   className="group flex gap-5 rounded-lg border border-border/60 bg-background/60 p-5 transition hover:border-primary/60"
                 >
                   {(h.hero_photo_url ?? h.cover_image_url) && (
@@ -100,11 +103,14 @@ export function CollectionPage({
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                      <h3 className="font-display text-2xl tracking-wide group-hover:text-primary md:text-3xl">
-                        {i + 1}. {h.name}
+                      <h3 className="font-display text-2xl tracking-wide md:text-3xl">
+                        <Link to="/hotels/$slug" params={{ slug: h.slug }} className="hover:text-primary">
+                          {i + 1}. {h.name}
+                        </Link>
                       </h3>
-                      {/* Pool Score is only published once all five criteria
-                          are individually assessed, so list pages show none. */}
+                      <span className="font-mono text-sm text-primary">
+                        {calculatePoolScore(h) != null ? `${calculatePoolScore(h)!.toFixed(1)} / 10` : SCORE_PENDING_LABEL}
+                      </span>
                     </div>
                     <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       {[h.neighborhood, h.pool_type].filter(Boolean).join(" · ")}
@@ -121,9 +127,10 @@ export function CollectionPage({
                           {h.season}
                         </span>
                       )}
+                      <CheckAvailability url={bookingUrlFor({ ...h, city: collection.city })} size="sm" />
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
 
