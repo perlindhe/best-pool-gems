@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+import { formatVerifiedDate, publicReviewer } from "@/lib/reviewer";
 import {
   FACTOR_LABELS,
   SCORE_PENDING_CONFIDENCE,
