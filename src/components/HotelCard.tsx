@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { bookingUrlFor } from "@/lib/booking-url";
 import { HotelImage } from "@/components/HotelImage";
 import { CheckAvailability } from "@/components/BookingCTA";
 import { VerificationBadge } from "@/components/VerificationBadge";
@@ -35,7 +36,7 @@ const summary = (h: CardHotel) => {
 
 export function HotelCard({ hotel, rank }: { hotel: CardHotel; rank: number }) {
   const photoUrl = hotel.hero_photo_url ?? hotel.cover_image_url ?? null;
-  const bookingUrl = hotel.affiliate_url ?? hotel.booking_url ?? null;
+  const bookingUrl = bookingUrlFor(hotel);
   const score = calculatePoolScore(hotel);
   const blurb = summary(hotel);
 

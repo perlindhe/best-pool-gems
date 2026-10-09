@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { bookingUrlFor } from "@/lib/booking-url";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
@@ -101,7 +102,7 @@ export function ThemeCollection({
                     View hotel →
                   </Link>
                   <CheckAvailability
-                    url={h.affiliate_url ?? h.booking_url}
+                    url={bookingUrlFor(h)}
                     size="sm"
                     className="ml-auto"
                   />

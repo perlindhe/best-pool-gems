@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { HotelCard } from "@/components/HotelCard";
 import { getCityHubSummaryFn, listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
 import { calculatePoolScore } from "@/lib/hotel-status";
+import { listCollectionHotels } from "@/lib/collections.functions";
 
 const PAGE_SIZE = 10;
 
@@ -28,11 +29,20 @@ export const Route = createFileRoute("/$citySlug/")({
     const city = getCity(params.citySlug);
     if (!city) throw notFound();
     const cityGuides = getCityGuides(city.slug);
-    const cityCollections = getCityCollections(city.slug);
-    const [hotelList, summary] = await Promise.all([
+    const allCollections = getCityCollections(city.slug);
+    const [hotelList, summary, collectionCounts] = await Promise.all([
       listCityHotelsFn({ data: { citySlug: city.slug } }),
       getCityHubSummaryFn({ data: { citySlug: city.slug } }).catch(() => null),
+      // Only link collections that actually render (thin pages 404).
+      Promise.all(
+        allCollections.map((c) =>
+          listCollectionHotels({ data: { citySlug: c.citySlug, articleSlug: c.articleSlug } })
+            .then((r) => r.hotels.length)
+            .catch(() => 0),
+        ),
+      ),
     ]);
+    const cityCollections = allCollections.filter((c, i) => collectionCounts[i] >= c.minHotels);
     return { city, cityGuides, cityCollections, hotels: hotelList.hotels, summary };
   },
 

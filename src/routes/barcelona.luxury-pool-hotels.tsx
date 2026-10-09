@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { bookingUrlFor } from "@/lib/booking-url";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { listCityHotelsFn, type CityHotel } from "@/lib/city-hub.functions";
 import { calculatePoolScore } from "@/lib/hotel-status";
@@ -342,7 +343,7 @@ function LuxuryPoolHotels() {
             h.adults_only === true ? "Adults only" : null,
             h.family_friendly === true ? "Family friendly" : null,
           ].filter(Boolean) as string[];
-          const bookingUrl = h.booking_url ?? h.affiliate_url ?? h.official_url ?? null;
+          const bookingUrl = bookingUrlFor(h);
           return (
           <article
             key={h.id}
