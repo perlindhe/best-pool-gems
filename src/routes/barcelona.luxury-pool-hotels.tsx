@@ -395,6 +395,20 @@ function LuxuryPoolHotels() {
 
                 <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
                   <div>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Pools</dt>
+                    <dd className="mt-1 text-foreground/90">{h.pool_count != null && h.pool_count > 0 ? h.pool_count : "Not verified"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Heating</dt>
+                    <dd className="mt-1 text-foreground/90">
+                      {h.heated_state === "heated" ? "Heated" : h.heated_state === "not_heated" ? "Not heated" : "Not verified"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Pool type</dt>
+                    <dd className="mt-1 text-foreground/90">{h.pool_type ?? "Not verified"}</dd>
+                  </div>
+                  <div>
                     <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Season</dt>
                     <dd className="mt-1 text-foreground/90">{h.season ?? "Not confirmed"}</dd>
                   </div>
