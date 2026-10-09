@@ -106,7 +106,7 @@ function renderInline(text: string) {
 function GuidePage() {
   const data = Route.useLoaderData();
   if (data.kind !== "guide") return null;
-  const { guide, content } = data;
+  const { guide, content, topHotels } = data;
   const related = getCityGuides(guide.citySlug)
 
     .filter((g) => g.slug !== guide.slug)
@@ -219,6 +219,33 @@ function GuidePage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {topHotels.length > 0 && (
+          <section className="border-t border-border/40">
+            <div className="mx-auto max-w-5xl px-6 py-16">
+              <p className="text-xs uppercase tracking-[0.3em] text-primary">Live ranking</p>
+              <h2 className="mt-3 font-display text-4xl tracking-wide md:text-5xl">
+                Top pool hotels in {guide.city} right now
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+                Pool Score, verification status and booking links update automatically from our database.
+              </p>
+              <div className="mt-8 space-y-6">
+                {topHotels.map((h, i) => (
+                  <HotelCard key={h.id} hotel={h} rank={i + 1} />
+                ))}
+              </div>
+              <div className="mt-8 flex flex-wrap gap-6 text-sm uppercase tracking-[0.25em]">
+                <Link to="/$citySlug" params={{ citySlug: guide.citySlug }} className="text-primary hover:text-foreground">
+                  Full {guide.city} ranking →
+                </Link>
+                <Link to="/rankings" search={{ city: guide.citySlug }} className="text-primary hover:text-foreground">
+                  Compare with filters →
+                </Link>
               </div>
             </div>
           </section>
