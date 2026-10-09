@@ -1,5 +1,10 @@
 # Roadmap
 
+## Fact source visibility
+- [x] Show field-specific source links and real verification dates for heating and opening hours
+- [x] Never label generic hotel links as verified fact evidence
+- [ ] Verify profile rendering and citation tests
+
 ## Design
 - [x] Preserve the previous dark design
 - [x] Apply the Luminous Editorial design system site-wide

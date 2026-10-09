@@ -1,4 +1,6 @@
 import { formatScoreDate } from "@/lib/pool-score-config";
+import { FactSource } from "@/components/FactSource";
+import { factCitation, type FactCitation } from "@/lib/fact-citation";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -182,6 +184,13 @@ function HotelDetailPage() {
   const counts = calculatePoolCounts(poolRecords);
   const heating = calculateHeatingStatus(poolRecords);
   const season = calculateSeasonStatus(poolRecords);
+  const officialUrls = [hotel.official_url, hotel.website_url];
+  const heatingCitations = poolRecords.filter(p => p.heating_state !== "unknown").map(p =>
+    factCitation({ field: "heating", evidence: p.evidence, sourceUrls: p.source_urls, date: p.last_verified, officialUrls }));
+  // A summary must not inherit a citation from an unrelated pool.
+  const heatingCitation = heatingCitations.length === 1 ? heatingCitations[0] : null;
+  const hoursCitation = factCitation({ field: "opening_hours", evidence: hotel.fact_verification,
+    date: hotel.last_verified_date, officialUrls });
   // A hotel with no confirmed pool never shows pool imagery.
   const hero = noPool ? null : (photos[0]?.url ?? hotel.cover_image_url);
   const poolSummary = describePoolMix(counts);
@@ -439,9 +448,9 @@ function HotelDetailPage() {
                   <PracticalFact label="Pools" value={poolSummary} />
                   <PracticalFact label="Pool type" value={publicValue(hotel.pool_type)} />
                   <PracticalFact label="Pool size" value={publicValue(hotel.pool_size)} />
-                  <PracticalFact label="Heating" value={HEATING_COPY[heating]} />
+                   <PracticalFact label="Heating" value={HEATING_COPY[heating]} citation={heatingCitation} />
                   <PracticalFact label="Season" value={season.sentence} />
-                  <PracticalFact label="Opening hours" value={hotel.pool_opening_hours} />
+                   <PracticalFact label="Opening hours" value={publicValue(hotel.pool_opening_hours)} citation={hoursCitation} />
                   <PracticalFact
                     label="Who can use the pool"
                     value={
@@ -821,10 +830,12 @@ function ComparedWith({ slug }: { slug: string }) {
 function PracticalFact({
   label,
   value,
+  citation,
   ...rest
 }: {
   label: string;
   value: string | number | null;
+  citation?: FactCitation | null;
 } & React.HTMLAttributes<HTMLDivElement>) {
   const confirmed = value !== null && value !== undefined && `${value}`.trim() !== "";
   return (
@@ -832,6 +843,7 @@ function PracticalFact({
       <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</dt>
       <dd className={confirmed ? "mt-1 text-sm text-foreground" : "mt-1 text-sm text-muted-foreground/70"}>
         {confirmed ? value : "Not verified"}
+        {confirmed && citation !== undefined && <FactSource citation={citation} />}
       </dd>
     </div>
   );
