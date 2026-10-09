@@ -342,9 +342,10 @@ function LuxuryPoolHotels() {
             h.adults_only === true ? "Adults only" : null,
             h.family_friendly === true ? "Family friendly" : null,
           ].filter(Boolean) as string[];
+          const bookingUrl = h.booking_url ?? h.affiliate_url ?? h.official_url ?? null;
           return (
-          <Link key={h.id} to="/hotels/$slug" params={{ slug: h.slug }} className="block">
           <article
+            key={h.id}
             className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 shadow-card transition hover:border-primary/60"
           >
             <div className="grid gap-0 md:grid-cols-[18rem_1fr]">
