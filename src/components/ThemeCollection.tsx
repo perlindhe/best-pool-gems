@@ -69,8 +69,19 @@ export function ThemeCollection({
                   )}
                 </div>
                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  {h.city}
-                  {h.country ? ` · ${h.country}` : ""}
+                  {[
+                    h.city,
+                    h.country,
+                    h.pool_count != null && h.pool_count > 0 ? `${h.pool_count} pools` : null,
+                    h.heated_state === "heated"
+                      ? "Heated"
+                      : h.heated_state === "not_heated"
+                        ? "Not heated"
+                        : null,
+                    h.pool_type,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
                 <div className="mt-4">
                   <VerificationBadge
