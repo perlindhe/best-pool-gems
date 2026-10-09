@@ -435,13 +435,28 @@ function LuxuryPoolHotels() {
                   </div>
                 )}
 
-                <p className="mt-5 text-xs uppercase tracking-[0.25em] text-primary">
-                  View hotel →
-                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-4">
+                  <Link
+                    to="/hotels/$slug"
+                    params={{ slug: h.slug }}
+                    className="text-xs uppercase tracking-[0.25em] text-primary hover:underline"
+                  >
+                    View hotel →
+                  </Link>
+                  {bookingUrl && (
+                    <a
+                      href={bookingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="rounded-sm border border-primary/50 bg-primary/10 px-3 py-1.5 text-xs uppercase tracking-[0.25em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+                    >
+                      Book ↗
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </article>
-          </Link>
           );
         })}
       </section>
