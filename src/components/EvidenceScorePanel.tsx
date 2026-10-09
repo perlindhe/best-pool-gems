@@ -134,8 +134,19 @@ export function EvidenceScorePanel({
         <p>
           Confidence: <span className="text-foreground">{CONFIDENCE_COPY[confidence]}</span>
         </p>
-        {formatDate(lastVerified) && <p>Last verified: {formatDate(lastVerified)}</p>}
-        {record?.approved_by && <p>Checked by: {record.approved_by}</p>}
+        {formatVerifiedDate(lastVerified) && <p>Last verified: {formatVerifiedDate(lastVerified)}</p>}
+        {record?.approved_by && (
+          <p>
+            Reviewed by:{" "}
+            <Link
+              to="/editors/$slug"
+              params={{ slug: publicReviewer(record.approved_by).slug }}
+              className="text-primary hover:underline"
+            >
+              {publicReviewer(record.approved_by).name}
+            </Link>
+          </p>
+        )}
         <p>Score version: {record?.score_version ?? "evidence-v2"}</p>
       </div>
     </div>

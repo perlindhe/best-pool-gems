@@ -300,8 +300,11 @@ function HotelDetailPage() {
               />
             )}
             {!noPool && <PracticalFact label="Season" value={season.sentence} />}
-            <PracticalFact label="Last checked" value={publicValue(hotel.last_verified_date)} />
-            <PracticalFact label="Checked by" value={publicValue(hotel.verified_by)} />
+            <PracticalFact
+              label="Last verified"
+              value={formatVerifiedDate(hotel.last_verified_date) ?? NOT_VERIFIED_LABEL}
+            />
+            <PracticalFact label="Reviewed by" value={publicReviewer(hotel.verified_by).name} />
             <PracticalFact
               label="Pool Score"
               value={
@@ -722,10 +725,14 @@ function HotelDetailPage() {
                 </ul>
               )}
               <p className="mt-4 text-sm text-muted-foreground">
-                <span className="text-[10px] uppercase tracking-[0.22em]">Checked by: </span>
-                <a href="/editors" className="text-primary hover:underline">
-                  {hotel.verified_by ?? "BestPoolHotels Editorial"}
-                </a>
+                <span className="text-[10px] uppercase tracking-[0.22em]">Reviewed by: </span>
+                <Link
+                  to="/editors/$slug"
+                  params={{ slug: publicReviewer(hotel.verified_by).slug }}
+                  className="text-primary hover:underline"
+                >
+                  {publicReviewer(hotel.verified_by).name}
+                </Link>
               </p>
               {hotel.verification_notes && (
                 <p className="mt-2 text-sm leading-relaxed text-foreground/85">
