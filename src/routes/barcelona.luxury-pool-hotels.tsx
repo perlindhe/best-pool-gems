@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GuideMeta } from "@/components/GuideMeta";
 import { AlsoConsidered } from "@/components/AlsoConsidered";
+import { VerificationBadge } from "@/components/VerificationBadge";
 import barcelonaImg from "@/assets/barcelona.jpg";
 
 const TITLE = "Top 10 pool hotels in Barcelona — Pool Score 2026";
@@ -111,6 +112,8 @@ export const Route = createFileRoute("/barcelona/luxury-pool-hotels")({
           (h.editorial_status ?? "published") === "published" &&
           calculatePoolScore(h) != null,
       )
+      // Ranking always follows the live database Pool Score.
+      .sort((a, b) => (calculatePoolScore(b) ?? 0) - (calculatePoolScore(a) ?? 0))
       .slice(0, 10);
     return { ranked };
   },
@@ -371,7 +374,7 @@ function LuxuryPoolHotels() {
                     {h.name}
                   </h2>
                   <span className="font-display text-2xl text-primary">
-                    {h.pool_score_0_10!.toFixed(1)}
+                    {calculatePoolScore(h)!.toFixed(1)}
                     <span className="ml-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       Pool Score
                     </span>
@@ -380,6 +383,9 @@ function LuxuryPoolHotels() {
                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   {[h.neighborhood, h.pool_type].filter(Boolean).join(" · ")}
                 </p>
+                <div className="mt-3">
+                  <VerificationBadge hotel={h} date={h.last_verified_date ?? h.pool_score_updated_at} />
+                </div>
                 {(h.why_included || h.editorial_notes) && (
                   <p className="mt-4 text-base leading-relaxed text-foreground/90">
                     {h.why_included ?? h.editorial_notes}
@@ -433,9 +439,9 @@ function LuxuryPoolHotels() {
             Pool Score, criterion by criterion
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-            Five sub-scores per hotel, each rated 0–10. The Pool Score is a
-            weighted blend — View &amp; Wow factor count for ~20% each, Size,
-            Loungers and Service for ~20% each. Full method on{" "}
+            Live from our database: guest pool sentiment, heating, number of
+            pools, pool size and independent recognition. When a score changes,
+            this table and the ranking update automatically. Full method on{" "}
             <Link to="/about" className="text-primary underline-offset-2 hover:underline">
               About
             </Link>.
@@ -460,7 +466,7 @@ function LuxuryPoolHotels() {
                       </p>
                     </td>
                     <td className="px-5 py-4 text-right font-display text-xl text-primary tabular-nums">
-                      {h.pool_score_0_10!.toFixed(1)}
+                      {calculatePoolScore(h)!.toFixed(1)}
                     </td>
                   </tr>
                   );
@@ -469,9 +475,8 @@ function LuxuryPoolHotels() {
             </table>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
-            Sub-scores are editorial assessments by the Best Pool Hotels team,
-            re-evaluated each season against on-site visits, hotel pool / wellness
-            pages and recent guest reviews. Last refreshed: {LAST_UPDATED}.
+            Scores are recalculated automatically each month from the evidence
+            behind every hotel — never typed in by hand.
           </p>
         </div>
       </section>
