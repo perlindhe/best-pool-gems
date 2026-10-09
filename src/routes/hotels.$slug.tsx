@@ -1,4 +1,5 @@
 import { formatScoreDate } from "@/lib/pool-score-config";
+import { bookingUrlFor } from "@/lib/booking-url";
 import { FactSource } from "@/components/FactSource";
 import { factCitation, type FactCitation } from "@/lib/fact-citation";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
@@ -525,7 +526,7 @@ function HotelDetailPage() {
                 </>
               )}
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <CheckAvailability url={hotel.affiliate_url ?? hotel.booking_url} />
+                <CheckAvailability url={bookingUrlFor(hotel)} />
                 <OfficialSiteLink url={hotel.official_url ?? hotel.website_url} />
               </div>
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
@@ -767,7 +768,7 @@ function HotelDetailPage() {
 
       <StickyBookingBar
         name={hotel.name}
-        url={hotel.affiliate_url ?? hotel.booking_url}
+        url={bookingUrlFor(hotel)}
       />
       <div className="h-20 md:hidden" aria-hidden="true" />
     </div>

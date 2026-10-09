@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { bookingUrlFor } from "@/lib/booking-url";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PoolFactsTable } from "@/components/PoolFactsTable";
@@ -466,7 +467,7 @@ function RankRow({ hotel, position }: { hotel: RankedHotel; position: number }) 
             </a>
           )}
           <CheckAvailability
-            url={hotel.affiliate_url ?? hotel.booking_url}
+            url={bookingUrlFor(hotel)}
             size="sm"
             className="ml-auto"
           />
