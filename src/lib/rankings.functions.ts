@@ -71,6 +71,8 @@ export type RankedHotel = {
   rooftop?: boolean | null;
   infinity?: boolean | null;
   heated_pool?: boolean | null;
+  heated_state?: string | null;
+  pool_count?: number | null;
   indoor?: boolean | null;
   outdoor?: boolean | null;
   adults_only?: boolean | null;
