@@ -1,4 +1,6 @@
 import type { PoolRecord } from "@/server/hotel-detail.server";
+import { FactSource } from "@/components/FactSource";
+import { factCitation } from "@/lib/fact-citation";
 
 const CATEGORY_LABEL: Record<PoolRecord["pool_category"], string> = {
   shared_hotel_pool: "Shared hotel pool",
@@ -11,7 +13,7 @@ const CATEGORY_LABEL: Record<PoolRecord["pool_category"], string> = {
 };
 
 const NOT_CONFIRMED =
-  "This detail has not yet been confirmed and is not included in the hotel's score.";
+  "Some details for this pool are still awaiting verification.";
 
 export type PoolMixCounts = {
   shared_pool_count: number | null;
@@ -81,10 +83,12 @@ export function PoolRecordsPanel({
   pools,
   counts,
   heatedState,
+  officialUrls = [],
 }: {
   pools: PoolRecord[];
   counts: PoolMixCounts;
   heatedState: string | null;
+  officialUrls?: (string | null | undefined)[];
 }) {
   if (!pools.length) return null;
   const summary = poolMixSentence(counts);
@@ -107,6 +111,14 @@ export function PoolRecordsPanel({
               {p.pool_name || CATEGORY_LABEL[p.pool_category]}
             </p>
             <p className="text-xs text-muted-foreground">{poolLine(p)}</p>
+            {p.heating_state !== "unknown" && <div className="mt-2">
+              <span className="text-xs font-medium text-foreground">Heating</span>
+              <FactSource citation={factCitation({ field: "heating", evidence: p.evidence, sourceUrls: p.source_urls, date: p.last_verified, officialUrls })} />
+            </div>}
+            {p.opening_hours && <div className="mt-2">
+              <span className="text-xs font-medium text-foreground">Pool opening hours: {p.opening_hours}</span>
+              <FactSource citation={factCitation({ field: "opening_hours", evidence: p.evidence, sourceUrls: p.source_urls, date: p.last_verified, officialUrls })} />
+            </div>}
             {p.fact_status !== "verified" && (
               <p className="mt-1 text-[11px] text-muted-foreground/80">{NOT_CONFIRMED}</p>
             )}

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { Json } from "@/integrations/supabase/types";
 import type { EvidenceScoreView as EvidenceScoreRecord } from "@/components/EvidenceScorePanel";
 
 export type HotelPhoto = {
@@ -31,7 +32,7 @@ export async function getHotelDetail(slug: string) {
   const { data: editorial } = await supabaseAdmin
     .from("hotels")
     .select(
-      "last_verified_date, sources, why_included, why_not_higher, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, children_allowed, season",
+      "last_verified_date, fact_verification, sources, why_included, why_not_higher, editorial_status, verified_by, verification_notes, primary_source_url, secondary_source_url, pool_opening_hours, day_pass_available, guest_only, children_allowed, season",
     )
     .eq("id", hotel.id as string)
     .maybeSingle();
@@ -57,6 +58,7 @@ export async function getHotelDetail(slug: string) {
 
   const hotelWithEditorial = {
     ...hotel,
+    fact_verification: editorial?.fact_verification ?? null,
     last_verified_date: (editorial?.last_verified_date as string | null) ?? null,
     editorial_sources,
     why_included: (editorial?.why_included as string | null) ?? null,
@@ -107,7 +109,7 @@ export async function getHotelDetail(slug: string) {
   const { data: poolRows } = await supabaseAdmin
     .from("hotel_pools")
     .select(
-      "id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, infinity_edge, heated, heating_status, heating_state, season_state, existence_state, heated_months, year_round, seasonal_dates, length_metres, approximate_size, saltwater, adults_only, children_allowed, day_pass, guest_access, opening_hours, view, fact_status, last_verified",
+      "id, pool_name, pool_category, shared_or_private, indoor, outdoor, rooftop, infinity_edge, heated, heating_status, heating_state, season_state, existence_state, heated_months, year_round, seasonal_dates, length_metres, approximate_size, saltwater, adults_only, children_allowed, day_pass, guest_access, opening_hours, view, fact_status, last_verified, source_urls, evidence",
     )
     .eq("hotel_id", hotel.id as string)
     .order("position", { ascending: true });
@@ -167,6 +169,8 @@ export type PoolRecord = {
   view: string | null;
   fact_status: "research_pending" | "partially_verified" | "verified";
   last_verified: string | null;
+  source_urls?: Json;
+  evidence?: Json;
 };
 
 

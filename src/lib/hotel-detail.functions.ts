@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { EvidenceScoreView } from "@/components/EvidenceScorePanel";
 import { getHotelDetail, resolveCanonicalSlug, type HotelPhoto, type PoolQuote, type HotelSource, type PoolRecord } from "@/server/hotel-detail.server";
 import type { PoolFacts } from "@/lib/rankings.functions";
+import type { Json } from "@/integrations/supabase/types";
 
 export type HotelDetail = {
   id: string;
@@ -27,6 +28,7 @@ export type HotelDetail = {
   pool_score_updated_at: string | null;
   meta_computed_at: string | null;
   last_verified_date: string | null;
+  fact_verification: Json | null;
   editorial_sources: HotelSource[];
   why_included: string | null;
   why_not_higher: string | null;
