@@ -3,7 +3,7 @@
 ## Fact source visibility
 - [x] Show field-specific source links and real verification dates for heating and opening hours
 - [x] Never label generic hotel links as verified fact evidence
-- [ ] Verify profile rendering and citation tests
+- [x] Verify profile rendering and citation tests (97 QA checks and citation safety checks passed)
 
 ## Design
 - [x] Preserve the previous dark design

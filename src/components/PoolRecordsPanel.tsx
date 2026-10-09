@@ -13,7 +13,7 @@ const CATEGORY_LABEL: Record<PoolRecord["pool_category"], string> = {
 };
 
 const NOT_CONFIRMED =
-  "This detail has not yet been confirmed and is not included in the hotel's score.";
+  "Some details for this pool are still awaiting verification.";
 
 export type PoolMixCounts = {
   shared_pool_count: number | null;
