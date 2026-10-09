@@ -64,6 +64,8 @@ function poolSubtitle(p: PoolDescriptor): string {
   const bits: string[] = [];
   if (p.indoor === true) bits.push("Indoor");
   if (p.indoor === false) bits.push("Outdoor");
+  if (p.heated === true) bits.push("Heated");
+  if (p.heated === false) bits.push("Not heated");
   if (p.length_m != null) bits.push(`${p.length_m} m`);
   if (p.adults_only === true) bits.push("Adults only");
   return bits.join(" · ");

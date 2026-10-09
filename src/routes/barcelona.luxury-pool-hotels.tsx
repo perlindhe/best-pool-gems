@@ -342,9 +342,10 @@ function LuxuryPoolHotels() {
             h.adults_only === true ? "Adults only" : null,
             h.family_friendly === true ? "Family friendly" : null,
           ].filter(Boolean) as string[];
+          const bookingUrl = h.booking_url ?? h.affiliate_url ?? h.official_url ?? null;
           return (
-          <Link key={h.id} to="/hotels/$slug" params={{ slug: h.slug }} className="block">
           <article
+            key={h.id}
             className="group relative overflow-hidden rounded-lg border border-border/60 bg-surface/60 shadow-card transition hover:border-primary/60"
           >
             <div className="grid gap-0 md:grid-cols-[18rem_1fr]">
@@ -371,7 +372,7 @@ function LuxuryPoolHotels() {
               <div className="flex-1 p-6 md:p-8">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h2 className="font-display text-3xl tracking-wide md:text-4xl group-hover:text-primary">
-                    {h.name}
+                    <Link to="/hotels/$slug" params={{ slug: h.slug }}>{h.name}</Link>
                   </h2>
                   <span className="font-display text-2xl text-primary">
                     {calculatePoolScore(h)!.toFixed(1)}
@@ -393,6 +394,20 @@ function LuxuryPoolHotels() {
                 )}
 
                 <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Pools</dt>
+                    <dd className="mt-1 text-foreground/90">{h.pool_count != null && h.pool_count > 0 ? h.pool_count : "Not verified"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Heating</dt>
+                    <dd className="mt-1 text-foreground/90">
+                      {h.heated_state === "heated" ? "Heated" : h.heated_state === "not_heated" ? "Not heated" : "Not verified"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Pool type</dt>
+                    <dd className="mt-1 text-foreground/90">{h.pool_type ?? "Not verified"}</dd>
+                  </div>
                   <div>
                     <dt className="text-[10px] uppercase tracking-[0.2em] text-primary">Season</dt>
                     <dd className="mt-1 text-foreground/90">{h.season ?? "Not confirmed"}</dd>
@@ -420,13 +435,28 @@ function LuxuryPoolHotels() {
                   </div>
                 )}
 
-                <p className="mt-5 text-xs uppercase tracking-[0.25em] text-primary">
-                  View hotel →
-                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-4">
+                  <Link
+                    to="/hotels/$slug"
+                    params={{ slug: h.slug }}
+                    className="text-xs uppercase tracking-[0.25em] text-primary hover:underline"
+                  >
+                    View hotel →
+                  </Link>
+                  {bookingUrl && (
+                    <a
+                      href={bookingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="rounded-sm border border-primary/50 bg-primary/10 px-3 py-1.5 text-xs uppercase tracking-[0.25em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+                    >
+                      Book ↗
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </article>
-          </Link>
           );
         })}
       </section>
