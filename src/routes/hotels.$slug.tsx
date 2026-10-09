@@ -23,8 +23,10 @@ import {
   HEATING_COPY,
   STATUS_COPY,
   SCORE_PENDING_LABEL,
+  NOT_VERIFIED_LABEL,
   type StatusPool,
 } from "@/lib/hotel-status";
+import { formatVerifiedDate, publicReviewer } from "@/lib/reviewer";
 import { SectionHeading, SectionIcon } from "@/components/SectionHeading";
 import {
   Waves,
