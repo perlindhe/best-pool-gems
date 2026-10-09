@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { Json } from "@/integrations/supabase/types";
 import type { EvidenceScoreView as EvidenceScoreRecord } from "@/components/EvidenceScorePanel";
 
 export type HotelPhoto = {
@@ -168,8 +169,8 @@ export type PoolRecord = {
   view: string | null;
   fact_status: "research_pending" | "partially_verified" | "verified";
   last_verified: string | null;
-  source_urls?: unknown;
-  evidence?: unknown;
+  source_urls?: Json;
+  evidence?: Json;
 };
 
 

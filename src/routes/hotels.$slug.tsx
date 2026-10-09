@@ -185,7 +185,7 @@ function HotelDetailPage() {
   const heating = calculateHeatingStatus(poolRecords);
   const season = calculateSeasonStatus(poolRecords);
   const officialUrls = [hotel.official_url, hotel.website_url];
-  const heatingCitations = poolRecords.filter(p => p.heating_state !== "unknown").map(p =>
+  const heatingCitations = pools.filter(p => p.heating_state !== "unknown").map(p =>
     factCitation({ field: "heating", evidence: p.evidence, sourceUrls: p.source_urls, date: p.last_verified, officialUrls }));
   // A summary must not inherit a citation from an unrelated pool.
   const heatingCitation = heatingCitations.length === 1 ? heatingCitations[0] : null;
@@ -407,6 +407,7 @@ function HotelDetailPage() {
               <div className="p-6 md:p-8">
                 <PoolRecordsPanel
                   pools={pools}
+                  officialUrls={officialUrls}
                   counts={{
                     shared_pool_count: hotel.shared_pool_count,
                     spa_pool_count: hotel.spa_pool_count,
