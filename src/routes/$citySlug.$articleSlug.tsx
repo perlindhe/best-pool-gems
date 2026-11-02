@@ -69,7 +69,7 @@ export const Route = createFileRoute("/$citySlug/$articleSlug")({
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
         <h1 className="font-display text-5xl text-primary">Something went wrong</h1>
-        <p className="mt-4 text-muted-foreground">{error.message}</p>
+        <p className="mt-4 text-muted-foreground">{(error as Error).message}</p>
       </div>
     </div>
   ),
