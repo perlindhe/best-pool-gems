@@ -166,7 +166,7 @@ async function classifyComments(
     idx,
     source: r.source,
     // Credit saver: 600 chars per comment is enough to judge pool relevance.
-    text: r.text.slice(0, 600),
+    text: r.text.slice(0, 400),
   }));
 
   const instructions =
@@ -177,7 +177,7 @@ async function classifyComments(
     "is_owner_content = true when the text reads as hotel marketing copy or an official description rather than a guest's own words. " +
     "Never guess: prefer 'unclear' over a made-up judgement. Return one object per input idx.";
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -185,15 +185,15 @@ async function classifyComments(
       "X-Lovable-AIG-SDK": "fetch",
     },
     body: JSON.stringify({
-      model: "openai/gpt-6-astra",
+      model: "google/gemini-3.8-flash",
       stream: true,
-      instructions,
-      input: `Hotel: ${hotelName}\n\nItems (json):\n${JSON.stringify(items)}`,
-      reasoning: { effort: "low" },
-      text: {
-        format: {
+      messages: [
+        { role: "system", content: instructions },
+        { role: "user", content: `Hotel: ${hotelName}\n\nItems (json):\n${JSON.stringify(items)}` },
+      ],
+      response_format: {
           type: "json_schema",
-          name: "classifications",
+          json_schema: { name: "classifications",
           strict: true,
           schema: {
             type: "object",
@@ -219,8 +219,7 @@ async function classifyComments(
               },
             },
           },
-        },
-      },
+        } },
     }),
   });
 
@@ -247,12 +246,11 @@ async function classifyComments(
       try {
         const evt = JSON.parse(payload) as {
           type?: string;
+          choices?: { delta?: { content?: string } }[];
           delta?: string;
           response?: { output_text?: string };
         };
-        if (evt.type === "response.output_text.delta" && evt.delta) output += evt.delta;
-        else if (evt.type === "response.completed" && evt.response?.output_text)
-          output = evt.response.output_text;
+        const d = evt.choices?.[0]?.delta?.content; if (d) output += d;
       } catch {
         // partial event; ignore
       }

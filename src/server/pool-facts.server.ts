@@ -55,7 +55,7 @@ async function firecrawlScrape(url: string): Promise<OfficialPage | null> {
     const json = (await res.json()) as { data?: { markdown?: string } };
     const markdown = (json.data?.markdown ?? "").trim();
     if (markdown.length < 80) return null;
-    return { url, markdown: markdown.slice(0, 8000) };
+    return { url, markdown: markdown.slice(0, 4000) };
   } catch {
     return null;
   }
@@ -99,7 +99,7 @@ async function firecrawlSearch(query: string, limit: number): Promise<OfficialPa
         const url = r.url ?? "";
         const markdown = (r.markdown ?? "").trim();
         if (!url || markdown.length < 80) continue;
-        out.push({ url, markdown: markdown.slice(0, 8000) });
+        out.push({ url, markdown: markdown.slice(0, 4000) });
       }
       return out;
     } catch {
@@ -169,7 +169,7 @@ async function extractFacts(
     `\n\nOfficial pages (json):\n` +
     JSON.stringify(pages.map((p) => ({ url: p.url, text: p.markdown })));
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -177,15 +177,15 @@ async function extractFacts(
       "X-Lovable-AIG-SDK": "fetch",
     },
     body: JSON.stringify({
-      model: "openai/gpt-6-astra",
+      model: "google/gemini-3.8-flash",
       stream: true,
-      instructions,
-      input,
-      reasoning: { effort: "low" },
-      text: {
-        format: {
+      messages: [
+        { role: "system", content: instructions },
+        { role: "user", content: input },
+      ],
+      response_format: {
           type: "json_schema",
-          name: "pool_facts",
+          json_schema: { name: "pool_facts",
           strict: true,
           schema: {
             type: "object",
@@ -217,8 +217,7 @@ async function extractFacts(
               },
             },
           },
-        },
-      },
+        } },
     }),
   });
 
@@ -245,11 +244,11 @@ async function extractFacts(
       try {
         const evt = JSON.parse(payload) as {
           type?: string;
+          choices?: { delta?: { content?: string } }[];
           delta?: string;
           text?: string;
         };
-        if (evt.type === "response.output_text.delta" && evt.delta) output += evt.delta;
-        if (evt.type === "response.output_text.done" && evt.text) output = evt.text;
+        const d = evt.choices?.[0]?.delta?.content; if (d) output += d;
       } catch {
         // partial frame
       }
@@ -303,7 +302,7 @@ export async function ingestPoolFacts(hotelId: string) {
     [...new Set(seeds.filter((u) => hostOf(u) === domain))].slice(0, 2).map(firecrawlScrape),
   );
   const searched = await firecrawlOfficialPoolPages(domain);
-  const pages = [...scraped.filter((p): p is OfficialPage => !!p), ...searched].slice(0, 10);
+  const pages = [...scraped.filter((p): p is OfficialPage => !!p), ...searched].slice(0, 5);
   if (!pages.length) return { updatedPools: 0, confirmedSize: 0, confirmedHeating: 0, pages: 0 };
 
   const officialUrls = new Set(pages.map((p) => p.url));

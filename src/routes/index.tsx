@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-6 py-32 text-center">
         <h1 className="font-display text-5xl text-primary">Couldn't load the rankings</h1>
-        <p className="mt-4 text-muted-foreground">{error.message}</p>
+        <p className="mt-4 text-muted-foreground">{(error as Error).message}</p>
         <Link to="/rankings" className="mt-8 inline-block text-sm uppercase tracking-[0.25em] text-primary">
           Browse all pools →
         </Link>
