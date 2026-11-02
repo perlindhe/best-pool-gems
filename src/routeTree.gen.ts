@@ -9,110 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerificationStandardsRouteImport } from './routes/verification-standards'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RooftopPoolHotelsRouteImport } from './routes/rooftop-pool-hotels'
-import { Route as RankingsRouteImport } from './routes/rankings'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PoolRankingsRouteImport } from './routes/pool-rankings'
-import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
-import { Route as IndoorPoolHotelsRouteImport } from './routes/indoor-pool-hotels'
-import { Route as HeatedPoolHotelsRouteImport } from './routes/heated-pool-hotels'
-import { Route as FamilyPoolHotelsRouteImport } from './routes/family-pool-hotels'
-import { Route as DisclosureRouteImport } from './routes/disclosure'
-import { Route as CorrectionsRouteImport } from './routes/corrections'
-import { Route as CookiesRouteImport } from './routes/cookies'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EditorsIndexRouteImport } from './routes/editors.index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as CorrectionsRouteImport } from './routes/corrections'
+import { Route as DisclosureRouteImport } from './routes/disclosure'
+import { Route as FamilyPoolHotelsRouteImport } from './routes/family-pool-hotels'
+import { Route as HeatedPoolHotelsRouteImport } from './routes/heated-pool-hotels'
+import { Route as IndoorPoolHotelsRouteImport } from './routes/indoor-pool-hotels'
+import { Route as IntegritetspolicyRouteImport } from './routes/integritetspolicy'
+import { Route as PoolRankingsRouteImport } from './routes/pool-rankings'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RankingsRouteImport } from './routes/rankings'
+import { Route as RooftopPoolHotelsRouteImport } from './routes/rooftop-pool-hotels'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as VerificationStandardsRouteImport } from './routes/verification-standards'
 import { Route as CitySlugIndexRouteImport } from './routes/$citySlug.index'
-import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
-import { Route as EditorsSlugRouteImport } from './routes/editors.$slug'
-import { Route as ComparePairRouteImport } from './routes/compare.$pair'
-import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
-import { Route as AdminQaRouteImport } from './routes/admin.qa'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AdminEvidenceRouteImport } from './routes/admin.evidence'
 import { Route as CitySlugArticleSlugRouteImport } from './routes/$citySlug.$articleSlug'
-import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminEvidenceRouteImport } from './routes/admin.evidence'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminQaRouteImport } from './routes/admin.qa'
+import { Route as BarcelonaLuxuryPoolHotelsRouteImport } from './routes/barcelona.luxury-pool-hotels'
+import { Route as ComparePairRouteImport } from './routes/compare.$pair'
+import { Route as EditorsIndexRouteImport } from './routes/editors.index'
+import { Route as EditorsSlugRouteImport } from './routes/editors.$slug'
+import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
 import { Route as ApiPublicEvidenceCronRouteImport } from './routes/api/public/evidence-cron'
-import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
-import { Route as ApiPublicHooksWriteEditorialRouteImport } from './routes/api/public/hooks/write-editorial'
-import { Route as ApiPublicHooksVerifyPoolExistenceRouteImport } from './routes/api/public/hooks/verify-pool-existence'
-import { Route as ApiPublicHooksRunIntegrityRouteImport } from './routes/api/public/hooks/run-integrity'
-import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
-import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
-import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
-import { Route as ApiPublicHooksEnhancedVerifyRouteImport } from './routes/api/public/hooks/enhanced-verify'
-import { Route as ApiPublicHooksClassifyPoolPhotosRouteImport } from './routes/api/public/hooks/classify-pool-photos'
-import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/api/public/hooks/backfill-tripadvisor'
-import { Route as ApiPublicHooksBackfillPoolQuotesRouteImport } from './routes/api/public/hooks/backfill-pool-quotes'
+import { Route as ApiPublicHotelsRouteImport } from './routes/api/public/hotels'
 import { Route as ApiPublicHooksAutoScoreAllRouteImport } from './routes/api/public/hooks/auto-score-all'
+import { Route as ApiPublicHooksBackfillPoolQuotesRouteImport } from './routes/api/public/hooks/backfill-pool-quotes'
+import { Route as ApiPublicHooksBackfillTripadvisorRouteImport } from './routes/api/public/hooks/backfill-tripadvisor'
+import { Route as ApiPublicHooksClassifyPoolPhotosRouteImport } from './routes/api/public/hooks/classify-pool-photos'
+import { Route as ApiPublicHooksEnhancedVerifyRouteImport } from './routes/api/public/hooks/enhanced-verify'
+import { Route as ApiPublicHooksRefreshAllPhotosRouteImport } from './routes/api/public/hooks/refresh-all-photos'
+import { Route as ApiPublicHooksRefreshGoogleRatingsRouteImport } from './routes/api/public/hooks/refresh-google-ratings'
+import { Route as ApiPublicHooksRefreshMissingPhotosRouteImport } from './routes/api/public/hooks/refresh-missing-photos'
+import { Route as ApiPublicHooksRunIntegrityRouteImport } from './routes/api/public/hooks/run-integrity'
+import { Route as ApiPublicHooksVerifyPoolExistenceRouteImport } from './routes/api/public/hooks/verify-pool-existence'
+import { Route as ApiPublicHooksWriteEditorialRouteImport } from './routes/api/public/hooks/write-editorial'
+import { Route as ApiPublicHotelsSlugRouteImport } from './routes/api/public/hotels.$slug'
 
-const VerificationStandardsRoute = VerificationStandardsRouteImport.update({
-  id: '/verification-standards',
-  path: '/verification-standards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RooftopPoolHotelsRoute = RooftopPoolHotelsRouteImport.update({
-  id: '/rooftop-pool-hotels',
-  path: '/rooftop-pool-hotels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RankingsRoute = RankingsRouteImport.update({
-  id: '/rankings',
-  path: '/rankings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PoolRankingsRoute = PoolRankingsRouteImport.update({
-  id: '/pool-rankings',
-  path: '/pool-rankings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
-  id: '/integritetspolicy',
-  path: '/integritetspolicy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndoorPoolHotelsRoute = IndoorPoolHotelsRouteImport.update({
-  id: '/indoor-pool-hotels',
-  path: '/indoor-pool-hotels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HeatedPoolHotelsRoute = HeatedPoolHotelsRouteImport.update({
-  id: '/heated-pool-hotels',
-  path: '/heated-pool-hotels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FamilyPoolHotelsRoute = FamilyPoolHotelsRouteImport.update({
-  id: '/family-pool-hotels',
-  path: '/family-pool-hotels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisclosureRoute = DisclosureRouteImport.update({
-  id: '/disclosure',
-  path: '/disclosure',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CorrectionsRoute = CorrectionsRouteImport.update({
-  id: '/corrections',
-  path: '/corrections',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CookiesRoute = CookiesRouteImport.update({
-  id: '/cookies',
-  path: '/cookies',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -120,19 +60,69 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EditorsIndexRoute = EditorsIndexRouteImport.update({
-  id: '/editors/',
-  path: '/editors/',
+const CorrectionsRoute = CorrectionsRouteImport.update({
+  id: '/corrections',
+  path: '/corrections',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
+const DisclosureRoute = DisclosureRouteImport.update({
+  id: '/disclosure',
+  path: '/disclosure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilyPoolHotelsRoute = FamilyPoolHotelsRouteImport.update({
+  id: '/family-pool-hotels',
+  path: '/family-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeatedPoolHotelsRoute = HeatedPoolHotelsRouteImport.update({
+  id: '/heated-pool-hotels',
+  path: '/heated-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndoorPoolHotelsRoute = IndoorPoolHotelsRouteImport.update({
+  id: '/indoor-pool-hotels',
+  path: '/indoor-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegritetspolicyRoute = IntegritetspolicyRouteImport.update({
+  id: '/integritetspolicy',
+  path: '/integritetspolicy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoolRankingsRoute = PoolRankingsRouteImport.update({
+  id: '/pool-rankings',
+  path: '/pool-rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RankingsRoute = RankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RooftopPoolHotelsRoute = RooftopPoolHotelsRouteImport.update({
+  id: '/rooftop-pool-hotels',
+  path: '/rooftop-pool-hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificationStandardsRoute = VerificationStandardsRouteImport.update({
+  id: '/verification-standards',
+  path: '/verification-standards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CitySlugIndexRoute = CitySlugIndexRouteImport.update({
@@ -140,19 +130,29 @@ const CitySlugIndexRoute = CitySlugIndexRouteImport.update({
   path: '/$citySlug/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HotelsSlugRoute = HotelsSlugRouteImport.update({
-  id: '/hotels/$slug',
-  path: '/hotels/$slug',
+const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
+  id: '/$citySlug/$articleSlug',
+  path: '/$citySlug/$articleSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EditorsSlugRoute = EditorsSlugRouteImport.update({
-  id: '/editors/$slug',
-  path: '/editors/$slug',
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComparePairRoute = ComparePairRouteImport.update({
-  id: '/compare/$pair',
-  path: '/compare/$pair',
+const AdminEvidenceRoute = AdminEvidenceRouteImport.update({
+  id: '/admin/evidence',
+  path: '/admin/evidence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQaRoute = AdminQaRouteImport.update({
+  id: '/admin/qa',
+  path: '/admin/qa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BarcelonaLuxuryPoolHotelsRoute =
@@ -161,29 +161,24 @@ const BarcelonaLuxuryPoolHotelsRoute =
     path: '/barcelona/luxury-pool-hotels',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AdminQaRoute = AdminQaRouteImport.update({
-  id: '/admin/qa',
-  path: '/admin/qa',
+const ComparePairRoute = ComparePairRouteImport.update({
+  id: '/compare/$pair',
+  path: '/compare/$pair',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
+const EditorsIndexRoute = EditorsIndexRouteImport.update({
+  id: '/editors/',
+  path: '/editors/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminEvidenceRoute = AdminEvidenceRouteImport.update({
-  id: '/admin/evidence',
-  path: '/admin/evidence',
+const EditorsSlugRoute = EditorsSlugRouteImport.update({
+  id: '/editors/$slug',
+  path: '/editors/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CitySlugArticleSlugRoute = CitySlugArticleSlugRouteImport.update({
-  id: '/$citySlug/$articleSlug',
-  path: '/$citySlug/$articleSlug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicHotelsRoute = ApiPublicHotelsRouteImport.update({
-  id: '/api/public/hotels',
-  path: '/api/public/hotels',
+const HotelsSlugRoute = HotelsSlugRouteImport.update({
+  id: '/hotels/$slug',
+  path: '/hotels/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicEvidenceCronRoute = ApiPublicEvidenceCronRouteImport.update({
@@ -191,63 +186,15 @@ const ApiPublicEvidenceCronRoute = ApiPublicEvidenceCronRouteImport.update({
   path: '/api/public/evidence-cron',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => ApiPublicHotelsRoute,
+const ApiPublicHotelsRoute = ApiPublicHotelsRouteImport.update({
+  id: '/api/public/hotels',
+  path: '/api/public/hotels',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksWriteEditorialRoute =
-  ApiPublicHooksWriteEditorialRouteImport.update({
-    id: '/api/public/hooks/write-editorial',
-    path: '/api/public/hooks/write-editorial',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksVerifyPoolExistenceRoute =
-  ApiPublicHooksVerifyPoolExistenceRouteImport.update({
-    id: '/api/public/hooks/verify-pool-existence',
-    path: '/api/public/hooks/verify-pool-existence',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRunIntegrityRoute =
-  ApiPublicHooksRunIntegrityRouteImport.update({
-    id: '/api/public/hooks/run-integrity',
-    path: '/api/public/hooks/run-integrity',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRefreshMissingPhotosRoute =
-  ApiPublicHooksRefreshMissingPhotosRouteImport.update({
-    id: '/api/public/hooks/refresh-missing-photos',
-    path: '/api/public/hooks/refresh-missing-photos',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRefreshGoogleRatingsRoute =
-  ApiPublicHooksRefreshGoogleRatingsRouteImport.update({
-    id: '/api/public/hooks/refresh-google-ratings',
-    path: '/api/public/hooks/refresh-google-ratings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRefreshAllPhotosRoute =
-  ApiPublicHooksRefreshAllPhotosRouteImport.update({
-    id: '/api/public/hooks/refresh-all-photos',
-    path: '/api/public/hooks/refresh-all-photos',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksEnhancedVerifyRoute =
-  ApiPublicHooksEnhancedVerifyRouteImport.update({
-    id: '/api/public/hooks/enhanced-verify',
-    path: '/api/public/hooks/enhanced-verify',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksClassifyPoolPhotosRoute =
-  ApiPublicHooksClassifyPoolPhotosRouteImport.update({
-    id: '/api/public/hooks/classify-pool-photos',
-    path: '/api/public/hooks/classify-pool-photos',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksBackfillTripadvisorRoute =
-  ApiPublicHooksBackfillTripadvisorRouteImport.update({
-    id: '/api/public/hooks/backfill-tripadvisor',
-    path: '/api/public/hooks/backfill-tripadvisor',
+const ApiPublicHooksAutoScoreAllRoute =
+  ApiPublicHooksAutoScoreAllRouteImport.update({
+    id: '/api/public/hooks/auto-score-all',
+    path: '/api/public/hooks/auto-score-all',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksBackfillPoolQuotesRoute =
@@ -256,12 +203,65 @@ const ApiPublicHooksBackfillPoolQuotesRoute =
     path: '/api/public/hooks/backfill-pool-quotes',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksAutoScoreAllRoute =
-  ApiPublicHooksAutoScoreAllRouteImport.update({
-    id: '/api/public/hooks/auto-score-all',
-    path: '/api/public/hooks/auto-score-all',
+const ApiPublicHooksBackfillTripadvisorRoute =
+  ApiPublicHooksBackfillTripadvisorRouteImport.update({
+    id: '/api/public/hooks/backfill-tripadvisor',
+    path: '/api/public/hooks/backfill-tripadvisor',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksClassifyPoolPhotosRoute =
+  ApiPublicHooksClassifyPoolPhotosRouteImport.update({
+    id: '/api/public/hooks/classify-pool-photos',
+    path: '/api/public/hooks/classify-pool-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksEnhancedVerifyRoute =
+  ApiPublicHooksEnhancedVerifyRouteImport.update({
+    id: '/api/public/hooks/enhanced-verify',
+    path: '/api/public/hooks/enhanced-verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRefreshAllPhotosRoute =
+  ApiPublicHooksRefreshAllPhotosRouteImport.update({
+    id: '/api/public/hooks/refresh-all-photos',
+    path: '/api/public/hooks/refresh-all-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRefreshGoogleRatingsRoute =
+  ApiPublicHooksRefreshGoogleRatingsRouteImport.update({
+    id: '/api/public/hooks/refresh-google-ratings',
+    path: '/api/public/hooks/refresh-google-ratings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRefreshMissingPhotosRoute =
+  ApiPublicHooksRefreshMissingPhotosRouteImport.update({
+    id: '/api/public/hooks/refresh-missing-photos',
+    path: '/api/public/hooks/refresh-missing-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRunIntegrityRoute =
+  ApiPublicHooksRunIntegrityRouteImport.update({
+    id: '/api/public/hooks/run-integrity',
+    path: '/api/public/hooks/run-integrity',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksVerifyPoolExistenceRoute =
+  ApiPublicHooksVerifyPoolExistenceRouteImport.update({
+    id: '/api/public/hooks/verify-pool-existence',
+    path: '/api/public/hooks/verify-pool-existence',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksWriteEditorialRoute =
+  ApiPublicHooksWriteEditorialRouteImport.update({
+    id: '/api/public/hooks/write-editorial',
+    path: '/api/public/hooks/write-editorial',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHotelsSlugRoute = ApiPublicHotelsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ApiPublicHotelsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -563,95 +563,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verification-standards': {
-      id: '/verification-standards'
-      path: '/verification-standards'
-      fullPath: '/verification-standards'
-      preLoaderRoute: typeof VerificationStandardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rooftop-pool-hotels': {
-      id: '/rooftop-pool-hotels'
-      path: '/rooftop-pool-hotels'
-      fullPath: '/rooftop-pool-hotels'
-      preLoaderRoute: typeof RooftopPoolHotelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rankings': {
-      id: '/rankings'
-      path: '/rankings'
-      fullPath: '/rankings'
-      preLoaderRoute: typeof RankingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pool-rankings': {
-      id: '/pool-rankings'
-      path: '/pool-rankings'
-      fullPath: '/pool-rankings'
-      preLoaderRoute: typeof PoolRankingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/integritetspolicy': {
-      id: '/integritetspolicy'
-      path: '/integritetspolicy'
-      fullPath: '/integritetspolicy'
-      preLoaderRoute: typeof IntegritetspolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/indoor-pool-hotels': {
-      id: '/indoor-pool-hotels'
-      path: '/indoor-pool-hotels'
-      fullPath: '/indoor-pool-hotels'
-      preLoaderRoute: typeof IndoorPoolHotelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/heated-pool-hotels': {
-      id: '/heated-pool-hotels'
-      path: '/heated-pool-hotels'
-      fullPath: '/heated-pool-hotels'
-      preLoaderRoute: typeof HeatedPoolHotelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/family-pool-hotels': {
-      id: '/family-pool-hotels'
-      path: '/family-pool-hotels'
-      fullPath: '/family-pool-hotels'
-      preLoaderRoute: typeof FamilyPoolHotelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disclosure': {
-      id: '/disclosure'
-      path: '/disclosure'
-      fullPath: '/disclosure'
-      preLoaderRoute: typeof DisclosureRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/corrections': {
-      id: '/corrections'
-      path: '/corrections'
-      fullPath: '/corrections'
-      preLoaderRoute: typeof CorrectionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cookies': {
-      id: '/cookies'
-      path: '/cookies'
-      fullPath: '/cookies'
-      preLoaderRoute: typeof CookiesRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -661,25 +577,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/editors/': {
-      id: '/editors/'
-      path: '/editors'
-      fullPath: '/editors/'
-      preLoaderRoute: typeof EditorsIndexRouteImport
+    '/corrections': {
+      id: '/corrections'
+      path: '/corrections'
+      fullPath: '/corrections'
+      preLoaderRoute: typeof CorrectionsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
+    '/disclosure': {
+      id: '/disclosure'
+      path: '/disclosure'
+      fullPath: '/disclosure'
+      preLoaderRoute: typeof DisclosureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family-pool-hotels': {
+      id: '/family-pool-hotels'
+      path: '/family-pool-hotels'
+      fullPath: '/family-pool-hotels'
+      preLoaderRoute: typeof FamilyPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heated-pool-hotels': {
+      id: '/heated-pool-hotels'
+      path: '/heated-pool-hotels'
+      fullPath: '/heated-pool-hotels'
+      preLoaderRoute: typeof HeatedPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/indoor-pool-hotels': {
+      id: '/indoor-pool-hotels'
+      path: '/indoor-pool-hotels'
+      fullPath: '/indoor-pool-hotels'
+      preLoaderRoute: typeof IndoorPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integritetspolicy': {
+      id: '/integritetspolicy'
+      path: '/integritetspolicy'
+      fullPath: '/integritetspolicy'
+      preLoaderRoute: typeof IntegritetspolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pool-rankings': {
+      id: '/pool-rankings'
+      path: '/pool-rankings'
+      fullPath: '/pool-rankings'
+      preLoaderRoute: typeof PoolRankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rankings': {
+      id: '/rankings'
+      path: '/rankings'
+      fullPath: '/rankings'
+      preLoaderRoute: typeof RankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooftop-pool-hotels': {
+      id: '/rooftop-pool-hotels'
+      path: '/rooftop-pool-hotels'
+      fullPath: '/rooftop-pool-hotels'
+      preLoaderRoute: typeof RooftopPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verification-standards': {
+      id: '/verification-standards'
+      path: '/verification-standards'
+      fullPath: '/verification-standards'
+      preLoaderRoute: typeof VerificationStandardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$citySlug/': {
@@ -689,46 +675,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CitySlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hotels/$slug': {
-      id: '/hotels/$slug'
-      path: '/hotels/$slug'
-      fullPath: '/hotels/$slug'
-      preLoaderRoute: typeof HotelsSlugRouteImport
+    '/$citySlug/$articleSlug': {
+      id: '/$citySlug/$articleSlug'
+      path: '/$citySlug/$articleSlug'
+      fullPath: '/$citySlug/$articleSlug'
+      preLoaderRoute: typeof CitySlugArticleSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/editors/$slug': {
-      id: '/editors/$slug'
-      path: '/editors/$slug'
-      fullPath: '/editors/$slug'
-      preLoaderRoute: typeof EditorsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compare/$pair': {
-      id: '/compare/$pair'
-      path: '/compare/$pair'
-      fullPath: '/compare/$pair'
-      preLoaderRoute: typeof ComparePairRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/barcelona/luxury-pool-hotels': {
-      id: '/barcelona/luxury-pool-hotels'
-      path: '/barcelona/luxury-pool-hotels'
-      fullPath: '/barcelona/luxury-pool-hotels'
-      preLoaderRoute: typeof BarcelonaLuxuryPoolHotelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/qa': {
-      id: '/admin/qa'
-      path: '/admin/qa'
-      fullPath: '/admin/qa'
-      preLoaderRoute: typeof AdminQaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/evidence': {
@@ -738,18 +696,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEvidenceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$citySlug/$articleSlug': {
-      id: '/$citySlug/$articleSlug'
-      path: '/$citySlug/$articleSlug'
-      fullPath: '/$citySlug/$articleSlug'
-      preLoaderRoute: typeof CitySlugArticleSlugRouteImport
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hotels': {
-      id: '/api/public/hotels'
-      path: '/api/public/hotels'
-      fullPath: '/api/public/hotels'
-      preLoaderRoute: typeof ApiPublicHotelsRouteImport
+    '/admin/qa': {
+      id: '/admin/qa'
+      path: '/admin/qa'
+      fullPath: '/admin/qa'
+      preLoaderRoute: typeof AdminQaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/barcelona/luxury-pool-hotels': {
+      id: '/barcelona/luxury-pool-hotels'
+      path: '/barcelona/luxury-pool-hotels'
+      fullPath: '/barcelona/luxury-pool-hotels'
+      preLoaderRoute: typeof BarcelonaLuxuryPoolHotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$pair': {
+      id: '/compare/$pair'
+      path: '/compare/$pair'
+      fullPath: '/compare/$pair'
+      preLoaderRoute: typeof ComparePairRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editors/': {
+      id: '/editors/'
+      path: '/editors'
+      fullPath: '/editors/'
+      preLoaderRoute: typeof EditorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editors/$slug': {
+      id: '/editors/$slug'
+      path: '/editors/$slug'
+      fullPath: '/editors/$slug'
+      preLoaderRoute: typeof EditorsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hotels/$slug': {
+      id: '/hotels/$slug'
+      path: '/hotels/$slug'
+      fullPath: '/hotels/$slug'
+      preLoaderRoute: typeof HotelsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/evidence-cron': {
@@ -759,74 +752,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEvidenceCronRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hotels/$slug': {
-      id: '/api/public/hotels/$slug'
-      path: '/$slug'
-      fullPath: '/api/public/hotels/$slug'
-      preLoaderRoute: typeof ApiPublicHotelsSlugRouteImport
-      parentRoute: typeof ApiPublicHotelsRoute
-    }
-    '/api/public/hooks/write-editorial': {
-      id: '/api/public/hooks/write-editorial'
-      path: '/api/public/hooks/write-editorial'
-      fullPath: '/api/public/hooks/write-editorial'
-      preLoaderRoute: typeof ApiPublicHooksWriteEditorialRouteImport
+    '/api/public/hotels': {
+      id: '/api/public/hotels'
+      path: '/api/public/hotels'
+      fullPath: '/api/public/hotels'
+      preLoaderRoute: typeof ApiPublicHotelsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/verify-pool-existence': {
-      id: '/api/public/hooks/verify-pool-existence'
-      path: '/api/public/hooks/verify-pool-existence'
-      fullPath: '/api/public/hooks/verify-pool-existence'
-      preLoaderRoute: typeof ApiPublicHooksVerifyPoolExistenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/run-integrity': {
-      id: '/api/public/hooks/run-integrity'
-      path: '/api/public/hooks/run-integrity'
-      fullPath: '/api/public/hooks/run-integrity'
-      preLoaderRoute: typeof ApiPublicHooksRunIntegrityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/refresh-missing-photos': {
-      id: '/api/public/hooks/refresh-missing-photos'
-      path: '/api/public/hooks/refresh-missing-photos'
-      fullPath: '/api/public/hooks/refresh-missing-photos'
-      preLoaderRoute: typeof ApiPublicHooksRefreshMissingPhotosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/refresh-google-ratings': {
-      id: '/api/public/hooks/refresh-google-ratings'
-      path: '/api/public/hooks/refresh-google-ratings'
-      fullPath: '/api/public/hooks/refresh-google-ratings'
-      preLoaderRoute: typeof ApiPublicHooksRefreshGoogleRatingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/refresh-all-photos': {
-      id: '/api/public/hooks/refresh-all-photos'
-      path: '/api/public/hooks/refresh-all-photos'
-      fullPath: '/api/public/hooks/refresh-all-photos'
-      preLoaderRoute: typeof ApiPublicHooksRefreshAllPhotosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/enhanced-verify': {
-      id: '/api/public/hooks/enhanced-verify'
-      path: '/api/public/hooks/enhanced-verify'
-      fullPath: '/api/public/hooks/enhanced-verify'
-      preLoaderRoute: typeof ApiPublicHooksEnhancedVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/classify-pool-photos': {
-      id: '/api/public/hooks/classify-pool-photos'
-      path: '/api/public/hooks/classify-pool-photos'
-      fullPath: '/api/public/hooks/classify-pool-photos'
-      preLoaderRoute: typeof ApiPublicHooksClassifyPoolPhotosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/backfill-tripadvisor': {
-      id: '/api/public/hooks/backfill-tripadvisor'
-      path: '/api/public/hooks/backfill-tripadvisor'
-      fullPath: '/api/public/hooks/backfill-tripadvisor'
-      preLoaderRoute: typeof ApiPublicHooksBackfillTripadvisorRouteImport
+    '/api/public/hooks/auto-score-all': {
+      id: '/api/public/hooks/auto-score-all'
+      path: '/api/public/hooks/auto-score-all'
+      fullPath: '/api/public/hooks/auto-score-all'
+      preLoaderRoute: typeof ApiPublicHooksAutoScoreAllRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/backfill-pool-quotes': {
@@ -836,12 +773,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBackfillPoolQuotesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/auto-score-all': {
-      id: '/api/public/hooks/auto-score-all'
-      path: '/api/public/hooks/auto-score-all'
-      fullPath: '/api/public/hooks/auto-score-all'
-      preLoaderRoute: typeof ApiPublicHooksAutoScoreAllRouteImport
+    '/api/public/hooks/backfill-tripadvisor': {
+      id: '/api/public/hooks/backfill-tripadvisor'
+      path: '/api/public/hooks/backfill-tripadvisor'
+      fullPath: '/api/public/hooks/backfill-tripadvisor'
+      preLoaderRoute: typeof ApiPublicHooksBackfillTripadvisorRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/classify-pool-photos': {
+      id: '/api/public/hooks/classify-pool-photos'
+      path: '/api/public/hooks/classify-pool-photos'
+      fullPath: '/api/public/hooks/classify-pool-photos'
+      preLoaderRoute: typeof ApiPublicHooksClassifyPoolPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/enhanced-verify': {
+      id: '/api/public/hooks/enhanced-verify'
+      path: '/api/public/hooks/enhanced-verify'
+      fullPath: '/api/public/hooks/enhanced-verify'
+      preLoaderRoute: typeof ApiPublicHooksEnhancedVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/refresh-all-photos': {
+      id: '/api/public/hooks/refresh-all-photos'
+      path: '/api/public/hooks/refresh-all-photos'
+      fullPath: '/api/public/hooks/refresh-all-photos'
+      preLoaderRoute: typeof ApiPublicHooksRefreshAllPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/refresh-google-ratings': {
+      id: '/api/public/hooks/refresh-google-ratings'
+      path: '/api/public/hooks/refresh-google-ratings'
+      fullPath: '/api/public/hooks/refresh-google-ratings'
+      preLoaderRoute: typeof ApiPublicHooksRefreshGoogleRatingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/refresh-missing-photos': {
+      id: '/api/public/hooks/refresh-missing-photos'
+      path: '/api/public/hooks/refresh-missing-photos'
+      fullPath: '/api/public/hooks/refresh-missing-photos'
+      preLoaderRoute: typeof ApiPublicHooksRefreshMissingPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/run-integrity': {
+      id: '/api/public/hooks/run-integrity'
+      path: '/api/public/hooks/run-integrity'
+      fullPath: '/api/public/hooks/run-integrity'
+      preLoaderRoute: typeof ApiPublicHooksRunIntegrityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/verify-pool-existence': {
+      id: '/api/public/hooks/verify-pool-existence'
+      path: '/api/public/hooks/verify-pool-existence'
+      fullPath: '/api/public/hooks/verify-pool-existence'
+      preLoaderRoute: typeof ApiPublicHooksVerifyPoolExistenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/write-editorial': {
+      id: '/api/public/hooks/write-editorial'
+      path: '/api/public/hooks/write-editorial'
+      fullPath: '/api/public/hooks/write-editorial'
+      preLoaderRoute: typeof ApiPublicHooksWriteEditorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hotels/$slug': {
+      id: '/api/public/hotels/$slug'
+      path: '/$slug'
+      fullPath: '/api/public/hotels/$slug'
+      preLoaderRoute: typeof ApiPublicHotelsSlugRouteImport
+      parentRoute: typeof ApiPublicHotelsRoute
     }
   }
 }
