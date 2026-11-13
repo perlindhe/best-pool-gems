@@ -231,7 +231,7 @@ export const runEvidenceAutomationForTestGroup = createServerFn({ method: "POST"
   .inputValidator((input: unknown) =>
     z
       .object({
-        limit: z.number().int().min(1).max(50).optional(),
+        limit: z.number().int().min(1).max(10).optional(),
         offset: z.number().int().min(0).optional(),
       })
       .optional()
