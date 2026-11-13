@@ -151,11 +151,11 @@ function EvidencePage() {
             disabled={busy === "__auto__"}
             onClick={() =>
               run("__auto__", () =>
-                runEvidenceAutomationForTestGroup({ data: { limit: PAGE, offset } }),
+                runEvidenceAutomationForTestGroup({ data: { limit: Math.min(PAGE, 10), offset } }),
               )
             }
           >
-            {busy === "__auto__" ? "Running automation…" : "Run automation for these hotels"}
+            {busy === "__auto__" ? "Running automation…" : "Räkna om nu (max 10 hotell, under 1 credit)"}
           </button>
           <button
             className="rounded border border-border px-3 py-1.5 disabled:opacity-40"
